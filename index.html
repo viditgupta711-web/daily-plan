@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#006644" />
+  <title>Master Daily Plan</title>
+  <!-- PWA: installable, offline Android/iOS app -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="icon.svg" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="My Plan" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: { DEFAULT: '#006644', dark: '#004d33', light: '#e6f2ee', mid: '#00875a' }
+          },
+          fontFamily: { sans: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body { -webkit-tap-highlight-color: transparent; }
+    body { overscroll-behavior-y: contain; }
+    .tabular { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+    .task-card { transition: opacity .25s ease, transform .25s ease, background-color .2s ease; }
+    .checkbox-tick { transition: all .18s ease; }
+    .modal-backdrop { backdrop-filter: blur(2px); }
+    input[type=time]::-webkit-calendar-picker-indicator { filter: invert(28%) sepia(86%) saturate(1352%) hue-rotate(135deg) brightness(94%) contrast(101%); }
+    ::-webkit-scrollbar { width: 0; height: 0; }
+    .no-sb::-webkit-scrollbar { display: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary { list-style: none; }
+    details[open] .chev { transform: rotate(180deg); }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen antialiased">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="sticky top-0 z-30 bg-forest text-white shadow-lg" style="padding-top: env(safe-area-inset-top);">
+    <div class="max-w-md mx-auto px-5 pt-4 pb-4">
+      <div class="flex items-start justify-between">
+        <div>
+          <p id="dateLabel" class="text-forest-light/80 text-xs font-medium tracking-wide uppercase">—</p>
+          <h1 id="clock" class="tabular text-5xl font-bold leading-none mt-1">--:--:--</h1>
+        </div>
+        <div class="shrink-0 flex flex-col items-end gap-2">
+          <button id="editToggle"
+            class="flex items-center gap-1.5 bg-white/15 active:bg-white/30 text-white text-sm font-semibold px-3 py-2 rounded-full transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+            </svg>
+            <span id="editToggleLabel">Edit</span>
+          </button>
+          <button id="weatherPill" title="Tap to refresh weather"
+            class="flex items-center gap-2 bg-white/15 active:bg-white/30 rounded-full pl-2.5 pr-3 py-1.5 transition">
+            <span id="wIcon" class="text-xl leading-none">⏳</span>
+            <span class="text-right leading-none">
+              <span id="wTemp" class="tabular text-base font-bold text-white block leading-none">--°</span>
+              <span id="wMeta" class="text-[10px] text-forest-light/90 block leading-none mt-1 whitespace-nowrap">Locating…</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary (list views only) -->
+      <div id="summaryBlock">
+        <div class="mt-4 flex items-center gap-3">
+          <div class="bg-white/15 rounded-xl px-3 py-2 text-center min-w-[78px]">
+            <p id="remainingCount" class="tabular text-2xl font-bold leading-none">0</p>
+            <p class="text-[10px] text-forest-light/90 uppercase tracking-wide mt-0.5">Remaining</p>
+          </div>
+          <div class="flex-1 bg-white/15 rounded-xl px-3 py-2 min-w-0">
+            <p class="text-[10px] text-forest-light/90 uppercase tracking-wide">Next Up</p>
+            <p id="nextTask" class="text-sm font-semibold leading-tight truncate mt-0.5">—</p>
+          </div>
+        </div>
+        <div class="mt-3 h-1.5 bg-white/20 rounded-full overflow-hidden">
+          <div id="progressBar" class="h-full bg-white rounded-full transition-all duration-500" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day tabs (Plan only) -->
+    <div id="dayTabs" class="max-w-md mx-auto px-3 pb-3">
+      <div class="grid grid-cols-3 gap-1 bg-white/10 rounded-xl p-1">
+        <button data-tab="weekday"  class="tab-btn rounded-lg py-2 text-sm font-semibold transition">Weekdays</button>
+        <button data-tab="wednesday" class="tab-btn rounded-lg py-2 text-sm font-semibold transition">Wednesday</button>
+        <button data-tab="weekend"  class="tab-btn rounded-lg py-2 text-sm font-semibold transition">Weekend</button>
+      </div>
+      <div id="weekendToggle" class="hidden mt-2 grid grid-cols-2 gap-1 bg-white/10 rounded-xl p-1">
+        <button data-day="saturday" class="day-btn rounded-lg py-1.5 text-xs font-semibold transition">Saturday</button>
+        <button data-day="sunday"   class="day-btn rounded-lg py-1.5 text-xs font-semibold transition">Sunday</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="max-w-md mx-auto px-4 pt-4 pb-28">
+
+    <!-- LIST VIEW (Plan + Hair) -->
+    <section id="view-list">
+      <div class="flex items-center justify-between mb-3 px-1">
+        <p id="listTitle" class="text-xs font-bold uppercase tracking-wider text-gray-400">Schedule</p>
+        <button id="resetBtn" class="flex items-center gap-1 text-xs font-semibold text-forest active:text-forest-dark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+          </svg>
+          <span id="resetLabel">Reset Day</span>
+        </button>
+      </div>
+      <p id="hairNote" class="hidden text-xs text-gray-400 leading-snug mb-3 px-1 bg-gray-100 rounded-lg p-2.5">✎ Hair care isn’t in the source plan — these are editable starters. Tap <b>Edit</b> to tailor to your routine.</p>
+      <div id="taskList" class="space-y-2.5"></div>
+      <button id="addBtn"
+        class="hidden mt-4 w-full border-2 border-dashed border-forest/40 text-forest font-semibold py-3.5 rounded-2xl active:bg-forest-light transition flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+        </svg>
+        <span id="addBtnLabel">Add Task</span>
+      </button>
+      <p id="emptyState" class="hidden text-center text-gray-400 text-sm py-16">No items yet. Tap “Add” to begin.</p>
+    </section>
+
+    <!-- CUSTOM VIEWS -->
+    <section id="view-food" class="hidden"></section>
+    <section id="view-skin" class="hidden"></section>
+    <section id="view-gym" class="hidden"></section>
+    <section id="view-monthly" class="hidden"></section>
+    <section id="view-dates" class="hidden"></section>
+    <section id="view-goals" class="hidden"></section>
+  </main>
+
+  <!-- ===================== BOTTOM NAV ===================== -->
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200" style="padding-bottom: env(safe-area-inset-bottom);">
+    <div class="max-w-md mx-auto flex overflow-x-auto no-sb scroll-smooth">
+      <button data-view="plan"    class="nav-btn"><span class="text-xl leading-none">🗓️</span><span class="text-[10px] font-semibold">Plan</span></button>
+      <button data-view="gym"     class="nav-btn"><span class="text-xl leading-none">🏋️</span><span class="text-[10px] font-semibold">Gym</span></button>
+      <button data-view="todo"    class="nav-btn"><span class="text-xl leading-none">📝</span><span class="text-[10px] font-semibold">To-Do</span></button>
+      <button data-view="goals"   class="nav-btn"><span class="text-xl leading-none">🎯</span><span class="text-[10px] font-semibold">Goals</span></button>
+      <button data-view="dates"   class="nav-btn"><span class="text-xl leading-none">📅</span><span class="text-[10px] font-semibold">Dates</span></button>
+      <button data-view="monthly" class="nav-btn"><span class="text-xl leading-none">📊</span><span class="text-[10px] font-semibold">Track</span></button>
+      <button data-view="food"    class="nav-btn"><span class="text-xl leading-none">🍴</span><span class="text-[10px] font-semibold">Food</span></button>
+      <button data-view="skin"    class="nav-btn"><span class="text-xl leading-none">✨</span><span class="text-[10px] font-semibold">Skin</span></button>
+      <button data-view="hair"    class="nav-btn"><span class="text-xl leading-none">💆</span><span class="text-[10px] font-semibold">Hair</span></button>
+    </div>
+  </nav>
+
+  <!-- ===================== EDIT MODAL ===================== -->
+  <div id="modal" class="hidden fixed inset-0 z-50 modal-backdrop bg-black/40 flex items-end sm:items-center justify-center">
+    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));">
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="modalTitle" class="text-lg font-bold text-gray-800">Edit Task</h2>
+        <button id="modalClose" class="text-gray-400 active:text-gray-600 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div id="fTimeRow">
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Time <span class="text-gray-300 normal-case">(optional)</span></label>
+          <input id="fTime" type="time"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none" />
+        </div>
+        <div id="fDateRow" class="hidden">
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Date</label>
+          <input id="fDate" type="date"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Name</label>
+          <input id="fLabel" type="text" placeholder="e.g. Meditation (20 min)"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Notes</label>
+          <textarea id="fNotes" rows="2" placeholder="Optional details…"
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none resize-none"></textarea>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button id="modalDelete" class="hidden flex-1 bg-red-50 text-red-600 font-semibold py-3.5 rounded-xl active:bg-red-100 transition">Delete</button>
+        <button id="modalSave" class="flex-[2] bg-forest text-white font-semibold py-3.5 rounded-xl active:bg-forest-dark transition shadow-md shadow-forest/30">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TOAST ===================== -->
+  <div id="toast" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] bg-gray-900 text-white text-sm font-medium px-4 py-2.5 rounded-full shadow-xl"></div>
+
+  <script>
+  /* ============================================================
+     MASTER DAILY PLAN — offline tracker. All data in LocalStorage.
+     Content for Food / Skin / Gym / Track sourced from MyPlan.html.
+     ============================================================ */
+
+  const STORE_KEY   = 'habitTracker.v1';
+  const DAY_KEY     = 'habitTracker.lastDay';
+  const HABITS_KEY  = 'habitTracker.habits';   // {date:{key:1}}
+  const GYMLOG_KEY  = 'habitTracker.gymlog';   // {'date||Exercise':[{w,r}]}
+
+  /* ---- Default checklists (Plan schedules + editable Hair) ---- */
+  const DEFAULTS = {
+    weekday: [
+      ['04:30','Wake + bullet coffee + 400 ml water','Ghee + black coffee (kept ritual)'],
+      ['04:40','Meditation (20 min)','Calm app — good for cortisol'],
+      ['05:00','Journaling (10 min)','Gratitude + top 3 intentions'],
+      ['05:10','Meal 1 + supplements','Eggs · banana · pitta (earlier — better digestion pre-gym)'],
+      ['05:25','Wash · ready · pack bag · insert aligners','Aligners in after AM brushing'],
+      ['06:00','Leave for gym (30 min)','was 6:15 / 15 min'],
+      ['06:30','Training (45 min)','Mon Push · Tue Pull · Thu Upper · Fri Lower'],
+      ['07:15','Shower + Vit C + SPF','Gym changing room'],
+      ['07:40','Park & Ride → Oxford','~20 min'],
+      ['08:15','Deep Work Block 1','Highest priority. Phone away'],
+      ['10:30','Break + walk','Toward 8–10k steps'],
+      ['11:00','Deep Work Block 2','Second priority'],
+      ['12:00','Meal 2 — Lunch','Batch meal + 180 g rice'],
+      ['12:40','Deep Work Block 3','Admin · meetings'],
+      ['14:30','Break + water','Short walk'],
+      ['15:00','Meal 3 — Snack','Yogurt + almonds + green tea'],
+      ['15:10','Deep Work Block 4 → Coursera','Wrap tasks · Data Analysis 1 hr'],
+      ['16:30','APM Course','1 hr focused'],
+      ['17:30','Work journal','3 wins · 1 challenge'],
+      ['17:40','Commute home','Decompress'],
+      ['18:30','Personal / family','—'],
+      ['19:30','Meal 4 — Dinner','Batch rotation · PM brush + aligner clean after'],
+      ['19:45','Sattu + PM skincare','Tonight’s rotation — see Skin'],
+      ['20:00','Reading / job applications','Calmer pre-sleep'],
+      ['20:45','Wind-down (screens off)','New'],
+      ['21:00','Lights out','was 10:15 — now ≈7.5 h']
+    ],
+    wednesday: [
+      ['04:30','Wake + bullet coffee','Ghee + black coffee'],
+      ['04:40','Meditation + journaling','Gratitude + intentions'],
+      ['05:10','Meal 1 + supplements · insert aligners','Banana · pitta · eggs'],
+      ['05:25','Surya Arghya','Outdoors at home'],
+      ['05:35','AM skincare (full)','Cleanse → Arbutin → Vit C → Caffeine → Moist → SPF'],
+      ['07:00','Commute to office','~50 min'],
+      ['08:00','Deep Work Blocks 1–2 + walks','Priority tasks · steps'],
+      ['12:00','Meal 2 — Lunch','Panchmel Dal'],
+      ['12:40','Deep Work 3–4 + snack','Yogurt + almonds + green tea'],
+      ['15:30','Coursera + APM','1 hr each'],
+      ['17:40','Commute home','Decompress'],
+      ['19:30','Meal 4 — Dinner','Panchmel Dal · PM brush + aligner clean'],
+      ['19:30','Red Light Mask (10 min)','Drink Sattu while it runs'],
+      ['19:45','PM skincare — Azelaic','Arbutin → Azelaic → Moisturiser'],
+      ['20:00','Reading / job applications','Calmer pre-sleep'],
+      ['21:00','Lights out','was 10:15']
+    ],
+    saturday: [
+      ['07:00','Wake + Meal 1 · insert aligners','Banana · pitta · supplements'],
+      ['07:20','Surya Arghya','Outdoors at home'],
+      ['07:30','AM skincare (full)','Cleanse → Vit C → moisturiser → SPF'],
+      ['07:45','Household — all before noon','Utensils · laundry · vacuum · grocery · bathroom'],
+      ['12:00','Meal 2 — Lunch','Quorn Rogan Josh'],
+      ['12:30','Job applications (3 hrs)','CV · cover letters · LinkedIn · portals'],
+      ['15:30','Meal 3 + break','Yogurt + almonds + green tea'],
+      ['15:50','Coursera (1 hr) + APM (3 hrs)','Extended weekend session'],
+      ['19:50','Sattu + PM skincare — Azelaic','Cleanse → Azelaic 12% → moisturiser'],
+      ['20:00','Batch cook — Dal Palak + rotis','×4 portions for Sun + Mon'],
+      ['22:15','Lights out','≥7.5 h before 7:00 wake']
+    ],
+    sunday: [
+      ['07:00','Wake + Meal 1 · insert aligners','Banana · pitta · supplements'],
+      ['07:20','Surya Arghya','Outdoors at home'],
+      ['07:30','AM skincare (full)','6-step recovery-friendly routine'],
+      ['07:45','Dance + light movement','Active recovery · Sunday ritual'],
+      ['08:30','Job applications (3 hrs)','CV · cover letters · portals'],
+      ['12:00','Meal 2 — Lunch','Quorn Rogan Josh'],
+      ['12:30','Coursera (1 hr) + APM (3 hrs)','Extended weekend session'],
+      ['16:30','Meal 3 + break','Yogurt + almonds + green tea'],
+      ['17:00','Batch cook — Keema Matar','×4 portions for Mon + Tue'],
+      ['18:30','Weekly review + planning','APM % · Coursera % · job tracker'],
+      ['19:30','Meal 4 — Dinner','Dal Palak + Rotis'],
+      ['19:45','Sattu + PM skincare (Recovery)','Moisturiser only · no actives'],
+      ['22:15','Lights out','≥7.5 h']
+    ],
+    hair: [
+      ['','Scalp massage / oil','Boosts circulation · e.g. 2× per week'],
+      ['','Wash — shampoo','Lukewarm water · massage scalp not lengths'],
+      ['','Conditioner / mask','Mid-lengths to ends · leave 2–3 min'],
+      ['','Microfibre towel dry','Blot, don’t rub'],
+      ['','Leave-in / serum','Optional · on damp hair'],
+      ['','Air-dry / low heat','Minimise heat damage']
+    ],
+    todo: [
+      ['','Reply to recruiter email','Follow up within 24 h'],
+      ['','Renew gym membership','PureGym Bicester'],
+      ['','Order next batch-cook groceries','Lentils · spinach · Quorn']
+    ]
+  };
+
+  /* ---- Reference data (from MyPlan.html) ---- */
+  var MEALS=[{name:'Bullet Coffee',time:'4:30 AM',k:'~140',p:'0g',c:'0g',f:'~15g',ing:['1 tsp ghee','1 cup strong black coffee'],prep:['Brew strong coffee','Add 1 tsp ghee while hot','Stir until combined. No milk, no sugar.'],tip:'Slow-release fat for mental clarity without an insulin spike.'},{name:'Meal 1 — Eggs + Banana + Pitta',time:'6:00 AM',k:'~560',p:'~24g',c:'~56g',f:'~17g',ing:['3 eggs (boiled night before)','1 banana','1 wheat pitta','MV · Ashwagandha · Shilajit · D3 · Omega-3'],prep:['Night before: boil eggs 10 min, cool, peel, fridge','Pack eggs + banana + pitta in gym bag','Supplements here — D3/Omega-3 need egg fat to absorb','Banana + pitta = pre-workout carbs'],tip:'Without banana + pitta you train near-fasted. Compound lifts stall by set 3.'},{name:'Protein Shake + Creatine',time:'8:00 AM',k:'~120',p:'~24g',c:'~3g',f:'~2g',ing:['1 scoop whey','5g creatine','250ml water'],prep:['At gym after shower: shake 10 sec','Drink on walk to bus or on the bus'],tip:'Post-workout window is wide. Just do not skip it daily.'},{name:'Meal 2 — Lunch Batch',time:'12:00 PM',k:'~650',p:'~32g',c:'~85g',f:'~15g',ing:['1 portion batch meal','180g cooked white rice'],prep:['Microwave 3–4 min','Panchmel Dal: add 2–3 tbsp water before reheating','Mon/Tue Keema · Wed/Thu Dal · Fri/Sat Rogan Josh · Sun/Mon Dal Palak'],tip:'Above 80kg: reduce rice to 150g. Below 78kg: add a roti on Dal Palak days.'},{name:'Meal 3 — Afternoon Snack',time:'3:00 PM',k:'~240',p:'~17g',c:'~10g',f:'~15g',ing:['200g full-fat Greek yogurt','4–5 almonds','Green tea (80°C)'],prep:['Yogurt + almonds','Green tea at 80°C not boiling, steep 2–3 min','Bridges lunch and dinner'],tip:'Green tea catechins support skin brightening internally.'},{name:'Meal 4 — Dinner',time:'7:30 PM',k:'~650',p:'~32g',c:'~85g',f:'~15g',ing:['1 portion batch meal','180g rice OR 2 rotis (Dal Palak)'],prep:['Reheat 4 min','Dal Palak: 2 rotis, 30 sec each side','Eat before 8 PM'],tip:'Sun/Mon Dal Palak nights are lighter for recovery.'},{name:'Sattu Drink',time:'7:45 PM',k:'~140',p:'~10g',c:'~22g',f:'~2g',ing:['2 scoops sattu (~50g)','300ml water','Pinch salt (optional)'],prep:['Sattu first, then water while stirring','Drink while Red Light mask runs on those nights','Max 200ml water after 8 PM'],tip:'Slow protein feeds muscles overnight.'}];
+  var BATCHES=[{name:'Quorn Keema Matar',days:'Mon + Tue',cook:'Sunday eve',col:'#8a6020',desc:'Quorn mince · peas · onion · tomato · garam masala. x4. Add peas/chickpeas side for fibre.'},{name:'Panchmel Dal + Broccoli',days:'Wed + Thu',cook:'Tuesday eve',col:'#1f7a65',desc:'Five-lentil mix + broccoli. Highest fibre. Add water before reheating.'},{name:'Quorn Rogan Josh',days:'Fri + Sat',cook:'Thursday eve',col:'#a8321f',desc:'Quorn pieces · yogurt · Kashmiri chilli. Add chickpeas. Chicken thighs after 2 months.'},{name:'Dal Palak + Rotis',days:'Sun + Mon',cook:'Saturday eve',col:'#5e3d9a',desc:'Red lentils + spinach + 2 rotis per portion. Lighter for recovery.'}];
+  var SUPPS=[{n:'Multivitamin',t:'6:00 AM with eggs'},{n:'Ashwagandha',t:'6:00 AM with eggs'},{n:'Shilajit',t:'6:00 AM with eggs'},{n:'Vitamin D3',t:'6:00 AM with eggs'},{n:'Omega-3',t:'6:00 AM with eggs'},{n:'Creatine 5g',t:'8:00 AM post-gym'}];
+  var EX={monday:{label:'Push',target:'Chest · Shoulders · Triceps',exs:[{n:'Barbell Bench Press',sets:4,reps:'5–8',tgt:'→ 42 kg',setup:'Flat bench. Bar over lower chest. Grip 1.5× shoulder-width. Retract scapulae before unracking. Slight arch. Feet flat.',exec:'Lower to lower chest. Elbows 70–75°. Press up and slightly back. Full lockout.',key:'Scapular retraction before unrack is everything. Set it before rep 1, hold through the set.',avoid:'Bouncing off chest. Elbows at 90°. Hips rising. Half reps.'},{n:'Overhead Press',sets:3,reps:'8–10',tgt:'→ 28 kg',setup:'Bar at upper chest. Grip just outside shoulders. Brace core hard.',exec:'Press straight up. Head back as bar clears forehead. Shrug at top.',key:'The shrug at lockout engages the upper trap and stabilises the shoulder.',avoid:'Lower-back arch. Wrists bending back. Bar behind head.'},{n:'DB Lateral Raise',sets:3,reps:'12–15',tgt:'Medial delt',setup:'Slight forward lean (10–15°). Soft elbow bend. Thumbs angled down.',exec:'Lead with elbows. Raise to shoulder height. 2-sec up, 3-sec down.',key:'Forward lean + thumbs-down target the medial delt — the muscle that builds shoulder width. The 3-sec lowering is where growth happens.',avoid:'Shrugging. Momentum. Wrists above elbows. Rushing the lowering.'},{n:'Incline DB Press',sets:3,reps:'10–12',tgt:'Upper chest',setup:'Bench 30–45°. Semi-supinated grip. Scapular retraction.',exec:'Press up and together. 3-sec lowering.',key:'Upper chest creates the chest-to-shoulder line. 3-sec lowering is the specific stimulus.',avoid:'Elbows too wide. Partial range. Skipping slow lowering.'},{n:'Tricep Overhead Extension',sets:3,reps:'12–15',tgt:'Long head',setup:'One DB overhead, both hands. Upper arms vertical, elbows forward.',exec:'Hinge at elbow only. Lower behind head to full stretch. Extend fully.',key:'Long head is the largest tricep portion and creates the horseshoe. Overhead is the only way to fully stretch it.',avoid:'Elbows flaring. Upper arms moving. Skipping the stretch.'}]},tuesday:{label:'Pull',target:'Back · Biceps · Rear Delts',exs:[{n:'Lat Pulldown (wide)',sets:4,reps:'8–10',tgt:'→ 42.5 kg',setup:'Lean back 10–15°. Grip wider than shoulders. Depress shoulders first.',exec:'Drive elbows down toward hip pockets. Hold 1 sec. Full stretch at top.',key:'Elbows to back pockets, not bar to chest. The full stretch at top matters as much as the contraction.',avoid:'Pulling with biceps. Excessive lean. Skipping the stretch.'},{n:'Seated Cable Row',sets:3,reps:'8–10',tgt:'→ 32.5 kg',setup:'Neutral spine. Slight hip lean to start.',exec:'Pull to lower sternum. Lead with elbows. Hold 1 sec.',key:'Chest tall throughout. Stop the set when the back rounds.',avoid:'Shrugging. Rounding. Momentum. Pulling to neck.'},{n:'Reverse Pec Deck',sets:3,reps:'15–20',tgt:'Rear delts',setup:'Chest on pad. Handles at shoulder height. Soft elbow bend.',exec:'Push elbows back and out. Slow return.',key:'Rear delt development creates the 3D round shoulder. Most people skip this and look flat from the side.',avoid:'Shrugging. Elbow bend making it a row. Momentum.'},{n:'Barbell Curl',sets:3,reps:'10–12',tgt:'→ 20 kg',setup:'Shoulder-width grip. Elbows pinned to sides.',exec:'Curl from full extension. Slight wrist rotation out at top. 2-sec lowering.',key:'Pinned elbows is the rule. Elbows drifting forward = front delt takes over.',avoid:'Elbows drifting. Swinging. Half reps.'},{n:'Hammer Curl (DB)',sets:2,reps:'12',tgt:'Brachialis',setup:'Neutral grip, thumbs up throughout.',exec:'Wrist neutral entire rep. Full range. Controlled lowering.',key:'Brachialis sits under the bicep and pushes it up. Creates arm depth.',avoid:'Wrist rotating. Swinging.'}]},thursday:{label:'Upper',target:'Definition + Frequency',exs:[{n:'DB Lateral Raise',sets:3,reps:'12–15',tgt:'2nd stimulus',setup:'Same as Monday: forward lean, thumbs down.',exec:'Lead with elbows, shoulder height, 3-sec lowering.',key:'Second lateral raise of the week. Medial delt frequency drives shoulder width.',avoid:'Fatigue collapses form — drop 1–2kg if needed.'},{n:'Incline DB Press',sets:3,reps:'12–15',tgt:'Upper chest vol.',setup:'Same 30–45°, lighter, higher reps.',exec:'3-sec lowering. Feel the upper chest.',key:'Monday strength, Thursday definition. Combined volume creates separation.',avoid:'Monday weight (too heavy for 15).'},{n:'Close-grip Lat Pulldown',sets:3,reps:'12–15',tgt:'Lower lats',setup:'V-bar. Elbows close to body.',exec:'Drive elbows down and in. Full stretch.',key:'Hits lower lat differently to Tuesday. Fuller development.',avoid:'Elbows drifting wide.'},{n:'Incline DB Curl',sets:3,reps:'12–15',tgt:'Bicep peak',setup:'Bench 45–60°. Arms hang behind torso. The stretch is the point.',exec:'Upper arm still. Curl from full stretch.',key:'Stretched position loads the long head — the visible bicep peak. Genuinely different to barbell curl.',avoid:'Moving upper arm forward. Cheating the stretch.'},{n:'Tricep Pushdown',sets:3,reps:'12–15',tgt:'Lateral head',setup:'High pulley. Elbows at sides, ~90°.',exec:'Full extension. Flare hands out at bottom with rope.',key:'Completes the tricep: Monday long head, today lateral head.',avoid:'Elbows rising. Partial extension.'}]},friday:{label:'Lower + Core',target:'Quads · Hamstrings · Glutes · Core',exs:[{n:'Barbell Squat',sets:4,reps:'6–8',tgt:'Primary',setup:'Bar on upper traps. Feet shoulder-width, toes out. Brace, squeeze glutes.',exec:'Hip + knee bend together. Knees over toes. Parallel minimum. Drive up.',key:'Brace before you move, hold the entire rep. Inhale top, hold through, exhale top.',avoid:'Knees caving. Heels rising. Half reps.'},{n:'Romanian Deadlift',sets:3,reps:'10–12',tgt:'Hams + glutes',setup:'Bar at hip level. Soft knee. Neutral spine.',exec:'Push hips back. Bar close to legs. Deep hamstring stretch. Drive hips forward.',key:'Hip hinge, not leg bend. Chase the stretch.',avoid:'Rounding back. Too much knee bend. Bar drifting.'},{n:'Leg Press',sets:3,reps:'12–15',tgt:'Quad volume',setup:'Feet shoulder-width, middle of platform.',exec:'Lower to 90°. Press through heels. Slight bend at top.',key:'3-sec lowering builds quad definition. Weight is not the point.',avoid:'Knees caving. Full lockout. Bum lifting.'},{n:'Lying Leg Curl',sets:3,reps:'12–15',tgt:'Hamstring',setup:'Pad above heels. Hips into pad.',exec:'Curl to glutes. 1-sec hold. 3-sec lowering.',key:'Peak hold + slow lowering is where development happens.',avoid:'Hips rising. Jerky start.'},{n:'Ab Wheel Rollout',sets:3,reps:'10–12',tgt:'Core',setup:'Kneel. Wheel below shoulders. Brace hard. Flat back.',exec:'Roll out slowly, flat back. Contract abs to return.',key:'Highest-activation ab exercise under load. The roll-out is where growth happens.',avoid:'Hips sagging (stop — injury risk). Going too far early.'}]}};
+  var SKIN_PM=[{night:'Monday',col:'#a8321f',rlm:true,active:'Red Light + Retinal',routine:'19:30: Double cleanse → Red Light Mask 10 min → Sattu while it runs → Retinal (dry skin) → 20 min wait → Moisturiser'},{night:'Tuesday',col:'#1d5fa0',rlm:true,active:'Red Light + Vit C + Niacinamide',routine:'19:30: Double cleanse → Red Light 10 min → Sattu → Vit C 20% → Niacinamide 10% → Moisturiser'},{night:'Wednesday',col:'#256b42',rlm:true,active:'Red Light + Azelaic',routine:'19:30: Double cleanse → Red Light 10 min → Sattu → Alpha Arbutin → Azelaic Acid 12% → Moisturiser'},{night:'Thursday',col:'#1d5fa0',rlm:false,active:'Vit C + Niacinamide',routine:'19:45: Sattu → Double cleanse → Vit C 20% → Niacinamide 10% → Moisturiser'},{night:'Friday',col:'#8a2060',rlm:false,active:'AHA PEEL',routine:'19:45: Sattu → Double cleanse → AHA 30% (5 min wk1–2, 8 min wk3–4) → Rinse cool → Moisturiser ONLY'},{night:'Saturday',col:'#256b42',rlm:false,active:'Azelaic Acid',routine:'19:50: Sattu → Double cleanse → Alpha Arbutin → Azelaic Acid 12% → Moisturiser'},{night:'Sunday',col:'#5e3d9a',rlm:false,active:'RECOVERY ONLY',routine:'19:45: Sattu → Double cleanse → Moisturiser ONLY. Full barrier repair.'}];
+  var SKIN_AM={
+    gym:{title:'Gym day AM — 3 min in changing room',note:'Post-shower only. 2 products. Red Light nights (Mon/Tue) start PM at 7:30.',steps:[{n:'Vitamin C 20%',note:'Travel bottle. 2–3 drops. 60 sec wait.'},{n:'SPF 50+ PA++++',note:'Two finger lengths. Face + neck. Every single day.'}]},
+    sat:{title:'Saturday — Post-AHA protection',note:'Skin sensitised 48hrs after Friday peel. No actives. SPF only.',steps:[{n:'Gentle Cleanser',note:'Lukewarm only. Pat dry.'},{n:'Moisturiser',note:'Barrier repair. Press in.'},{n:'SPF 50+ PA++++',note:'Two finger lengths. Even on cloudy days.'}]},
+    rest:{title:'Rest day — Full AM routine (10 min)',note:'After Surya Arghya. 6-step protocol.',steps:[{n:'Gentle Cleanser',note:'Lukewarm water. Pat dry.'},{n:'Alpha Arbutin 2%',note:'2–3 drops. 60 sec. Inhibits melanin production.'},{n:'Vitamin C 20%',note:'3 drops. 60 sec. Brightening + UV antioxidant.'},{n:'Caffeine Solution',note:'1 drop per eye. Tap, never rub.'},{n:'Moisturiser',note:'Pea-sized. Press in.'},{n:'SPF 50+ PA++++',note:'Two finger lengths. Non-negotiable.'}]}
+  };
+  var SKIN_PATH=[{col:'#a8321f',label:'Cell Turnover',text:'Retinal (Mon) — accelerates renewal. Pigmented cells shed faster.'},{col:'#256b42',label:'Tyrosinase Block',text:'Azelaic + Arbutin (Wed/Sat) — dual block of the melanin enzyme.'},{col:'#1d5fa0',label:'Melanin Transfer Block',text:'Niacinamide + Vit C (Tue/Thu) — stop new spots forming.'},{col:'#5e3d9a',label:'Surface Removal',text:'AHA Peel (Fri) — removes surface pigment. Reveals fresher skin.'}];
+  var SKIN_RULES=['SPF PA++++ every morning. One UV day undoes 2 weeks of brightening.','Never Retinal and Vitamin C in the same routine.','AHA night: rinse cool, moisturiser ONLY afterwards.','Saturday AM: no actives — skin sensitised post-AHA.','Red Light on bare clean skin only — serums block penetration.','Green tea at 3 PM supports brightening internally.'];
+  var HABITS=[
+    {key:'morning',  icon:'🌅', label:'Morning routine',  sub:'Wake on time + meditation / Surya'},
+    {key:'training', icon:'🏋', label:'Training / movement', sub:'Gym, dance, or recovery'},
+    {key:'nutrition',icon:'🥗', label:'Nutrition on plan', sub:'4 meals + sattu'},
+    {key:'supps',    icon:'💊', label:'Supplements',       sub:'AM with eggs + creatine post-gym'},
+    {key:'skin',     icon:'✦',  label:'PM skincare',       sub:'Tonight’s rotation'},
+    {key:'coursera', icon:'📊', label:'Coursera',          sub:'1 hour data analysis'},
+    {key:'apm',      icon:'🎓', label:'APM course',        sub:'Daily study block'},
+    {key:'jobs',     icon:'📩', label:'Job applications',  sub:'Daily block'}
+  ];
+  const STREAK_THRESHOLD = 6; // of 8 habits = a "win" day
+
+  /* ---- State ---- */
+  let store;
+  let view       = 'plan';            // plan | food | skin | hair | gym | monthly
+  let activeTab  = 'weekday';
+  let activeDay  = 'saturday';
+  let gymDay     = 'monday';
+  let editMode   = false;
+  let editingId  = null;
+  let modalKind  = 'task';            // task | event | goal
+  let datesPeriod = 'week';           // week | month | year
+  let goalsPeriod = 'week';
+  let events = [];                    // [{id,date,title,note}]
+  let goals  = { week:[], month:[], year:[] }; // {id,text,note,done}
+
+  /* ---- Helpers ---- */
+  const $  = (s) => document.querySelector(s);
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const pad = (n) => String(n).padStart(2,'0');
+  const dstr = (d) => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  const todayStr = () => dstr(new Date());
+  const dateNAgo = (n) => { const d = new Date(); d.setDate(d.getDate()-n); return dstr(d); };
+
+  function buildDefault() {
+    const out = {};
+    for (const key in DEFAULTS)
+      out[key] = DEFAULTS[key].map(([time,label,notes]) => ({ id: uid(), time, label, notes, done:false }));
+    return out;
+  }
+  function save() { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      store = raw ? JSON.parse(raw) : buildDefault();
+      const def = buildDefault();
+      for (const k in DEFAULTS) if (!Array.isArray(store[k])) store[k] = def[k]; // add new keys (e.g. hair)
+      if (!raw) save();
+    } catch (e) { store = buildDefault(); save(); }
+    autoResetOnNewDay();
+  }
+  // Daily checklists reset each calendar day. Habit history & gym logs persist.
+  function autoResetOnNewDay() {
+    const today = new Date().toDateString();
+    if (localStorage.getItem(DAY_KEY) !== today) {
+      for (const k in store) if (k !== 'todo') store[k].forEach(t => t.done = false); // To-Do persists
+      localStorage.setItem(DAY_KEY, today);
+      save();
+    }
+  }
+
+  function currentKey()    { return activeTab === 'weekend' ? activeDay : activeTab; }
+  function activeListKey() { return (view === 'hair' || view === 'todo') ? view : currentKey(); }
+  function currentList()   { return store[activeListKey()]; }
+
+  /* ---- Time formatting ---- */
+  function to12h(t) {
+    if (!t) return '';
+    const [h, m] = t.split(':').map(Number);
+    const ap = h < 12 ? 'AM' : 'PM';
+    return `${h % 12 === 0 ? 12 : h % 12}:${pad(m)} ${ap}`;
+  }
+  function nowHM() { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+
+  /* ---- Clock ---- */
+  function tickClock() {
+    const d = new Date();
+    $('#clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    $('#dateLabel').textContent = d.toLocaleDateString(undefined, { weekday:'long', day:'numeric', month:'short' });
+  }
+
+  /* ---- Habit storage (Track) ---- */
+  function getHabits(date) { try { return (JSON.parse(localStorage.getItem(HABITS_KEY) || '{}'))[date] || {}; } catch (e) { return {}; } }
+  function setHabit(date, key, val) {
+    let all; try { all = JSON.parse(localStorage.getItem(HABITS_KEY) || '{}'); } catch (e) { all = {}; }
+    if (!all[date]) all[date] = {};
+    if (val) all[date][key] = 1; else delete all[date][key];
+    localStorage.setItem(HABITS_KEY, JSON.stringify(all));
+  }
+  function dayCount(date) { const h = getHabits(date); return HABITS.reduce((c,x) => c + (h[x.key] ? 1 : 0), 0); }
+  function isWin(date) { return dayCount(date) >= STREAK_THRESHOLD; }
+  function currentStreak() { let s=0; for (let i=0;i<400;i++){ const d=dateNAgo(i); if(isWin(d))s++; else { if(i===0) continue; break; } } return s; }
+  function bestStreak() { let best=0,run=0; for (let i=400;i>=0;i--){ if(isWin(dateNAgo(i))){ run++; if(run>best)best=run; } else run=0; } return best; }
+  function habitStreak(key) { let s=0; for (let i=0;i<400;i++){ const h=getHabits(dateNAgo(i)); if(h[key])s++; else { if(i===0) continue; break; } } return s; }
+
+  /* ---- Gym log storage ---- */
+  function getGymLogs() { try { return JSON.parse(localStorage.getItem(GYMLOG_KEY) || '{}'); } catch (e) { return {}; } }
+  function setGymLogs(o) { localStorage.setItem(GYMLOG_KEY, JSON.stringify(o)); }
+  function getExLog(n) { return getGymLogs()[todayStr() + '||' + n] || null; }
+
+  /* ============================================================
+     RENDER — routes to the active view
+     ============================================================ */
+  function render() {
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      const on = b.dataset.view === view;
+      b.className = 'nav-btn shrink-0 min-w-[60px] flex flex-col items-center justify-center gap-0.5 py-2 transition ' +
+        (on ? 'text-forest' : 'text-gray-400 active:text-gray-600');
+      if (on) b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    });
+    const isList = (view === 'plan' || view === 'hair' || view === 'todo');
+    $('#summaryBlock').classList.toggle('hidden', !isList);
+    $('#dayTabs').classList.toggle('hidden', view !== 'plan');
+    $('#editToggle').classList.toggle('hidden', !isList);
+    $('#view-list').classList.toggle('hidden', !isList);
+    ['food','skin','gym','monthly','dates','goals'].forEach(v => $('#view-' + v).classList.toggle('hidden', view !== v));
+
+    if (isList) renderList();
+    else if (view === 'food') renderFood();
+    else if (view === 'skin') renderSkin();
+    else if (view === 'gym') renderGym();
+    else if (view === 'monthly') renderMonthly();
+    else if (view === 'dates') renderDates();
+    else if (view === 'goals') renderGoals();
+  }
+
+  /* ---- LIST view (Plan + Hair) ---- */
+  function renderList() {
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      const on = b.dataset.tab === activeTab;
+      b.className = 'tab-btn rounded-lg py-2 text-sm font-semibold transition ' +
+        (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
+    });
+    document.querySelectorAll('.day-btn').forEach(b => {
+      const on = b.dataset.day === activeDay;
+      b.className = 'day-btn rounded-lg py-1.5 text-xs font-semibold transition ' +
+        (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
+    });
+    $('#weekendToggle').classList.toggle('hidden', activeTab !== 'weekend');
+    $('#hairNote').classList.toggle('hidden', view !== 'hair');
+    $('#addBtnLabel').textContent = view === 'hair' ? 'Add Item' : 'Add Task';
+    // To-Do always shows quick-add; reset hides while editing
+    $('#addBtn').classList.toggle('hidden', !(editMode || view === 'todo'));
+    $('#resetBtn').classList.toggle('hidden', editMode);
+    $('#resetLabel').textContent = view === 'todo' ? 'Clear Done' : 'Reset Day';
+
+    const titles = { weekday:'Mon · Tue · Thu · Fri', wednesday:'Wednesday · Rest Day',
+                     saturday:'Saturday', sunday:'Sunday', hair:'Hair Care', todo:'To-Do List' };
+    $('#listTitle').textContent = titles[activeListKey()];
+
+    const list = currentList();
+    const ordered = view === 'plan'
+      ? [...list].sort((a,b) => { if (a.done !== b.done) return a.done ? 1 : -1; return (a.time||'').localeCompare(b.time||''); })
+      : [...list].sort((a,b) => (a.done?1:0) - (b.done?1:0)); // hair: keep order, done last
+
+    const wrap = $('#taskList'); wrap.innerHTML = '';
+    $('#emptyState').classList.toggle('hidden', list.length !== 0 || editMode);
+    ordered.forEach(t => wrap.appendChild(taskCard(t)));
+    updateSummary();
+  }
+
+  function updateSummary() {
+    if (view !== 'plan' && view !== 'hair' && view !== 'todo') return;
+    const list = currentList();
+    const remaining = list.filter(t => !t.done);
+    $('#remainingCount').textContent = remaining.length;
+    $('#progressBar').style.width = (list.length ? Math.round((list.length - remaining.length) / list.length * 100) : 0) + '%';
+    let next;
+    if (view === 'plan') {
+      const now = nowHM();
+      const s = [...remaining].sort((a,b) => (a.time||'').localeCompare(b.time||''));
+      next = s.find(t => (t.time||'') >= now) || s[0];
+      $('#nextTask').textContent = next ? `${next.label}${next.time ? ' · ' + to12h(next.time) : ''}` : (list.length ? '🎉 All done for today' : '—');
+    } else {
+      next = remaining[0];
+      $('#nextTask').textContent = next ? next.label : (list.length ? '🎉 All done' : '—');
+    }
+  }
+
+  function taskCard(t) {
+    const el = document.createElement('div');
+    el.className = 'task-card flex items-center gap-3 bg-white rounded-2xl px-3.5 py-3 shadow-sm border border-gray-100 ' + (t.done ? 'opacity-55' : '');
+
+    const left = document.createElement('button');
+    left.className = 'shrink-0 flex flex-col items-center justify-center w-14';
+    left.innerHTML = `
+      <div class="w-7 h-7 rounded-full flex items-center justify-center border-2 checkbox-tick ${t.done ? 'bg-forest border-forest' : 'border-gray-300'}">
+        ${t.done ? '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : ''}
+      </div>
+      ${t.time ? `<span class="tabular text-[10px] font-semibold mt-1 ${t.done ? 'text-gray-400' : 'text-forest'}">${to12h(t.time)}</span>` : ''}`;
+
+    const body = document.createElement('div');
+    body.className = 'flex-1 min-w-0';
+    const note = (t.notes && t.notes !== '—')
+      ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${t.done ? 'line-through' : ''}">${esc(t.notes)}</p>` : '';
+    body.innerHTML = `<p class="text-[15px] font-semibold leading-snug ${t.done ? 'line-through text-gray-400' : 'text-gray-800'}">${esc(t.label)}</p>${note}`;
+
+    if (editMode) {
+      el.classList.add('cursor-pointer','active:bg-gray-50');
+      const pencil = document.createElement('div');
+      pencil.className = 'shrink-0 text-gray-300';
+      pencil.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>';
+      el.append(left, body, pencil);
+      el.onclick = () => openModal(t.id);
+    } else {
+      el.append(left, body);
+      const toggle = () => { t.done = !t.done; save(); renderList(); };
+      left.onclick = (e) => { e.stopPropagation(); toggle(); };
+      el.onclick = toggle;
+    }
+    return el;
+  }
+
+  /* ---- Shared section helpers (custom views) ---- */
+  const secTitle = (t) => `<p class="text-xs font-bold uppercase tracking-wider text-gray-400 mt-5 mb-2 px-1 first:mt-1">${esc(t)}</p>`;
+  const chev = '<svg class="chev shrink-0 w-5 h-5 text-gray-300 transition-transform mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>';
+  function infoBox(title, text, color) {
+    return `<div class="rounded-2xl p-3.5 mb-1" style="background:${color}14;border-left:4px solid ${color}">
+      <p class="text-sm font-bold" style="color:${color}">${esc(title)}</p>
+      <p class="text-xs text-gray-500 leading-relaxed mt-1">${text}</p></div>`;
+  }
+
+  /* ---- FOOD view ---- */
+  function renderFood() {
+    let h = secTitle('Daily Meals') + '<div class="space-y-2.5">';
+    MEALS.forEach(m => {
+      h += `<details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <summary class="cursor-pointer px-4 py-3 flex items-start justify-between gap-3 active:bg-gray-50">
+          <div class="min-w-0">
+            <p class="font-semibold text-[15px] text-gray-800 leading-snug">${esc(m.name)}</p>
+            <p class="text-xs text-forest font-semibold mt-0.5">${esc(m.time)}</p>
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${esc(m.k)} kcal</span>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">P ${esc(m.p)}</span>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">C ${esc(m.c)}</span>
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">F ${esc(m.f)}</span>
+            </div>
+          </div>${chev}
+        </summary>
+        <div class="px-4 pb-4 border-t border-gray-50">
+          <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-1">Ingredients</p>
+          ${m.ing.map(x => `<p class="text-sm text-gray-600 leading-relaxed">• ${esc(x)}</p>`).join('')}
+          <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-1">Preparation</p>
+          ${m.prep.map((x,j) => `<div class="flex gap-2 mt-1.5"><span class="shrink-0 w-5 h-5 rounded-full bg-forest-light text-forest text-[11px] font-bold flex items-center justify-center">${j+1}</span><p class="text-sm text-gray-600 leading-snug">${esc(x)}</p></div>`).join('')}
+          ${m.tip ? `<div class="mt-3 bg-amber-50 rounded-xl p-3 text-xs text-amber-800 leading-relaxed">💡 ${esc(m.tip)}</div>` : ''}
+        </div></details>`;
+    });
+    h += '</div>';
+
+    h += secTitle('Batch Rotation') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    BATCHES.forEach(b => {
+      h += `<div class="px-4 py-3">
+        <p class="font-semibold text-[15px]" style="color:${b.col}">${esc(b.name)}</p>
+        <p class="text-xs text-gray-400 font-medium mt-0.5">${esc(b.days)} · Cook: ${esc(b.cook)}</p>
+        <p class="text-sm text-gray-600 leading-snug mt-1">${esc(b.desc)}</p></div>`;
+    });
+    h += '</div>';
+
+    h += secTitle('Supplements') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    SUPPS.forEach(s => { h += `<div class="px-4 py-2.5 flex items-center justify-between"><span class="text-sm font-semibold text-gray-700">${esc(s.n)}</span><span class="text-xs text-gray-400">${esc(s.t)}</span></div>`; });
+    h += '</div>';
+
+    $('#view-food').innerHTML = h;
+  }
+
+  /* ---- SKIN view ---- */
+  function renderSkin() {
+    const dow = new Date().getDay();
+    const isGym = [1,2,4,5].includes(dow), isSat = dow === 6;
+    const am = isGym ? SKIN_AM.gym : isSat ? SKIN_AM.sat : SKIN_AM.rest;
+    const amCol = isGym ? '#a8321f' : isSat ? '#8a2060' : '#256b42';
+    const pmIdx = dow === 0 ? 6 : dow - 1;
+
+    let h = infoBox(am.title, esc(am.note), amCol);
+    h += secTitle('AM Routine') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    am.steps.forEach((s,i) => {
+      h += `<div class="flex gap-3 px-4 py-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-forest-light text-forest text-xs font-bold flex items-center justify-center">${i+1}</span>
+        <div><p class="text-sm font-semibold text-gray-800">${esc(s.n)}</p><p class="text-xs text-gray-400 leading-snug mt-0.5">${esc(s.note)}</p></div></div>`;
+    });
+    h += '</div>';
+
+    h += secTitle('Red Light Mask') + infoBox('🔴 Mon · Tue · Wed — 3 sessions/week',
+      '10–15 min on clean bare skin before serums. Start PM at 7:30 on these nights. Drink Sattu while it runs. Boosts collagen, fades pigmentation, aids recovery. Not Friday (AHA-sensitised skin).', '#b83200');
+
+    h += secTitle('PM Rotation — Tonight Highlighted') + '<div class="space-y-2">';
+    SKIN_PM.forEach((pm,i) => {
+      const tn = i === pmIdx;
+      h += `<div class="bg-white rounded-2xl shadow-sm border ${tn ? 'border-forest ring-1 ring-forest/30' : 'border-gray-100'} px-4 py-3">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-bold" style="color:${pm.col}">${esc(pm.night)}${tn ? ' · Tonight ◉' : ''}</p>
+          ${pm.rlm ? '<span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">🔴 Red Light</span>' : ''}
+        </div>
+        <p class="text-xs font-semibold mt-0.5" style="color:${pm.col}">${esc(pm.active)}</p>
+        <p class="text-xs text-gray-500 leading-relaxed mt-1">${esc(pm.routine)}</p></div>`;
+    });
+    h += '</div>';
+
+    h += secTitle('4-Pathway Pigmentation Attack') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    SKIN_PATH.forEach(p => {
+      h += `<div class="px-4 py-3"><p class="text-xs font-bold" style="color:${p.col}">${esc(p.label)}</p><p class="text-xs text-gray-500 leading-snug mt-0.5">${esc(p.text)}</p></div>`;
+    });
+    h += '</div>';
+
+    h += secTitle('Rules') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    SKIN_RULES.forEach(r => { h += `<p class="px-4 py-2.5 text-sm text-gray-600 leading-snug">• ${esc(r)}</p>`; });
+    h += '</div>';
+
+    $('#view-skin').innerHTML = h;
+  }
+
+  /* ---- GYM view ---- */
+  function setGymDay(k) { gymDay = k; renderGym(); }
+  function saveGymLog(day, ei) {
+    const ex = EX[day].exs[ei], sets = [];
+    for (let s = 0; s < ex.sets; s++) {
+      const w = parseFloat(($('#gl-'+day+'-'+ei+'-'+s+'-w')||{}).value) || 0;
+      const r = parseInt(($('#gl-'+day+'-'+ei+'-'+s+'-r')||{}).value) || 0;
+      sets.push({ w, r });
+    }
+    const logs = getGymLogs(); logs[todayStr() + '||' + ex.n] = sets; setGymLogs(logs);
+    toast('Logged ' + ex.n); renderGym();
+  }
+  function renderGym() {
+    const keys = ['monday','tuesday','thursday','friday'];
+    let h = '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-3">';
+    keys.forEach(k => {
+      const on = k === gymDay;
+      h += `<button onclick="setGymDay('${k}')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${on ? 'bg-forest text-white shadow' : 'text-gray-500 active:bg-gray-200'}">${EX[k].label}</button>`;
+    });
+    h += '</div>';
+
+    const d = EX[gymDay];
+    h += infoBox(gymDay.charAt(0).toUpperCase() + gymDay.slice(1) + ' — ' + d.label,
+      esc(d.target) + '<br>45 min · 90 sec rest compounds · 60 sec isolations', '#a8321f');
+
+    h += '<div class="space-y-2.5 mt-2">';
+    d.exs.forEach((ex,ei) => {
+      const log = getExLog(ex.n);
+      let logRows = '';
+      for (let s = 0; s < ex.sets; s++) {
+        const pv = log ? log[s] : null;
+        logRows += `<div class="flex items-center gap-2 mt-2">
+          <span class="shrink-0 w-6 text-xs font-bold text-gray-400">S${s+1}</span>
+          <input id="gl-${gymDay}-${ei}-${s}-w" type="number" inputmode="decimal" placeholder="kg" value="${pv ? pv.w : ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest">
+          <input id="gl-${gymDay}-${ei}-${s}-r" type="number" inputmode="numeric" placeholder="reps" value="${pv ? pv.r : ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest">
+        </div>`;
+      }
+      h += `<details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <summary class="cursor-pointer px-4 py-3 flex items-center justify-between gap-2 active:bg-gray-50">
+          <div class="min-w-0">
+            <p class="font-semibold text-[15px] text-gray-800 leading-snug">${esc(ex.n)}</p>
+            <p class="text-xs text-gray-400 mt-0.5">${ex.sets} sets · ${esc(ex.reps)} reps</p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            ${ex.tgt ? `<span class="text-[11px] font-bold text-forest bg-forest-light px-2 py-0.5 rounded-full">${esc(ex.tgt)}</span>` : ''}
+            ${log ? '<span class="text-[11px] font-bold text-emerald-600">✓</span>' : ''}${chev}
+          </div>
+        </summary>
+        <div class="px-4 pb-4 border-t border-gray-50">
+          <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-0.5">Setup</p>
+          <p class="text-sm text-gray-600 leading-snug">${esc(ex.setup)}</p>
+          <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-2.5 mb-0.5">Execution</p>
+          <p class="text-sm text-gray-600 leading-snug">${esc(ex.exec)}</p>
+          <div class="mt-3 bg-forest-light rounded-xl p-3 text-xs text-forest-dark leading-relaxed">⚡ ${esc(ex.key)}</div>
+          <div class="mt-2 bg-red-50 rounded-xl p-3 text-xs text-red-700 leading-relaxed">✗ Avoid: ${esc(ex.avoid)}</div>
+          <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-0.5">Log today · weight × reps</p>
+          ${logRows}
+          <button onclick="saveGymLog('${gymDay}',${ei})" class="mt-3 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark transition">${log ? 'Update log' : 'Save log'}</button>
+        </div></details>`;
+    });
+    h += '</div>';
+
+    // History
+    const recent = recentGym(21);
+    h += secTitle('Recent Logs') ;
+    if (!recent.length) {
+      h += '<p class="text-center text-gray-400 text-sm py-4">No sessions logged yet. Log sets above and they appear here.</p>';
+    } else {
+      h += '<div class="space-y-2">';
+      recent.forEach(day => {
+        h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 py-3">
+          <p class="text-xs font-bold text-forest mb-1">${esc(day.date)}</p>`;
+        day.items.forEach(it => {
+          h += `<div class="flex justify-between gap-2 py-0.5"><span class="text-xs text-gray-600 truncate">${esc(it.name)}</span><span class="text-xs text-gray-400 shrink-0">${it.sets.map(s => s.w + '×' + s.r).join(' · ')}</span></div>`;
+        });
+        h += '</div>';
+      });
+      h += '</div>';
+    }
+
+    $('#view-gym').innerHTML = h;
+  }
+  function recentGym(days) {
+    const all = getGymLogs(), cut = new Date(); cut.setDate(cut.getDate() - days);
+    const byDate = {};
+    Object.keys(all).forEach(k => {
+      const date = k.split('||')[0], name = k.slice(date.length + 2);
+      const dt = new Date(date + 'T12:00');
+      if (dt >= cut) { (byDate[date] = byDate[date] || []).push({ name, sets: all[k] }); }
+    });
+    return Object.keys(byDate).sort().reverse().map(date => {
+      const d = new Date(date + 'T12:00');
+      return { date: d.toLocaleDateString(undefined, { weekday:'short', day:'numeric', month:'short' }), items: byDate[date] };
+    });
+  }
+
+  /* ---- MONTHLY / TRACK view ---- */
+  function toggleHabit(key) { const t = todayStr(); setHabit(t, key, getHabits(t)[key] ? 0 : 1); renderMonthly(); }
+  function resetMonthly() {
+    if (confirm('Delete all habit tracking and streaks? Workout logs are kept.')) {
+      localStorage.setItem(HABITS_KEY, '{}'); renderMonthly(); toast('Tracking reset');
+    }
+  }
+  function renderMonthly() {
+    const cur = currentStreak(), best = bestStreak();
+    const today = todayStr(), hb = getHabits(today), done = dayCount(today);
+
+    let h = '<div class="grid grid-cols-2 gap-3 mb-1">';
+    h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center"><p class="text-2xl">🔥</p><p class="tabular text-3xl font-bold text-gray-800 leading-none mt-1">${cur}</p><p class="text-[10px] uppercase tracking-wide text-gray-400 mt-1">Current streak</p></div>`;
+    h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center"><p class="text-2xl">🏆</p><p class="tabular text-3xl font-bold text-gray-800 leading-none mt-1">${best}</p><p class="text-[10px] uppercase tracking-wide text-gray-400 mt-1">Best streak</p></div>`;
+    h += '</div>';
+
+    // Today's habits
+    h += secTitle(`Today’s Habits — ${done}/${HABITS.length} done`);
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    HABITS.forEach(hab => {
+      const on = !!hb[hab.key];
+      h += `<div onclick="toggleHabit('${hab.key}')" class="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 ${on ? 'opacity-60' : ''}">
+        <div class="w-7 h-7 shrink-0 rounded-full flex items-center justify-center border-2 ${on ? 'bg-forest border-forest' : 'border-gray-300'}">
+          ${on ? '<svg class="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : ''}
+        </div>
+        <span class="text-lg shrink-0">${hab.icon}</span>
+        <div class="flex-1 min-w-0"><p class="text-sm font-semibold ${on ? 'line-through text-gray-400' : 'text-gray-800'}">${esc(hab.label)}</p><p class="text-xs text-gray-400 truncate">${esc(hab.sub)}</p></div>
+        <span class="text-[10px] font-bold text-forest shrink-0">${habitStreak(hab.key) || ''}</span>
+      </div>`;
+    });
+    h += '</div>';
+
+    // Month calendar grid
+    const now = new Date(), y = now.getFullYear(), mo = now.getMonth();
+    const firstDow = new Date(y, mo, 1).getDay(), dim = new Date(y, mo+1, 0).getDate(), todayD = now.getDate();
+    const monthName = now.toLocaleDateString(undefined, { month:'long', year:'numeric' });
+    h += secTitle(monthName + ' — win days');
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">';
+    h += '<div class="grid grid-cols-7 gap-1 mb-1">' + ['S','M','T','W','T','F','S'].map(d => `<div class="text-center text-[10px] font-bold text-gray-300">${d}</div>`).join('') + '</div>';
+    h += '<div class="grid grid-cols-7 gap-1">';
+    for (let i = 0; i < firstDow; i++) h += '<div></div>';
+    for (let dd = 1; dd <= dim; dd++) {
+      const ds = dstr(new Date(y, mo, dd)), c = dayCount(ds), win = isWin(ds), future = dd > todayD;
+      let cls;
+      if (future) cls = 'bg-gray-50 text-gray-300';
+      else if (win) cls = 'bg-forest text-white';
+      else if (c > 0) cls = 'bg-forest/20 text-forest';
+      else cls = 'bg-gray-100 text-gray-400';
+      const ring = dd === todayD ? ' ring-2 ring-forest ring-offset-1' : '';
+      h += `<div class="aspect-square rounded-lg flex items-center justify-center text-[11px] font-semibold ${cls}${ring}">${dd}</div>`;
+    }
+    h += '</div>';
+    h += '<div class="flex items-center justify-center gap-3 mt-3 text-[10px] text-gray-400"><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-forest"></span>Win (6+/8)</span><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-forest/20"></span>Partial</span><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100"></span>Missed</span></div>';
+    h += '</div>';
+
+    // 30-day summary
+    let win30 = 0, logged30 = 0;
+    for (let i = 0; i < 30; i++) { const ds = dateNAgo(i); const c = dayCount(ds); if (c > 0) logged30++; if (isWin(ds)) win30++; }
+    h += secTitle('Last 30 Days') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex justify-around text-center">';
+    h += `<div><p class="tabular text-2xl font-bold text-forest">${win30}</p><p class="text-[10px] text-gray-400 mt-0.5">Win days</p></div>`;
+    h += `<div><p class="tabular text-2xl font-bold text-amber-600">${logged30}</p><p class="text-[10px] text-gray-400 mt-0.5">Days active</p></div>`;
+    h += `<div><p class="tabular text-2xl font-bold text-blue-600">${Math.round(win30/30*100)}%</p><p class="text-[10px] text-gray-400 mt-0.5">Consistency</p></div>`;
+    h += '</div>';
+
+    h += infoBox('How streaks work', 'A “win day” = hitting at least 6 of your 8 habits. Your streak counts consecutive win days — today doesn’t break it until midnight. The number beside each habit is its own streak.', '#256b42');
+    h += '<button onclick="resetMonthly()" class="mt-3 w-full text-red-500 text-sm font-semibold py-3 active:text-red-700">Reset all tracking data</button>';
+
+    $('#view-monthly').innerHTML = h;
+  }
+
+  /* ============================================================
+     DATES (scheduler) & GOALS  — separate persistent stores
+     ============================================================ */
+  const EVENTS_KEY = 'habitTracker.events';
+  const GOALS_KEY  = 'habitTracker.goals';
+  const dateNAhead   = (n) => { const d = new Date(); d.setDate(d.getDate()+n); return dstr(d); };
+  const endOfMonthStr = () => { const d = new Date(); return dstr(new Date(d.getFullYear(), d.getMonth()+1, 0)); };
+
+  function loadEvents() {
+    try { const r = localStorage.getItem(EVENTS_KEY); if (r) { events = JSON.parse(r); return; } } catch (e) {}
+    events = [
+      { id: uid(), date: dateNAhead(3),  title: 'Submit 3 job applications', note: 'CV + tailored cover letter' },
+      { id: uid(), date: dateNAhead(10), title: 'Coursera module deadline',  note: 'Data Analysis' },
+      { id: uid(), date: endOfMonthStr(),title: 'Monthly review + planning',  note: 'APM % · Coursera % · job tracker' }
+    ];
+    saveEvents();
+  }
+  function saveEvents() { localStorage.setItem(EVENTS_KEY, JSON.stringify(events)); }
+
+  function loadGoals() {
+    try { const r = localStorage.getItem(GOALS_KEY); if (r) { goals = JSON.parse(r); ['week','month','year'].forEach(p => { if (!Array.isArray(goals[p])) goals[p] = []; }); return; } } catch (e) {}
+    const g = (text) => ({ id: uid(), text, note:'', done:false });
+    goals = {
+      week:  [g('Apply to 10 roles'), g('Hit 4 gym sessions'), g('Finish 1 Coursera module')],
+      month: [g('Complete APM section 2'), g('Reach 80 job applications'), g('Lose 1 kg')],
+      year:  [g('Land a Product Manager role'), g('Finish APM certification'), g('Hold a 5-day training week')]
+    };
+    saveGoals();
+  }
+  function saveGoals() { localStorage.setItem(GOALS_KEY, JSON.stringify(goals)); }
+
+  /* date maths */
+  function startOfToday() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+  function endOfPeriod(p) {
+    const d = new Date(); d.setHours(23,59,59,999);
+    if (p === 'week') { const dow = (d.getDay()+6) % 7; d.setDate(d.getDate() + (6 - dow)); }
+    else if (p === 'month') { d.setMonth(d.getMonth()+1, 0); }
+    else { d.setMonth(11, 31); }
+    return d;
+  }
+  function dayDiff(ds) { return Math.round((new Date(ds + 'T00:00') - startOfToday()) / 86400000); }
+  function countdown(ds) {
+    const n = dayDiff(ds);
+    if (n === 0) return 'Today'; if (n === 1) return 'Tomorrow'; if (n === -1) return 'Yesterday';
+    if (n > 1) { if (n < 7) return 'in ' + n + ' days'; if (n < 14) return 'in 1 week'; if (n < 31) return 'in ' + Math.round(n/7) + ' weeks'; if (n < 60) return 'in 1 month'; return 'in ' + Math.round(n/30) + ' months'; }
+    const m = -n; if (m < 7) return m + ' days ago'; if (m < 31) return Math.round(m/7) + ' weeks ago'; return Math.round(m/30) + ' months ago';
+  }
+  const periodToggle = (which, cur) => {
+    const fn = which === 'dates' ? 'setDatesPeriod' : 'setGoalsPeriod';
+    return '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-1">' +
+      [['week','Week'],['month','Month'],['year','Year']].map(([k,l]) =>
+        `<button onclick="${fn}('${k}')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${k===cur ? 'bg-forest text-white shadow' : 'text-gray-500 active:bg-gray-200'}">${l}</button>`
+      ).join('') + '</div>';
+  };
+  const addBtnHtml = (label, onclick) =>
+    `<button onclick="${onclick}" class="mt-3 w-full border-2 border-dashed border-forest/40 text-forest font-semibold py-3.5 rounded-2xl active:bg-forest-light transition flex items-center justify-center gap-2"><svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>${esc(label)}</button>`;
+
+  function setDatesPeriod(p) { datesPeriod = p; renderDates(); }
+  function setGoalsPeriod(p) { goalsPeriod = p; renderGoals(); }
+
+  function eventCard(e) {
+    const n = dayDiff(e.date), isToday = n === 0, over = n < 0;
+    const chip = over ? 'bg-red-50 text-red-600' : isToday ? 'bg-forest text-white' : 'bg-forest-light text-forest';
+    const d = new Date(e.date + 'T00:00');
+    return `<div onclick="openEventModal('${e.id}')" class="bg-white rounded-2xl shadow-sm border ${isToday ? 'border-forest' : 'border-gray-100'} px-4 py-3 mb-2.5 flex items-center gap-3 cursor-pointer active:bg-gray-50">
+      <div class="shrink-0 w-12 text-center">
+        <p class="text-[10px] font-bold uppercase text-gray-400 leading-none">${d.toLocaleDateString(undefined,{month:'short'})}</p>
+        <p class="tabular text-xl font-bold text-gray-800 leading-tight">${d.getDate()}</p>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="font-semibold text-[15px] text-gray-800 leading-snug">${esc(e.title)}</p>
+        ${e.note ? `<p class="text-xs text-gray-400 leading-snug mt-0.5">${esc(e.note)}</p>` : ''}
+      </div>
+      <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-full ${chip}">${countdown(e.date)}</span>
+    </div>`;
+  }
+
+  function renderDates() {
+    let h = periodToggle('dates', datesPeriod);
+    const start = startOfToday(), end = endOfPeriod(datesPeriod);
+    const sorted  = [...events].sort((a,b) => a.date.localeCompare(b.date));
+    const overdue = sorted.filter(e => dayDiff(e.date) < 0);
+    const within  = sorted.filter(e => { const t = new Date(e.date + 'T00:00'); return t >= start && t <= end; });
+
+    if (overdue.length) {
+      h += secTitle('⚠ Overdue');
+      h += overdue.map(eventCard).join('');
+    }
+    h += secTitle({ week:'This Week', month:'This Month', year:'This Year' }[datesPeriod]);
+    h += within.length ? within.map(eventCard).join('')
+       : `<p class="text-center text-gray-400 text-sm py-10">No events ${{week:'this week',month:'this month',year:'this year'}[datesPeriod]}. Tap “Add Event”.</p>`;
+    h += addBtnHtml('Add Event', 'openEventModal(null)');
+    $('#view-dates').innerHTML = h;
+  }
+
+  function toggleGoal(id) {
+    const it = goals[goalsPeriod].find(x => x.id === id);
+    if (it) { it.done = !it.done; saveGoals(); renderGoals(); }
+  }
+  function renderGoals() {
+    let h = periodToggle('goals', goalsPeriod);
+    const list = goals[goalsPeriod] || [];
+    const done = list.filter(x => x.done).length;
+    const pct = list.length ? Math.round(done / list.length * 100) : 0;
+    const label = { week:'This Week', month:'This Month', year:'This Year' }[goalsPeriod];
+    h += `<div class="flex items-center justify-between mt-4 mb-2 px-1"><p class="text-xs font-bold uppercase tracking-wider text-gray-400">${label} · ${done}/${list.length}</p></div>`;
+    h += `<div class="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3"><div class="h-full bg-forest rounded-full transition-all duration-500" style="width:${pct}%"></div></div>`;
+    if (!list.length) {
+      h += '<p class="text-center text-gray-400 text-sm py-10">No goals yet. Tap “Add Goal”.</p>';
+    } else {
+      [...list].sort((a,b) => (a.done?1:0) - (b.done?1:0)).forEach(go => {
+        h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-3.5 py-3 mb-2.5 flex items-center gap-3 ${go.done ? 'opacity-55' : ''}">
+          <button onclick="toggleGoal('${go.id}')" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center border-2 ${go.done ? 'bg-forest border-forest' : 'border-gray-300'}">
+            ${go.done ? '<svg class="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : ''}
+          </button>
+          <div class="flex-1 min-w-0" onclick="openGoalModal('${go.id}')">
+            <p class="text-[15px] font-semibold leading-snug ${go.done ? 'line-through text-gray-400' : 'text-gray-800'}">${esc(go.text)}</p>
+            ${go.note ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${go.done ? 'line-through' : ''}">${esc(go.note)}</p>` : ''}
+          </div>
+          <svg onclick="openGoalModal('${go.id}')" class="shrink-0 w-5 h-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+        </div>`;
+      });
+    }
+    h += addBtnHtml('Add Goal', 'openGoalModal(null)');
+    $('#view-goals').innerHTML = h;
+  }
+
+  /* ---- Modal field visibility ---- */
+  function showModalFields(kind) {
+    $('#fTimeRow').classList.toggle('hidden', kind !== 'task');
+    $('#fDateRow').classList.toggle('hidden', kind !== 'event');
+  }
+  function openEventModal(id) {
+    modalKind = 'event'; editingId = id;
+    $('#modalTitle').textContent = (id ? 'Edit ' : 'Add ') + 'Event';
+    $('#modalDelete').classList.toggle('hidden', !id);
+    showModalFields('event');
+    if (id) { const e = events.find(x => x.id === id); $('#fDate').value = e.date; $('#fLabel').value = e.title; $('#fNotes').value = e.note || ''; }
+    else    { $('#fDate').value = todayStr(); $('#fLabel').value = ''; $('#fNotes').value = ''; }
+    $('#modal').classList.remove('hidden'); setTimeout(() => $('#fLabel').focus(), 50);
+  }
+  function openGoalModal(id) {
+    modalKind = 'goal'; editingId = id;
+    $('#modalTitle').textContent = (id ? 'Edit ' : 'Add ') + 'Goal';
+    $('#modalDelete').classList.toggle('hidden', !id);
+    showModalFields('goal');
+    if (id) { const it = goals[goalsPeriod].find(x => x.id === id); $('#fLabel').value = it.text; $('#fNotes').value = it.note || ''; }
+    else    { $('#fLabel').value = ''; $('#fNotes').value = ''; }
+    $('#modal').classList.remove('hidden'); setTimeout(() => $('#fLabel').focus(), 50);
+  }
+
+  /* ---- Modal (CRUD for list views) ---- */
+  function openModal(id) {
+    modalKind = 'task'; showModalFields('task');
+    editingId = id;
+    const isEdit = !!id;
+    $('#modalTitle').textContent = (isEdit ? 'Edit ' : 'Add ') + (view === 'hair' ? 'Item' : 'Task');
+    $('#modalDelete').classList.toggle('hidden', !isEdit);
+    if (isEdit) {
+      const t = currentList().find(x => x.id === id);
+      $('#fTime').value = t.time || ''; $('#fLabel').value = t.label; $('#fNotes').value = (t.notes && t.notes !== '—') ? t.notes : '';
+    } else {
+      $('#fTime').value = view === 'plan' ? nowHM() : ''; $('#fLabel').value = ''; $('#fNotes').value = '';
+    }
+    $('#modal').classList.remove('hidden');
+    setTimeout(() => $('#fLabel').focus(), 50);
+  }
+  function closeModal() { $('#modal').classList.add('hidden'); editingId = null; }
+  function saveModal() {
+    const label = $('#fLabel').value.trim();
+    if (!label) { toast('Please enter a name'); return; }
+    const notes = $('#fNotes').value.trim();
+
+    if (modalKind === 'event') {
+      const date = $('#fDate').value || todayStr();
+      if (editingId) Object.assign(events.find(x => x.id === editingId), { date, title: label, note: notes });
+      else events.push({ id: uid(), date, title: label, note: notes });
+      saveEvents(); renderDates(); closeModal(); toast(editingId ? 'Saved' : 'Event added'); return;
+    }
+    if (modalKind === 'goal') {
+      const arr = goals[goalsPeriod];
+      if (editingId) Object.assign(arr.find(x => x.id === editingId), { text: label, note: notes });
+      else arr.push({ id: uid(), text: label, note: notes, done: false });
+      saveGoals(); renderGoals(); closeModal(); toast(editingId ? 'Saved' : 'Goal added'); return;
+    }
+    // task (plan / hair / todo)
+    const time = $('#fTime').value, list = currentList(), tnotes = notes || '—';
+    if (editingId) Object.assign(list.find(x => x.id === editingId), { time, label, notes: tnotes });
+    else list.push({ id: uid(), time, label, notes: tnotes, done: false });
+    save(); renderList(); closeModal(); toast(editingId ? 'Saved' : 'Added');
+  }
+  function deleteCurrent() {
+    if (modalKind === 'event') { const i = events.findIndex(x => x.id === editingId); if (i > -1) events.splice(i,1); saveEvents(); renderDates(); closeModal(); toast('Deleted'); return; }
+    if (modalKind === 'goal')  { const a = goals[goalsPeriod]; const i = a.findIndex(x => x.id === editingId); if (i > -1) a.splice(i,1); saveGoals(); renderGoals(); closeModal(); toast('Deleted'); return; }
+    const list = currentList(), i = list.findIndex(x => x.id === editingId);
+    if (i > -1) list.splice(i, 1);
+    save(); renderList(); closeModal(); toast('Deleted');
+  }
+  function resetDay() {
+    if (view === 'todo') { // clear completed to-dos
+      const list = currentList();
+      for (let i = list.length - 1; i >= 0; i--) if (list[i].done) list.splice(i, 1);
+      save(); renderList(); toast('Cleared completed');
+    } else {
+      currentList().forEach(t => t.done = false); save(); renderList(); toast('Day reset');
+    }
+  }
+
+  /* ---- Toast ---- */
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add('hidden'), 1800);
+  }
+
+  /* ---- Edit mode ---- */
+  function setEditMode(on) {
+    editMode = on;
+    $('#editToggleLabel').textContent = on ? 'Done' : 'Edit';
+    renderList(); // renderList owns Add/Reset button visibility
+  }
+
+  /* ---- View switching ---- */
+  function setView(v) { view = v; if (editMode) setEditMode(false); window.scrollTo(0,0); render(); }
+
+  /* ============================================================
+     WEATHER — Open-Meteo (free, no key). Cached for offline.
+     ============================================================ */
+  const WEATHER_KEY = 'habitTracker.weather';
+  const OXFORD = { lat: 51.7520, lon: -1.2577, city: 'Oxford' };
+  const WMO = {
+    0:['☀️','Clear'],1:['🌤️','Mainly clear'],2:['⛅','Partly cloudy'],3:['☁️','Overcast'],
+    45:['🌫️','Fog'],48:['🌫️','Rime fog'],51:['🌦️','Light drizzle'],53:['🌦️','Drizzle'],55:['🌦️','Heavy drizzle'],
+    56:['🌧️','Freezing drizzle'],57:['🌧️','Freezing drizzle'],61:['🌧️','Light rain'],63:['🌧️','Rain'],65:['🌧️','Heavy rain'],
+    66:['🌧️','Freezing rain'],67:['🌧️','Freezing rain'],71:['🌨️','Light snow'],73:['❄️','Snow'],75:['❄️','Heavy snow'],77:['🌨️','Snow grains'],
+    80:['🌦️','Showers'],81:['🌧️','Showers'],82:['⛈️','Violent showers'],85:['🌨️','Snow showers'],86:['🌨️','Snow showers'],
+    95:['⛈️','Thunderstorm'],96:['⛈️','Thunderstorm'],99:['⛈️','Thunderstorm']
+  };
+  function paintWeather(w) {
+    if (!w) return;
+    const [icon, label] = WMO[w.code] || ['🌡️','Weather'];
+    $('#wIcon').textContent = icon; $('#wTemp').textContent = Math.round(w.temp) + '°';
+    const hl = (w.hi != null && w.lo != null) ? ` · H${Math.round(w.hi)}° L${Math.round(w.lo)}°` : '';
+    $('#wMeta').textContent = (w.city || label) + hl;
+    $('#weatherPill').title = `${label}${w.city ? ' · ' + w.city : ''} — updated ${new Date(w.ts).toLocaleTimeString()}`;
+  }
+  function getPosition() {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) return resolve(OXFORD);
+      navigator.geolocation.getCurrentPosition(
+        p => resolve({ lat: p.coords.latitude, lon: p.coords.longitude, city: null }),
+        () => resolve(OXFORD), { timeout: 8000, maximumAge: 1800000 });
+    });
+  }
+  async function fetchWeather() {
+    if (!navigator.onLine) return;
+    try {
+      const pos = await getPosition();
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.lat}&longitude=${pos.lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`);
+      if (!res.ok) throw new Error('http ' + res.status);
+      const d = await res.json();
+      let city = pos.city;
+      if (!city) { try { const g = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.lat}&longitude=${pos.lon}&localityLanguage=en`); if (g.ok) { const gj = await g.json(); city = gj.city || gj.locality || gj.principalSubdivision || null; } } catch (_) {} }
+      const w = { temp: d.current.temperature_2m, code: d.current.weather_code, hi: d.daily?.temperature_2m_max?.[0], lo: d.daily?.temperature_2m_min?.[0], city: city || OXFORD.city, ts: Date.now() };
+      localStorage.setItem(WEATHER_KEY, JSON.stringify(w)); paintWeather(w);
+    } catch (e) {
+      if (!localStorage.getItem(WEATHER_KEY)) { $('#wTemp').textContent = '--°'; $('#wMeta').textContent = 'Unavailable'; $('#wIcon').textContent = '🌡️'; }
+    }
+  }
+  function initWeather() {
+    const cached = localStorage.getItem(WEATHER_KEY);
+    if (cached) { try { paintWeather(JSON.parse(cached)); } catch (_) {} }
+    fetchWeather();
+    $('#weatherPill').onclick = () => { $('#wIcon').textContent = '⏳'; fetchWeather().then(() => toast('Weather updated')); };
+    window.addEventListener('online', fetchWeather);
+    setInterval(fetchWeather, 1800000);
+  }
+
+  /* ---- Auto-pick today's tab/day ---- */
+  function pickToday() {
+    const d = new Date().getDay();
+    if (d === 3) activeTab = 'wednesday';
+    else if (d === 6) { activeTab = 'weekend'; activeDay = 'saturday'; }
+    else if (d === 0) { activeTab = 'weekend'; activeDay = 'sunday'; }
+    else activeTab = 'weekday';
+    gymDay = ({1:'monday',2:'tuesday',4:'thursday',5:'friday'})[d] || 'monday';
+  }
+
+  /* ---- Init ---- */
+  function init() {
+    load(); loadEvents(); loadGoals(); pickToday();
+
+    document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => { activeTab = b.dataset.tab; renderList(); });
+    document.querySelectorAll('.day-btn').forEach(b => b.onclick = () => { activeDay = b.dataset.day; renderList(); });
+    document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => setView(b.dataset.view));
+
+    $('#editToggle').onclick = () => setEditMode(!editMode);
+    $('#addBtn').onclick      = () => openModal(null);
+    $('#resetBtn').onclick    = resetDay;
+    $('#modalClose').onclick  = closeModal;
+    $('#modalSave').onclick   = saveModal;
+    $('#modalDelete').onclick = deleteCurrent;
+    $('#modal').onclick = (e) => { if (e.target === $('#modal')) closeModal(); };
+
+    tickClock();
+    setInterval(tickClock, 1000);
+    setInterval(updateSummary, 30000);
+    initWeather();
+    render();
+  }
+  document.addEventListener('DOMContentLoaded', init);
+
+  /* ---- Register service worker (installable + offline). No-op on file://. ---- */
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "Master Daily Plan",
+  "short_name": "My Plan",
+  "description": "Offline daily plan, gym, habits, food, skincare and goals tracker.",
+  "id": "master-daily-plan",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#006644",
+  "categories": ["productivity", "lifestyle", "health"],
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
