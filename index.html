@@ -35,12 +35,20 @@
     .task-card { transition: opacity .25s ease, transform .25s ease, background-color .2s ease; }
     .checkbox-tick { transition: all .18s ease; }
     .modal-backdrop { backdrop-filter: blur(2px); }
-    input[type=time]::-webkit-calendar-picker-indicator { filter: invert(28%) sepia(86%) saturate(1352%) hue-rotate(135deg) brightness(94%) contrast(101%); }
+    input[type=time]::-webkit-calendar-picker-indicator,
+    input[type=date]::-webkit-calendar-picker-indicator { filter: invert(28%) sepia(86%) saturate(1352%) hue-rotate(135deg) brightness(94%) contrast(101%); }
     ::-webkit-scrollbar { width: 0; height: 0; }
     .no-sb::-webkit-scrollbar { display: none; }
     summary::-webkit-details-marker { display: none; }
     summary { list-style: none; }
     details[open] .chev { transform: rotate(180deg); }
+    .ring-track { stroke: rgba(255,255,255,.22); }
+    .ring-prog  { transition: stroke-dashoffset .8s cubic-bezier(.4,0,.2,1); }
+    .fld { width:100%; background:#f9fafb; border:1px solid #e5e7eb; border-radius:.75rem; padding:.7rem 1rem; font-size:16px; color:#1f2937; outline:none; }
+    .fld:focus { border-color:#006644; box-shadow:0 0 0 3px rgba(0,102,68,.15); }
+    .flbl { display:block; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
+    .mgroup { transition: fill .2s ease; }
+    .sheet { max-height: 86vh; overflow-y: auto; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen antialiased">
@@ -54,13 +62,22 @@
           <h1 id="clock" class="tabular text-5xl font-bold leading-none mt-1">--:--:--</h1>
         </div>
         <div class="shrink-0 flex flex-col items-end gap-2">
-          <button id="editToggle"
-            class="flex items-center gap-1.5 bg-white/15 active:bg-white/30 text-white text-sm font-semibold px-3 py-2 rounded-full transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-            </svg>
-            <span id="editToggleLabel">Edit</span>
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button id="dataBtn" title="Export & backup"
+              class="flex items-center justify-center w-9 h-9 bg-white/15 active:bg-white/30 text-white rounded-full transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.19L6.03 7.72a.75.75 0 00-1.06 1.06l4.5 4.5a.75.75 0 001.06 0l4.5-4.5a.75.75 0 10-1.06-1.06l-3.22 3.22V2.75z"/>
+                <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z"/>
+              </svg>
+            </button>
+            <button id="editToggle"
+              class="flex items-center gap-1.5 bg-white/15 active:bg-white/30 text-white text-sm font-semibold px-3 py-2 rounded-full transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+              </svg>
+              <span id="editToggleLabel">Edit</span>
+            </button>
+          </div>
           <button id="weatherPill" title="Tap to refresh weather"
             class="flex items-center gap-2 bg-white/15 active:bg-white/30 rounded-full pl-2.5 pr-3 py-1.5 transition">
             <span id="wIcon" class="text-xl leading-none">⏳</span>
@@ -92,14 +109,22 @@
 
     <!-- Day tabs (Plan only) -->
     <div id="dayTabs" class="max-w-md mx-auto px-3 pb-3">
-      <div class="grid grid-cols-3 gap-1 bg-white/10 rounded-xl p-1">
-        <button data-tab="weekday"  class="tab-btn rounded-lg py-2 text-sm font-semibold transition">Weekdays</button>
-        <button data-tab="wednesday" class="tab-btn rounded-lg py-2 text-sm font-semibold transition">Wednesday</button>
-        <button data-tab="weekend"  class="tab-btn rounded-lg py-2 text-sm font-semibold transition">Weekend</button>
+      <div class="grid grid-cols-2 gap-1 bg-white/10 rounded-xl p-1">
+        <button data-tab="weekday" class="tab-btn rounded-lg py-2 text-sm font-semibold transition">Weekdays</button>
+        <button data-tab="weekend" class="tab-btn rounded-lg py-2 text-sm font-semibold transition">Weekend</button>
       </div>
       <div id="weekendToggle" class="hidden mt-2 grid grid-cols-2 gap-1 bg-white/10 rounded-xl p-1">
         <button data-day="saturday" class="day-btn rounded-lg py-1.5 text-xs font-semibold transition">Saturday</button>
         <button data-day="sunday"   class="day-btn rounded-lg py-1.5 text-xs font-semibold transition">Sunday</button>
+      </div>
+    </div>
+
+    <!-- Body sub-tabs (Body only) -->
+    <div id="bodyTabs" class="hidden max-w-md mx-auto px-3 pb-3">
+      <div class="grid grid-cols-3 gap-1 bg-white/10 rounded-xl p-1">
+        <button data-body="food" class="body-btn rounded-lg py-2 text-sm font-semibold transition">🍴 Food</button>
+        <button data-body="skin" class="body-btn rounded-lg py-2 text-sm font-semibold transition">✨ Skin</button>
+        <button data-body="hair" class="body-btn rounded-lg py-2 text-sm font-semibold transition">💆 Hair</button>
       </div>
     </div>
   </header>
@@ -107,7 +132,10 @@
   <!-- ===================== MAIN ===================== -->
   <main class="max-w-md mx-auto px-4 pt-4 pb-28">
 
-    <!-- LIST VIEW (Plan + Hair) -->
+    <!-- 75-Hard ring widget (Plan tab) -->
+    <div id="ringWidget" class="hidden mb-4"></div>
+
+    <!-- LIST VIEW (Plan + Hair + To-Do) -->
     <section id="view-list">
       <div class="flex items-center justify-between mb-3 px-1">
         <p id="listTitle" class="text-xs font-bold uppercase tracking-wider text-gray-400">Schedule</p>
@@ -131,30 +159,32 @@
     </section>
 
     <!-- CUSTOM VIEWS -->
-    <section id="view-food" class="hidden"></section>
-    <section id="view-skin" class="hidden"></section>
-    <section id="view-gym" class="hidden"></section>
+    <section id="view-hard"    class="hidden"></section>
+    <section id="view-food"    class="hidden"></section>
+    <section id="view-skin"    class="hidden"></section>
+    <section id="view-gym"     class="hidden"></section>
     <section id="view-monthly" class="hidden"></section>
-    <section id="view-dates" class="hidden"></section>
-    <section id="view-goals" class="hidden"></section>
+    <section id="view-bench"   class="hidden"></section>
+    <section id="view-dates"   class="hidden"></section>
+    <section id="view-goals"   class="hidden"></section>
   </main>
 
   <!-- ===================== BOTTOM NAV ===================== -->
   <nav class="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200" style="padding-bottom: env(safe-area-inset-bottom);">
     <div class="max-w-md mx-auto flex overflow-x-auto no-sb scroll-smooth">
       <button data-view="plan"    class="nav-btn"><span class="text-xl leading-none">🗓️</span><span class="text-[10px] font-semibold">Plan</span></button>
+      <button data-view="hard"    class="nav-btn"><span class="text-xl leading-none">🔥</span><span class="text-[10px] font-semibold">75</span></button>
       <button data-view="gym"     class="nav-btn"><span class="text-xl leading-none">🏋️</span><span class="text-[10px] font-semibold">Gym</span></button>
+      <button data-view="body"    class="nav-btn"><span class="text-xl leading-none">🧴</span><span class="text-[10px] font-semibold">Body</span></button>
       <button data-view="todo"    class="nav-btn"><span class="text-xl leading-none">📝</span><span class="text-[10px] font-semibold">To-Do</span></button>
       <button data-view="goals"   class="nav-btn"><span class="text-xl leading-none">🎯</span><span class="text-[10px] font-semibold">Goals</span></button>
       <button data-view="dates"   class="nav-btn"><span class="text-xl leading-none">📅</span><span class="text-[10px] font-semibold">Dates</span></button>
       <button data-view="monthly" class="nav-btn"><span class="text-xl leading-none">📊</span><span class="text-[10px] font-semibold">Track</span></button>
-      <button data-view="food"    class="nav-btn"><span class="text-xl leading-none">🍴</span><span class="text-[10px] font-semibold">Food</span></button>
-      <button data-view="skin"    class="nav-btn"><span class="text-xl leading-none">✨</span><span class="text-[10px] font-semibold">Skin</span></button>
-      <button data-view="hair"    class="nav-btn"><span class="text-xl leading-none">💆</span><span class="text-[10px] font-semibold">Hair</span></button>
+      <button data-view="bench"   class="nav-btn"><span class="text-xl leading-none">📈</span><span class="text-[10px] font-semibold">Bench</span></button>
     </div>
   </nav>
 
-  <!-- ===================== EDIT MODAL ===================== -->
+  <!-- ===================== TASK / EVENT / GOAL MODAL ===================== -->
   <div id="modal" class="hidden fixed inset-0 z-50 modal-backdrop bg-black/40 flex items-end sm:items-center justify-center">
     <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));">
       <div class="flex items-center justify-between mb-4">
@@ -167,24 +197,20 @@
       </div>
       <div class="space-y-4">
         <div id="fTimeRow">
-          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Time <span class="text-gray-300 normal-case">(optional)</span></label>
-          <input id="fTime" type="time"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none" />
+          <label class="flbl">Time <span class="text-gray-300 normal-case">(optional)</span></label>
+          <input id="fTime" type="time" class="fld" />
         </div>
         <div id="fDateRow" class="hidden">
-          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Date</label>
-          <input id="fDate" type="date"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none" />
+          <label class="flbl">Date</label>
+          <input id="fDate" type="date" class="fld" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Name</label>
-          <input id="fLabel" type="text" placeholder="e.g. Meditation (20 min)"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none" />
+          <label class="flbl">Name</label>
+          <input id="fLabel" type="text" placeholder="e.g. Meditation (20 min)" class="fld" />
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Notes</label>
-          <textarea id="fNotes" rows="2" placeholder="Optional details…"
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-800 focus:border-forest focus:ring-2 focus:ring-forest/20 outline-none resize-none"></textarea>
+          <label class="flbl">Notes</label>
+          <textarea id="fNotes" rows="2" placeholder="Optional details…" class="fld resize-none"></textarea>
         </div>
       </div>
       <div class="flex gap-3 mt-6">
@@ -194,38 +220,98 @@
     </div>
   </div>
 
+  <!-- ===================== GENERIC RECORD EDITOR ===================== -->
+  <div id="recModal" class="hidden fixed inset-0 z-50 modal-backdrop bg-black/40 flex items-end sm:items-center justify-center">
+    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl sheet" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));">
+      <div class="flex items-center justify-between mb-4">
+        <h2 id="recTitle" class="text-lg font-bold text-gray-800">Edit</h2>
+        <button id="recClose" class="text-gray-400 active:text-gray-600 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+      <div id="recFields" class="space-y-3.5"></div>
+      <div id="recMove" class="hidden gap-2 mt-4 grid grid-cols-2">
+        <button id="recUp"   class="bg-gray-100 text-gray-600 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">↑ Move up</button>
+        <button id="recDown" class="bg-gray-100 text-gray-600 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">↓ Move down</button>
+      </div>
+      <div class="flex gap-3 mt-4">
+        <button id="recDelete" class="hidden flex-1 bg-red-50 text-red-600 font-semibold py-3.5 rounded-xl active:bg-red-100 transition">Delete</button>
+        <button id="recSave" class="flex-[2] bg-forest text-white font-semibold py-3.5 rounded-xl active:bg-forest-dark transition shadow-md shadow-forest/30">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== DATA / EXPORT SHEET ===================== -->
+  <div id="dataModal" class="hidden fixed inset-0 z-50 modal-backdrop bg-black/40 flex items-end sm:items-center justify-center">
+    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl sheet" style="padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));">
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="text-lg font-bold text-gray-800">Data</h2>
+        <button id="dataClose" class="text-gray-400 active:text-gray-600 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+      <p class="text-xs text-gray-400 leading-relaxed mb-4">Everything lives on this device. Export for analysis; back up so a cleared cache can’t wipe it.</p>
+      <div class="space-y-2.5">
+        <button id="btnXlsx" class="w-full bg-forest text-white font-semibold py-3.5 rounded-xl active:bg-forest-dark transition shadow-md shadow-forest/30">⇩ Export Excel (.xlsx)</button>
+        <button id="btnJson" class="w-full bg-gray-100 text-gray-700 font-semibold py-3.5 rounded-xl active:bg-gray-200 transition">⇩ Backup all data (.json)</button>
+        <button id="btnRestore" class="w-full bg-gray-100 text-gray-700 font-semibold py-3.5 rounded-xl active:bg-gray-200 transition">⇧ Restore from backup</button>
+        <input id="fileRestore" type="file" accept="application/json,.json" class="hidden" />
+        <div id="storageInfo" class="text-[11px] text-gray-400 text-center pt-1"></div>
+        <button id="btnSeed" class="w-full text-amber-600 text-sm font-semibold py-3 active:text-amber-800">↺ Restore built-in content defaults</button>
+        <button id="btnWipe" class="w-full text-red-500 text-sm font-semibold py-3 active:text-red-700">⚠ Erase everything on this device</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== TOAST ===================== -->
   <div id="toast" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] bg-gray-900 text-white text-sm font-medium px-4 py-2.5 rounded-full shadow-xl"></div>
 
   <script>
-  /* ============================================================
-     MASTER DAILY PLAN — offline tracker. All data in LocalStorage.
-     Content for Food / Skin / Gym / Track sourced from MyPlan.html.
-     ============================================================ */
+  /* ==================================================================
+     MASTER DAILY PLAN v2 — offline tracker. All data in LocalStorage.
+     v2 adds: 75 Hard tab + ring, Benchmarks tab, full editability,
+     gym video + anatomy, XLSX export, JSON backup/restore.
+     ================================================================== */
 
-  const STORE_KEY   = 'habitTracker.v1';
-  const DAY_KEY     = 'habitTracker.lastDay';
-  const HABITS_KEY  = 'habitTracker.habits';   // {date:{key:1}}
-  const GYMLOG_KEY  = 'habitTracker.gymlog';   // {'date||Exercise':[{w,r}]}
+  const SK = {
+    content : 'habitTracker.content.v2',   // all editable reference content
+    legacy  : 'habitTracker.v1',           // v1 schedules (migrated)
+    day     : 'habitTracker.lastDay',
+    habits  : 'habitTracker.habits',       // {date:{key:1}}
+    gymlog  : 'habitTracker.gymlog',       // {'date||Exercise':[{w,r}]}
+    events  : 'habitTracker.events',
+    goals   : 'habitTracker.goals',
+    hardlog : 'habitTracker.hardlog',      // {date:{t:{key:1},note:'',comms:''}}
+    hardmeta: 'habitTracker.hardmeta',     // {start,length,attempt,history:[]}
+    bench   : 'habitTracker.benchlog',     // [{id,date,wpm,acc,hand,comms,weight,photo}]
+    weather : 'habitTracker.weather',
+    wedArch : 'habitTracker.wednesday.archived'
+  };
 
-  /* ---- Default checklists (Plan schedules + editable Hair) ---- */
-  const DEFAULTS = {
+  /* ============================ SEED CONTENT ============================ */
+  const SEED = {};
+
+  SEED.schedules = {
     weekday: [
       ['04:30','Wake + bullet coffee + 400 ml water','Ghee + black coffee (kept ritual)'],
       ['04:40','Meditation (20 min)','Calm app — good for cortisol'],
-      ['05:00','Journaling (10 min)','Gratitude + top 3 intentions'],
+      ['05:00','Journaling by hand (10 min)','Gratitude + top 3 intentions · 75 Hard handwriting practice'],
       ['05:10','Meal 1 + supplements','Eggs · banana · pitta (earlier — better digestion pre-gym)'],
       ['05:25','Wash · ready · pack bag · insert aligners','Aligners in after AM brushing'],
       ['06:00','Leave for gym (30 min)','was 6:15 / 15 min'],
       ['06:30','Training (45 min)','Mon Push · Tue Pull · Thu Upper · Fri Lower'],
       ['07:15','Shower + Vit C + SPF','Gym changing room'],
       ['07:40','Park & Ride → Oxford','~20 min'],
-      ['08:15','Deep Work Block 1','Highest priority. Phone away'],
+      ['08:15','Deep Work Block 1 (keyboard covered)','Highest priority. Phone away. 75 Hard typing practice'],
       ['10:30','Break + walk','Toward 8–10k steps'],
       ['11:00','Deep Work Block 2','Second priority'],
       ['12:00','Meal 2 — Lunch','Batch meal + 180 g rice'],
       ['12:40','Deep Work Block 3','Admin · meetings'],
-      ['14:30','Break + water','Short walk'],
+      ['14:30','Break + water','Short walk · toward 3.8 L'],
       ['15:00','Meal 3 — Snack','Yogurt + almonds + green tea'],
       ['15:10','Deep Work Block 4 → Coursera','Wrap tasks · Data Analysis 1 hr'],
       ['16:30','APM Course','1 hr focused'],
@@ -233,55 +319,45 @@
       ['17:40','Commute home','Decompress'],
       ['18:30','Personal / family','—'],
       ['19:30','Meal 4 — Dinner','Batch rotation · PM brush + aligner clean after'],
-      ['19:45','Sattu + PM skincare','Tonight’s rotation — see Skin'],
-      ['20:00','Reading / job applications','Calmer pre-sleep'],
+      ['19:45','Sattu + PM skincare','Tonight’s rotation — see Body › Skin'],
+      ['20:00','Read 10 physical pages','75 Hard · non-fiction only, no Kindle'],
+      ['20:20','Communication lesson + use it','75 Hard · see today’s cue on the 75 tab'],
+      ['20:40','Progress photo','Same time, same spot'],
       ['20:45','Wind-down (screens off)','New'],
       ['21:00','Lights out','was 10:15 — now ≈7.5 h']
     ],
-    wednesday: [
-      ['04:30','Wake + bullet coffee','Ghee + black coffee'],
-      ['04:40','Meditation + journaling','Gratitude + intentions'],
-      ['05:10','Meal 1 + supplements · insert aligners','Banana · pitta · eggs'],
-      ['05:25','Surya Arghya','Outdoors at home'],
-      ['05:35','AM skincare (full)','Cleanse → Arbutin → Vit C → Caffeine → Moist → SPF'],
-      ['07:00','Commute to office','~50 min'],
-      ['08:00','Deep Work Blocks 1–2 + walks','Priority tasks · steps'],
-      ['12:00','Meal 2 — Lunch','Panchmel Dal'],
-      ['12:40','Deep Work 3–4 + snack','Yogurt + almonds + green tea'],
-      ['15:30','Coursera + APM','1 hr each'],
-      ['17:40','Commute home','Decompress'],
-      ['19:30','Meal 4 — Dinner','Panchmel Dal · PM brush + aligner clean'],
-      ['19:30','Red Light Mask (10 min)','Drink Sattu while it runs'],
-      ['19:45','PM skincare — Azelaic','Arbutin → Azelaic → Moisturiser'],
-      ['20:00','Reading / job applications','Calmer pre-sleep'],
-      ['21:00','Lights out','was 10:15']
-    ],
     saturday: [
       ['07:00','Wake + Meal 1 · insert aligners','Banana · pitta · supplements'],
+      ['07:10','Journal by hand + meditate','75 Hard · slow handwriting'],
       ['07:20','Surya Arghya','Outdoors at home'],
       ['07:30','AM skincare (full)','Cleanse → Vit C → moisturiser → SPF'],
       ['07:45','Household — all before noon','Utensils · laundry · vacuum · grocery · bathroom'],
+      ['09:00','Training (45 min)','75 Hard · gym session or 45-min outdoor walk/run'],
       ['12:00','Meal 2 — Lunch','Quorn Rogan Josh'],
       ['12:30','Job applications (3 hrs)','CV · cover letters · LinkedIn · portals'],
       ['15:30','Meal 3 + break','Yogurt + almonds + green tea'],
       ['15:50','Coursera (1 hr) + APM (3 hrs)','Extended weekend session'],
       ['19:50','Sattu + PM skincare — Azelaic','Cleanse → Azelaic 12% → moisturiser'],
       ['20:00','Batch cook — Dal Palak + rotis','×4 portions for Sun + Mon'],
+      ['20:45','Read 10 pages + comms cue + photo','75 Hard evening block'],
       ['22:15','Lights out','≥7.5 h before 7:00 wake']
     ],
     sunday: [
       ['07:00','Wake + Meal 1 · insert aligners','Banana · pitta · supplements'],
+      ['07:10','Journal by hand + meditate','75 Hard · slow handwriting'],
       ['07:20','Surya Arghya','Outdoors at home'],
       ['07:30','AM skincare (full)','6-step recovery-friendly routine'],
-      ['07:45','Dance + light movement','Active recovery · Sunday ritual'],
+      ['07:45','Dance + light movement (45 min)','Active recovery · counts as the 75 Hard session'],
       ['08:30','Job applications (3 hrs)','CV · cover letters · portals'],
       ['12:00','Meal 2 — Lunch','Quorn Rogan Josh'],
       ['12:30','Coursera (1 hr) + APM (3 hrs)','Extended weekend session'],
       ['16:30','Meal 3 + break','Yogurt + almonds + green tea'],
       ['17:00','Batch cook — Keema Matar','×4 portions for Mon + Tue'],
+      ['18:00','Weekly benchmarks','75 Hard · typing WPM · handwriting photo · 2-min voice memo'],
       ['18:30','Weekly review + planning','APM % · Coursera % · job tracker'],
       ['19:30','Meal 4 — Dinner','Dal Palak + Rotis'],
       ['19:45','Sattu + PM skincare (Recovery)','Moisturiser only · no actives'],
+      ['20:15','Read 10 pages + comms cue + photo','75 Hard evening block'],
       ['22:15','Lights out','≥7.5 h']
     ],
     hair: [
@@ -299,86 +375,328 @@
     ]
   };
 
-  /* ---- Reference data (from MyPlan.html) ---- */
-  var MEALS=[{name:'Bullet Coffee',time:'4:30 AM',k:'~140',p:'0g',c:'0g',f:'~15g',ing:['1 tsp ghee','1 cup strong black coffee'],prep:['Brew strong coffee','Add 1 tsp ghee while hot','Stir until combined. No milk, no sugar.'],tip:'Slow-release fat for mental clarity without an insulin spike.'},{name:'Meal 1 — Eggs + Banana + Pitta',time:'6:00 AM',k:'~560',p:'~24g',c:'~56g',f:'~17g',ing:['3 eggs (boiled night before)','1 banana','1 wheat pitta','MV · Ashwagandha · Shilajit · D3 · Omega-3'],prep:['Night before: boil eggs 10 min, cool, peel, fridge','Pack eggs + banana + pitta in gym bag','Supplements here — D3/Omega-3 need egg fat to absorb','Banana + pitta = pre-workout carbs'],tip:'Without banana + pitta you train near-fasted. Compound lifts stall by set 3.'},{name:'Protein Shake + Creatine',time:'8:00 AM',k:'~120',p:'~24g',c:'~3g',f:'~2g',ing:['1 scoop whey','5g creatine','250ml water'],prep:['At gym after shower: shake 10 sec','Drink on walk to bus or on the bus'],tip:'Post-workout window is wide. Just do not skip it daily.'},{name:'Meal 2 — Lunch Batch',time:'12:00 PM',k:'~650',p:'~32g',c:'~85g',f:'~15g',ing:['1 portion batch meal','180g cooked white rice'],prep:['Microwave 3–4 min','Panchmel Dal: add 2–3 tbsp water before reheating','Mon/Tue Keema · Wed/Thu Dal · Fri/Sat Rogan Josh · Sun/Mon Dal Palak'],tip:'Above 80kg: reduce rice to 150g. Below 78kg: add a roti on Dal Palak days.'},{name:'Meal 3 — Afternoon Snack',time:'3:00 PM',k:'~240',p:'~17g',c:'~10g',f:'~15g',ing:['200g full-fat Greek yogurt','4–5 almonds','Green tea (80°C)'],prep:['Yogurt + almonds','Green tea at 80°C not boiling, steep 2–3 min','Bridges lunch and dinner'],tip:'Green tea catechins support skin brightening internally.'},{name:'Meal 4 — Dinner',time:'7:30 PM',k:'~650',p:'~32g',c:'~85g',f:'~15g',ing:['1 portion batch meal','180g rice OR 2 rotis (Dal Palak)'],prep:['Reheat 4 min','Dal Palak: 2 rotis, 30 sec each side','Eat before 8 PM'],tip:'Sun/Mon Dal Palak nights are lighter for recovery.'},{name:'Sattu Drink',time:'7:45 PM',k:'~140',p:'~10g',c:'~22g',f:'~2g',ing:['2 scoops sattu (~50g)','300ml water','Pinch salt (optional)'],prep:['Sattu first, then water while stirring','Drink while Red Light mask runs on those nights','Max 200ml water after 8 PM'],tip:'Slow protein feeds muscles overnight.'}];
-  var BATCHES=[{name:'Quorn Keema Matar',days:'Mon + Tue',cook:'Sunday eve',col:'#8a6020',desc:'Quorn mince · peas · onion · tomato · garam masala. x4. Add peas/chickpeas side for fibre.'},{name:'Panchmel Dal + Broccoli',days:'Wed + Thu',cook:'Tuesday eve',col:'#1f7a65',desc:'Five-lentil mix + broccoli. Highest fibre. Add water before reheating.'},{name:'Quorn Rogan Josh',days:'Fri + Sat',cook:'Thursday eve',col:'#a8321f',desc:'Quorn pieces · yogurt · Kashmiri chilli. Add chickpeas. Chicken thighs after 2 months.'},{name:'Dal Palak + Rotis',days:'Sun + Mon',cook:'Saturday eve',col:'#5e3d9a',desc:'Red lentils + spinach + 2 rotis per portion. Lighter for recovery.'}];
-  var SUPPS=[{n:'Multivitamin',t:'6:00 AM with eggs'},{n:'Ashwagandha',t:'6:00 AM with eggs'},{n:'Shilajit',t:'6:00 AM with eggs'},{n:'Vitamin D3',t:'6:00 AM with eggs'},{n:'Omega-3',t:'6:00 AM with eggs'},{n:'Creatine 5g',t:'8:00 AM post-gym'}];
-  var EX={monday:{label:'Push',target:'Chest · Shoulders · Triceps',exs:[{n:'Barbell Bench Press',sets:4,reps:'5–8',tgt:'→ 42 kg',setup:'Flat bench. Bar over lower chest. Grip 1.5× shoulder-width. Retract scapulae before unracking. Slight arch. Feet flat.',exec:'Lower to lower chest. Elbows 70–75°. Press up and slightly back. Full lockout.',key:'Scapular retraction before unrack is everything. Set it before rep 1, hold through the set.',avoid:'Bouncing off chest. Elbows at 90°. Hips rising. Half reps.'},{n:'Overhead Press',sets:3,reps:'8–10',tgt:'→ 28 kg',setup:'Bar at upper chest. Grip just outside shoulders. Brace core hard.',exec:'Press straight up. Head back as bar clears forehead. Shrug at top.',key:'The shrug at lockout engages the upper trap and stabilises the shoulder.',avoid:'Lower-back arch. Wrists bending back. Bar behind head.'},{n:'DB Lateral Raise',sets:3,reps:'12–15',tgt:'Medial delt',setup:'Slight forward lean (10–15°). Soft elbow bend. Thumbs angled down.',exec:'Lead with elbows. Raise to shoulder height. 2-sec up, 3-sec down.',key:'Forward lean + thumbs-down target the medial delt — the muscle that builds shoulder width. The 3-sec lowering is where growth happens.',avoid:'Shrugging. Momentum. Wrists above elbows. Rushing the lowering.'},{n:'Incline DB Press',sets:3,reps:'10–12',tgt:'Upper chest',setup:'Bench 30–45°. Semi-supinated grip. Scapular retraction.',exec:'Press up and together. 3-sec lowering.',key:'Upper chest creates the chest-to-shoulder line. 3-sec lowering is the specific stimulus.',avoid:'Elbows too wide. Partial range. Skipping slow lowering.'},{n:'Tricep Overhead Extension',sets:3,reps:'12–15',tgt:'Long head',setup:'One DB overhead, both hands. Upper arms vertical, elbows forward.',exec:'Hinge at elbow only. Lower behind head to full stretch. Extend fully.',key:'Long head is the largest tricep portion and creates the horseshoe. Overhead is the only way to fully stretch it.',avoid:'Elbows flaring. Upper arms moving. Skipping the stretch.'}]},tuesday:{label:'Pull',target:'Back · Biceps · Rear Delts',exs:[{n:'Lat Pulldown (wide)',sets:4,reps:'8–10',tgt:'→ 42.5 kg',setup:'Lean back 10–15°. Grip wider than shoulders. Depress shoulders first.',exec:'Drive elbows down toward hip pockets. Hold 1 sec. Full stretch at top.',key:'Elbows to back pockets, not bar to chest. The full stretch at top matters as much as the contraction.',avoid:'Pulling with biceps. Excessive lean. Skipping the stretch.'},{n:'Seated Cable Row',sets:3,reps:'8–10',tgt:'→ 32.5 kg',setup:'Neutral spine. Slight hip lean to start.',exec:'Pull to lower sternum. Lead with elbows. Hold 1 sec.',key:'Chest tall throughout. Stop the set when the back rounds.',avoid:'Shrugging. Rounding. Momentum. Pulling to neck.'},{n:'Reverse Pec Deck',sets:3,reps:'15–20',tgt:'Rear delts',setup:'Chest on pad. Handles at shoulder height. Soft elbow bend.',exec:'Push elbows back and out. Slow return.',key:'Rear delt development creates the 3D round shoulder. Most people skip this and look flat from the side.',avoid:'Shrugging. Elbow bend making it a row. Momentum.'},{n:'Barbell Curl',sets:3,reps:'10–12',tgt:'→ 20 kg',setup:'Shoulder-width grip. Elbows pinned to sides.',exec:'Curl from full extension. Slight wrist rotation out at top. 2-sec lowering.',key:'Pinned elbows is the rule. Elbows drifting forward = front delt takes over.',avoid:'Elbows drifting. Swinging. Half reps.'},{n:'Hammer Curl (DB)',sets:2,reps:'12',tgt:'Brachialis',setup:'Neutral grip, thumbs up throughout.',exec:'Wrist neutral entire rep. Full range. Controlled lowering.',key:'Brachialis sits under the bicep and pushes it up. Creates arm depth.',avoid:'Wrist rotating. Swinging.'}]},thursday:{label:'Upper',target:'Definition + Frequency',exs:[{n:'DB Lateral Raise',sets:3,reps:'12–15',tgt:'2nd stimulus',setup:'Same as Monday: forward lean, thumbs down.',exec:'Lead with elbows, shoulder height, 3-sec lowering.',key:'Second lateral raise of the week. Medial delt frequency drives shoulder width.',avoid:'Fatigue collapses form — drop 1–2kg if needed.'},{n:'Incline DB Press',sets:3,reps:'12–15',tgt:'Upper chest vol.',setup:'Same 30–45°, lighter, higher reps.',exec:'3-sec lowering. Feel the upper chest.',key:'Monday strength, Thursday definition. Combined volume creates separation.',avoid:'Monday weight (too heavy for 15).'},{n:'Close-grip Lat Pulldown',sets:3,reps:'12–15',tgt:'Lower lats',setup:'V-bar. Elbows close to body.',exec:'Drive elbows down and in. Full stretch.',key:'Hits lower lat differently to Tuesday. Fuller development.',avoid:'Elbows drifting wide.'},{n:'Incline DB Curl',sets:3,reps:'12–15',tgt:'Bicep peak',setup:'Bench 45–60°. Arms hang behind torso. The stretch is the point.',exec:'Upper arm still. Curl from full stretch.',key:'Stretched position loads the long head — the visible bicep peak. Genuinely different to barbell curl.',avoid:'Moving upper arm forward. Cheating the stretch.'},{n:'Tricep Pushdown',sets:3,reps:'12–15',tgt:'Lateral head',setup:'High pulley. Elbows at sides, ~90°.',exec:'Full extension. Flare hands out at bottom with rope.',key:'Completes the tricep: Monday long head, today lateral head.',avoid:'Elbows rising. Partial extension.'}]},friday:{label:'Lower + Core',target:'Quads · Hamstrings · Glutes · Core',exs:[{n:'Barbell Squat',sets:4,reps:'6–8',tgt:'Primary',setup:'Bar on upper traps. Feet shoulder-width, toes out. Brace, squeeze glutes.',exec:'Hip + knee bend together. Knees over toes. Parallel minimum. Drive up.',key:'Brace before you move, hold the entire rep. Inhale top, hold through, exhale top.',avoid:'Knees caving. Heels rising. Half reps.'},{n:'Romanian Deadlift',sets:3,reps:'10–12',tgt:'Hams + glutes',setup:'Bar at hip level. Soft knee. Neutral spine.',exec:'Push hips back. Bar close to legs. Deep hamstring stretch. Drive hips forward.',key:'Hip hinge, not leg bend. Chase the stretch.',avoid:'Rounding back. Too much knee bend. Bar drifting.'},{n:'Leg Press',sets:3,reps:'12–15',tgt:'Quad volume',setup:'Feet shoulder-width, middle of platform.',exec:'Lower to 90°. Press through heels. Slight bend at top.',key:'3-sec lowering builds quad definition. Weight is not the point.',avoid:'Knees caving. Full lockout. Bum lifting.'},{n:'Lying Leg Curl',sets:3,reps:'12–15',tgt:'Hamstring',setup:'Pad above heels. Hips into pad.',exec:'Curl to glutes. 1-sec hold. 3-sec lowering.',key:'Peak hold + slow lowering is where development happens.',avoid:'Hips rising. Jerky start.'},{n:'Ab Wheel Rollout',sets:3,reps:'10–12',tgt:'Core',setup:'Kneel. Wheel below shoulders. Brace hard. Flat back.',exec:'Roll out slowly, flat back. Contract abs to return.',key:'Highest-activation ab exercise under load. The roll-out is where growth happens.',avoid:'Hips sagging (stop — injury risk). Going too far early.'}]}};
-  var SKIN_PM=[{night:'Monday',col:'#a8321f',rlm:true,active:'Red Light + Retinal',routine:'19:30: Double cleanse → Red Light Mask 10 min → Sattu while it runs → Retinal (dry skin) → 20 min wait → Moisturiser'},{night:'Tuesday',col:'#1d5fa0',rlm:true,active:'Red Light + Vit C + Niacinamide',routine:'19:30: Double cleanse → Red Light 10 min → Sattu → Vit C 20% → Niacinamide 10% → Moisturiser'},{night:'Wednesday',col:'#256b42',rlm:true,active:'Red Light + Azelaic',routine:'19:30: Double cleanse → Red Light 10 min → Sattu → Alpha Arbutin → Azelaic Acid 12% → Moisturiser'},{night:'Thursday',col:'#1d5fa0',rlm:false,active:'Vit C + Niacinamide',routine:'19:45: Sattu → Double cleanse → Vit C 20% → Niacinamide 10% → Moisturiser'},{night:'Friday',col:'#8a2060',rlm:false,active:'AHA PEEL',routine:'19:45: Sattu → Double cleanse → AHA 30% (5 min wk1–2, 8 min wk3–4) → Rinse cool → Moisturiser ONLY'},{night:'Saturday',col:'#256b42',rlm:false,active:'Azelaic Acid',routine:'19:50: Sattu → Double cleanse → Alpha Arbutin → Azelaic Acid 12% → Moisturiser'},{night:'Sunday',col:'#5e3d9a',rlm:false,active:'RECOVERY ONLY',routine:'19:45: Sattu → Double cleanse → Moisturiser ONLY. Full barrier repair.'}];
-  var SKIN_AM={
-    gym:{title:'Gym day AM — 3 min in changing room',note:'Post-shower only. 2 products. Red Light nights (Mon/Tue) start PM at 7:30.',steps:[{n:'Vitamin C 20%',note:'Travel bottle. 2–3 drops. 60 sec wait.'},{n:'SPF 50+ PA++++',note:'Two finger lengths. Face + neck. Every single day.'}]},
-    sat:{title:'Saturday — Post-AHA protection',note:'Skin sensitised 48hrs after Friday peel. No actives. SPF only.',steps:[{n:'Gentle Cleanser',note:'Lukewarm only. Pat dry.'},{n:'Moisturiser',note:'Barrier repair. Press in.'},{n:'SPF 50+ PA++++',note:'Two finger lengths. Even on cloudy days.'}]},
-    rest:{title:'Rest day — Full AM routine (10 min)',note:'After Surya Arghya. 6-step protocol.',steps:[{n:'Gentle Cleanser',note:'Lukewarm water. Pat dry.'},{n:'Alpha Arbutin 2%',note:'2–3 drops. 60 sec. Inhibits melanin production.'},{n:'Vitamin C 20%',note:'3 drops. 60 sec. Brightening + UV antioxidant.'},{n:'Caffeine Solution',note:'1 drop per eye. Tap, never rub.'},{n:'Moisturiser',note:'Pea-sized. Press in.'},{n:'SPF 50+ PA++++',note:'Two finger lengths. Non-negotiable.'}]}
-  };
-  var SKIN_PATH=[{col:'#a8321f',label:'Cell Turnover',text:'Retinal (Mon) — accelerates renewal. Pigmented cells shed faster.'},{col:'#256b42',label:'Tyrosinase Block',text:'Azelaic + Arbutin (Wed/Sat) — dual block of the melanin enzyme.'},{col:'#1d5fa0',label:'Melanin Transfer Block',text:'Niacinamide + Vit C (Tue/Thu) — stop new spots forming.'},{col:'#5e3d9a',label:'Surface Removal',text:'AHA Peel (Fri) — removes surface pigment. Reveals fresher skin.'}];
-  var SKIN_RULES=['SPF PA++++ every morning. One UV day undoes 2 weeks of brightening.','Never Retinal and Vitamin C in the same routine.','AHA night: rinse cool, moisturiser ONLY afterwards.','Saturday AM: no actives — skin sensitised post-AHA.','Red Light on bare clean skin only — serums block penetration.','Green tea at 3 PM supports brightening internally.'];
-  var HABITS=[
-    {key:'morning',  icon:'🌅', label:'Morning routine',  sub:'Wake on time + meditation / Surya'},
-    {key:'training', icon:'🏋', label:'Training / movement', sub:'Gym, dance, or recovery'},
-    {key:'nutrition',icon:'🥗', label:'Nutrition on plan', sub:'4 meals + sattu'},
-    {key:'supps',    icon:'💊', label:'Supplements',       sub:'AM with eggs + creatine post-gym'},
-    {key:'skin',     icon:'✦',  label:'PM skincare',       sub:'Tonight’s rotation'},
-    {key:'coursera', icon:'📊', label:'Coursera',          sub:'1 hour data analysis'},
-    {key:'apm',      icon:'🎓', label:'APM course',        sub:'Daily study block'},
-    {key:'jobs',     icon:'📩', label:'Job applications',  sub:'Daily block'}
+  SEED.meals = [
+    {name:'Bullet Coffee',time:'4:30 AM',k:'~140',p:'0g',c:'0g',f:'~15g',
+     ing:['1 tsp ghee','1 cup strong black coffee'],
+     prep:['Brew strong coffee','Add 1 tsp ghee while hot','Stir until combined. No milk, no sugar.'],
+     tip:'Slow-release fat for mental clarity without an insulin spike.'},
+    {name:'Meal 1 — Eggs + Banana + Pitta',time:'6:00 AM',k:'~560',p:'~24g',c:'~56g',f:'~17g',
+     ing:['3 eggs (boiled night before)','1 banana','1 wheat pitta','MV · Ashwagandha · Shilajit · D3 · Omega-3'],
+     prep:['Night before: boil eggs 10 min, cool, peel, fridge','Pack eggs + banana + pitta in gym bag','Supplements here — D3/Omega-3 need egg fat to absorb','Banana + pitta = pre-workout carbs'],
+     tip:'Without banana + pitta you train near-fasted. Compound lifts stall by set 3.'},
+    {name:'Protein Shake + Creatine',time:'8:00 AM',k:'~120',p:'~24g',c:'~3g',f:'~2g',
+     ing:['1 scoop whey','5g creatine','250ml water'],
+     prep:['At gym after shower: shake 10 sec','Drink on walk to bus or on the bus'],
+     tip:'Post-workout window is wide. Just do not skip it daily.'},
+    {name:'Meal 2 — Lunch Batch',time:'12:00 PM',k:'~650',p:'~32g',c:'~85g',f:'~15g',
+     ing:['1 portion batch meal','180g cooked white rice'],
+     prep:['Microwave 3–4 min','Panchmel Dal: add 2–3 tbsp water before reheating','Mon/Tue Keema · Wed/Thu Dal · Fri/Sat Rogan Josh · Sun/Mon Dal Palak'],
+     tip:'Above 80kg: reduce rice to 150g. Below 78kg: add a roti on Dal Palak days.'},
+    {name:'Meal 3 — Afternoon Snack',time:'3:00 PM',k:'~240',p:'~17g',c:'~10g',f:'~15g',
+     ing:['200g full-fat Greek yogurt','4–5 almonds','Green tea (80°C)'],
+     prep:['Yogurt + almonds','Green tea at 80°C not boiling, steep 2–3 min','Bridges lunch and dinner'],
+     tip:'Green tea catechins support skin brightening internally.'},
+    {name:'Meal 4 — Dinner',time:'7:30 PM',k:'~650',p:'~32g',c:'~85g',f:'~15g',
+     ing:['1 portion batch meal','180g rice OR 2 rotis (Dal Palak)'],
+     prep:['Reheat 4 min','Dal Palak: 2 rotis, 30 sec each side','Eat before 8 PM'],
+     tip:'Sun/Mon Dal Palak nights are lighter for recovery.'},
+    {name:'Sattu Drink',time:'7:45 PM',k:'~140',p:'~10g',c:'~22g',f:'~2g',
+     ing:['2 scoops sattu (~50g)','300ml water','Pinch salt (optional)'],
+     prep:['Sattu first, then water while stirring','Drink while Red Light mask runs on those nights','Max 200ml water after 8 PM'],
+     tip:'Slow protein feeds muscles overnight.'}
   ];
-  const STREAK_THRESHOLD = 6; // of 8 habits = a "win" day
 
-  /* ---- State ---- */
-  let store;
-  let view       = 'plan';            // plan | food | skin | hair | gym | monthly
-  let activeTab  = 'weekday';
-  let activeDay  = 'saturday';
+  SEED.batches = [
+    {name:'Quorn Keema Matar',days:'Mon + Tue',cook:'Sunday eve',col:'#8a6020',desc:'Quorn mince · peas · onion · tomato · garam masala. x4. Add peas/chickpeas side for fibre.'},
+    {name:'Panchmel Dal + Broccoli',days:'Wed + Thu',cook:'Tuesday eve',col:'#1f7a65',desc:'Five-lentil mix + broccoli. Highest fibre. Add water before reheating.'},
+    {name:'Quorn Rogan Josh',days:'Fri + Sat',cook:'Thursday eve',col:'#a8321f',desc:'Quorn pieces · yogurt · Kashmiri chilli. Add chickpeas. Chicken thighs after 2 months.'},
+    {name:'Dal Palak + Rotis',days:'Sun + Mon',cook:'Saturday eve',col:'#5e3d9a',desc:'Red lentils + spinach + 2 rotis per portion. Lighter for recovery.'}
+  ];
+
+  SEED.supps = [
+    {n:'Multivitamin',t:'6:00 AM with eggs'},{n:'Ashwagandha',t:'6:00 AM with eggs'},
+    {n:'Shilajit',t:'6:00 AM with eggs'},{n:'Vitamin D3',t:'6:00 AM with eggs'},
+    {n:'Omega-3',t:'6:00 AM with eggs'},{n:'Creatine 5g',t:'8:00 AM post-gym'}
+  ];
+
+  /* ---- Gym. pri/sec = muscle-group keys used by the anatomy diagram ---- */
+  SEED.gym = [
+   {key:'monday',label:'Push',target:'Chest · Shoulders · Triceps',exs:[
+    {n:'Barbell Bench Press',sets:4,reps:'5–8',tgt:'→ 42 kg',vid:'rT7DgCr-3pg',vidT:'How To: Barbell Bench Press — ScottHermanFitness',
+     pri:['chest'],sec:['delts','triceps'],
+     setup:'Flat bench. Bar over lower chest. Grip 1.5× shoulder-width. Retract scapulae before unracking. Slight arch. Feet flat.',
+     exec:'Lower to lower chest. Elbows 70–75°. Press up and slightly back. Full lockout.',
+     key:'Scapular retraction before unrack is everything. Set it before rep 1, hold through the set.',
+     avoid:'Bouncing off chest. Elbows at 90°. Hips rising. Half reps.'},
+    {n:'Overhead Press',sets:3,reps:'8–10',tgt:'→ 28 kg',vid:'2yjwXTZQDDI',vidT:'How To: Standing Straight-Bar Military / Overhead Press — ScottHermanFitness',
+     pri:['delts'],sec:['triceps','traps','abs'],
+     setup:'Bar at upper chest. Grip just outside shoulders. Brace core hard.',
+     exec:'Press straight up. Head back as bar clears forehead. Shrug at top.',
+     key:'The shrug at lockout engages the upper trap and stabilises the shoulder.',
+     avoid:'Lower-back arch. Wrists bending back. Bar behind head.'},
+    {n:'DB Lateral Raise',sets:3,reps:'12–15',tgt:'Medial delt',vid:'3VcKaXpzqRo',vidT:'How To: Dumbbell Side Lateral Raise — ScottHermanFitness',
+     pri:['delts'],sec:['traps'],
+     setup:'Slight forward lean (10–15°). Soft elbow bend. Thumbs angled down.',
+     exec:'Lead with elbows. Raise to shoulder height. 2-sec up, 3-sec down.',
+     key:'Forward lean + thumbs-down target the medial delt — the muscle that builds shoulder width. The 3-sec lowering is where growth happens.',
+     avoid:'Shrugging. Momentum. Wrists above elbows. Rushing the lowering.'},
+    {n:'Incline DB Press',sets:3,reps:'10–12',tgt:'Upper chest',vid:'8iPEnn-ltC8',vidT:'How To: Dumbbell Incline Chest Press — ScottHermanFitness',
+     pri:['chest'],sec:['delts','triceps'],
+     setup:'Bench 30–45°. Semi-supinated grip. Scapular retraction.',
+     exec:'Press up and together. 3-sec lowering.',
+     key:'Upper chest creates the chest-to-shoulder line. 3-sec lowering is the specific stimulus.',
+     avoid:'Elbows too wide. Partial range. Skipping slow lowering.'},
+    {n:'Tricep Overhead Extension',sets:3,reps:'12–15',tgt:'Long head',vid:'_gsUck-7M74',vidT:'How to Do a Dumbbell Tricep Extension — Howcast',
+     pri:['triceps'],sec:['delts'],
+     setup:'One DB overhead, both hands. Upper arms vertical, elbows forward.',
+     exec:'Hinge at elbow only. Lower behind head to full stretch. Extend fully.',
+     key:'Long head is the largest tricep portion and creates the horseshoe. Overhead is the only way to fully stretch it.',
+     avoid:'Elbows flaring. Upper arms moving. Skipping the stretch.'}]},
+   {key:'tuesday',label:'Pull',target:'Back · Biceps · Rear Delts',exs:[
+    {n:'Lat Pulldown (wide)',sets:4,reps:'8–10',tgt:'→ 42.5 kg',vid:'CAwf7n6Luuc',vidT:'How To: Lat Pulldown | 3 GOLDEN RULES — ScottHermanFitness',
+     pri:['lats'],sec:['biceps','rhomboids','rearDelts'],
+     setup:'Lean back 10–15°. Grip wider than shoulders. Depress shoulders first.',
+     exec:'Drive elbows down toward hip pockets. Hold 1 sec. Full stretch at top.',
+     key:'Elbows to back pockets, not bar to chest. The full stretch at top matters as much as the contraction.',
+     avoid:'Pulling with biceps. Excessive lean. Skipping the stretch.'},
+    {n:'Seated Cable Row',sets:3,reps:'8–10',tgt:'→ 32.5 kg',vid:'GZbfZ033f74',vidT:'How To: Seated Low Row (LF Cable) — ScottHermanFitness',
+     pri:['rhomboids','lats'],sec:['biceps','lowerBack','traps'],
+     setup:'Neutral spine. Slight hip lean to start.',
+     exec:'Pull to lower sternum. Lead with elbows. Hold 1 sec.',
+     key:'Chest tall throughout. Stop the set when the back rounds.',
+     avoid:'Shrugging. Rounding. Momentum. Pulling to neck.'},
+    {n:'Reverse Pec Deck',sets:3,reps:'15–20',tgt:'Rear delts',vid:'ttvfGg9d76c',vidT:'How To: Dumbbell Bent-Over Raise (same rear-delt pattern) — ScottHermanFitness',
+     pri:['rearDelts'],sec:['rhomboids','traps'],
+     setup:'Chest on pad. Handles at shoulder height. Soft elbow bend.',
+     exec:'Push elbows back and out. Slow return.',
+     key:'Rear delt development creates the 3D round shoulder. Most people skip this and look flat from the side.',
+     avoid:'Shrugging. Elbow bend making it a row. Momentum.'},
+    {n:'Barbell Curl',sets:3,reps:'10–12',tgt:'→ 20 kg',vid:'kwG2ipFRgfo',vidT:'How to Do a Barbell Curl | Arm Workout — Howcast',
+     pri:['biceps'],sec:['forearms'],
+     setup:'Shoulder-width grip. Elbows pinned to sides.',
+     exec:'Curl from full extension. Slight wrist rotation out at top. 2-sec lowering.',
+     key:'Pinned elbows is the rule. Elbows drifting forward = front delt takes over.',
+     avoid:'Elbows drifting. Swinging. Half reps.'},
+    {n:'Hammer Curl (DB)',sets:2,reps:'12',tgt:'Brachialis',vid:'zC3nLlEvin4',vidT:'How To: Dumbbell Hammer Curl — ScottHermanFitness',
+     pri:['biceps','forearms'],sec:[],
+     setup:'Neutral grip, thumbs up throughout.',
+     exec:'Wrist neutral entire rep. Full range. Controlled lowering.',
+     key:'Brachialis sits under the bicep and pushes it up. Creates arm depth.',
+     avoid:'Wrist rotating. Swinging.'}]},
+   {key:'thursday',label:'Upper',target:'Definition + Frequency',exs:[
+    {n:'DB Lateral Raise',sets:3,reps:'12–15',tgt:'2nd stimulus',vid:'3VcKaXpzqRo',vidT:'How To: Dumbbell Side Lateral Raise — ScottHermanFitness',
+     pri:['delts'],sec:['traps'],
+     setup:'Same as Monday: forward lean, thumbs down.',
+     exec:'Lead with elbows, shoulder height, 3-sec lowering.',
+     key:'Second lateral raise of the week. Medial delt frequency drives shoulder width.',
+     avoid:'Fatigue collapses form — drop 1–2kg if needed.'},
+    {n:'Incline DB Press',sets:3,reps:'12–15',tgt:'Upper chest vol.',vid:'8iPEnn-ltC8',vidT:'How To: Dumbbell Incline Chest Press — ScottHermanFitness',
+     pri:['chest'],sec:['delts','triceps'],
+     setup:'Same 30–45°, lighter, higher reps.',
+     exec:'3-sec lowering. Feel the upper chest.',
+     key:'Monday strength, Thursday definition. Combined volume creates separation.',
+     avoid:'Monday weight (too heavy for 15).'},
+    {n:'Close-grip Lat Pulldown',sets:3,reps:'12–15',tgt:'Lower lats',vid:'',vidT:'',
+     pri:['lats'],sec:['biceps','rhomboids'],
+     setup:'V-bar. Elbows close to body.',
+     exec:'Drive elbows down and in. Full stretch.',
+     key:'Hits lower lat differently to Tuesday. Fuller development.',
+     avoid:'Elbows drifting wide.'},
+    {n:'Incline DB Curl',sets:3,reps:'12–15',tgt:'Bicep peak',vid:'soxrZlIl35U',vidT:'How To: Seated Incline Dumbbell Bicep Curl — ScottHermanFitness',
+     pri:['biceps'],sec:['forearms'],
+     setup:'Bench 45–60°. Arms hang behind torso. The stretch is the point.',
+     exec:'Upper arm still. Curl from full stretch.',
+     key:'Stretched position loads the long head — the visible bicep peak. Genuinely different to barbell curl.',
+     avoid:'Moving upper arm forward. Cheating the stretch.'},
+    {n:'Tricep Pushdown',sets:3,reps:'12–15',tgt:'Lateral head',vid:'2-LAMcpzODU',vidT:'How To: Tricep Pushdown (Life Fitness Cable) — ScottHermanFitness',
+     pri:['triceps'],sec:['forearms'],
+     setup:'High pulley. Elbows at sides, ~90°.',
+     exec:'Full extension. Flare hands out at bottom with rope.',
+     key:'Completes the tricep: Monday long head, today lateral head.',
+     avoid:'Elbows rising. Partial extension.'}]},
+   {key:'friday',label:'Lower + Core',target:'Quads · Hamstrings · Glutes · Core',exs:[
+    {n:'Barbell Squat',sets:4,reps:'6–8',tgt:'Primary',vid:'bEv6CCg2BC8',vidT:'How To Get A Huge Squat With Perfect Technique — Jeff Nippard',
+     pri:['quads','glutes'],sec:['hamstrings','lowerBack','abs','calves'],
+     setup:'Bar on upper traps. Feet shoulder-width, toes out. Brace, squeeze glutes.',
+     exec:'Hip + knee bend together. Knees over toes. Parallel minimum. Drive up.',
+     key:'Brace before you move, hold the entire rep. Inhale top, hold through, exhale top.',
+     avoid:'Knees caving. Heels rising. Half reps.'},
+    {n:'Romanian Deadlift',sets:3,reps:'10–12',tgt:'Hams + glutes',vid:'JCXUYuzwNrM',vidT:'How To: Romanian Deadlift (Barbell) — ScottHermanFitness',
+     pri:['hamstrings','glutes'],sec:['lowerBack','forearms','traps'],
+     setup:'Bar at hip level. Soft knee. Neutral spine.',
+     exec:'Push hips back. Bar close to legs. Deep hamstring stretch. Drive hips forward.',
+     key:'Hip hinge, not leg bend. Chase the stretch.',
+     avoid:'Rounding back. Too much knee bend. Bar drifting.'},
+    {n:'Leg Press',sets:3,reps:'12–15',tgt:'Quad volume',vid:'IZxyjW7MPJQ',vidT:'How To: Seated Leg Press (Cybex) — ScottHermanFitness',
+     pri:['quads'],sec:['glutes','hamstrings'],
+     setup:'Feet shoulder-width, middle of platform.',
+     exec:'Lower to 90°. Press through heels. Slight bend at top.',
+     key:'3-sec lowering builds quad definition. Weight is not the point.',
+     avoid:'Knees caving. Full lockout. Bum lifting.'},
+    {n:'Lying Leg Curl',sets:3,reps:'12–15',tgt:'Hamstring',vid:'1Tq3QdYUuHs',vidT:'How To: Prone Leg Curl (Cybex) — ScottHermanFitness',
+     pri:['hamstrings'],sec:['calves','glutes'],
+     setup:'Pad above heels. Hips into pad.',
+     exec:'Curl to glutes. 1-sec hold. 3-sec lowering.',
+     key:'Peak hold + slow lowering is where development happens.',
+     avoid:'Hips rising. Jerky start.'},
+    {n:'Ab Wheel Rollout',sets:3,reps:'10–12',tgt:'Core',vid:'',vidT:'',
+     pri:['abs'],sec:['obliques','lats','lowerBack'],
+     setup:'Kneel. Wheel below shoulders. Brace hard. Flat back.',
+     exec:'Roll out slowly, flat back. Contract abs to return.',
+     key:'Highest-activation ab exercise under load. The roll-out is where growth happens.',
+     avoid:'Hips sagging (stop — injury risk). Going too far early.'}]}
+  ];
+
+  SEED.skinPM = [
+    {night:'Monday',col:'#a8321f',rlm:true,active:'Red Light + Retinal',routine:'19:30: Double cleanse → Red Light Mask 10 min → Sattu while it runs → Retinal (dry skin) → 20 min wait → Moisturiser'},
+    {night:'Tuesday',col:'#1d5fa0',rlm:true,active:'Red Light + Vit C + Niacinamide',routine:'19:30: Double cleanse → Red Light 10 min → Sattu → Vit C 20% → Niacinamide 10% → Moisturiser'},
+    {night:'Wednesday',col:'#256b42',rlm:true,active:'Red Light + Azelaic',routine:'19:30: Double cleanse → Red Light 10 min → Sattu → Alpha Arbutin → Azelaic Acid 12% → Moisturiser'},
+    {night:'Thursday',col:'#1d5fa0',rlm:false,active:'Vit C + Niacinamide',routine:'19:45: Sattu → Double cleanse → Vit C 20% → Niacinamide 10% → Moisturiser'},
+    {night:'Friday',col:'#8a2060',rlm:false,active:'AHA PEEL',routine:'19:45: Sattu → Double cleanse → AHA 30% (5 min wk1–2, 8 min wk3–4) → Rinse cool → Moisturiser ONLY'},
+    {night:'Saturday',col:'#256b42',rlm:false,active:'Azelaic Acid',routine:'19:50: Sattu → Double cleanse → Alpha Arbutin → Azelaic Acid 12% → Moisturiser'},
+    {night:'Sunday',col:'#5e3d9a',rlm:false,active:'RECOVERY ONLY',routine:'19:45: Sattu → Double cleanse → Moisturiser ONLY. Full barrier repair.'}
+  ];
+
+  SEED.skinAM = [
+    {key:'gym',title:'Gym day AM — 3 min in changing room',note:'Post-shower only. 2 products. Red Light nights (Mon/Tue) start PM at 7:30.',col:'#a8321f',
+     steps:['Vitamin C 20% :: Travel bottle. 2–3 drops. 60 sec wait.','SPF 50+ PA++++ :: Two finger lengths. Face + neck. Every single day.']},
+    {key:'sat',title:'Saturday — Post-AHA protection',note:'Skin sensitised 48hrs after Friday peel. No actives. SPF only.',col:'#8a2060',
+     steps:['Gentle Cleanser :: Lukewarm only. Pat dry.','Moisturiser :: Barrier repair. Press in.','SPF 50+ PA++++ :: Two finger lengths. Even on cloudy days.']},
+    {key:'rest',title:'Rest day — Full AM routine (10 min)',note:'After Surya Arghya. 6-step protocol.',col:'#256b42',
+     steps:['Gentle Cleanser :: Lukewarm water. Pat dry.','Alpha Arbutin 2% :: 2–3 drops. 60 sec. Inhibits melanin production.','Vitamin C 20% :: 3 drops. 60 sec. Brightening + UV antioxidant.','Caffeine Solution :: 1 drop per eye. Tap, never rub.','Moisturiser :: Pea-sized. Press in.','SPF 50+ PA++++ :: Two finger lengths. Non-negotiable.']}
+  ];
+
+  SEED.skinPath = [
+    {col:'#a8321f',label:'Cell Turnover',text:'Retinal (Mon) — accelerates renewal. Pigmented cells shed faster.'},
+    {col:'#256b42',label:'Tyrosinase Block',text:'Azelaic + Arbutin (Wed/Sat) — dual block of the melanin enzyme.'},
+    {col:'#1d5fa0',label:'Melanin Transfer Block',text:'Niacinamide + Vit C (Tue/Thu) — stop new spots forming.'},
+    {col:'#5e3d9a',label:'Surface Removal',text:'AHA Peel (Fri) — removes surface pigment. Reveals fresher skin.'}
+  ];
+
+  SEED.skinRules = [
+    {r:'SPF PA++++ every morning. One UV day undoes 2 weeks of brightening.'},
+    {r:'Never Retinal and Vitamin C in the same routine.'},
+    {r:'AHA night: rinse cool, moisturiser ONLY afterwards.'},
+    {r:'Saturday AM: no actives — skin sensitised post-AHA.'},
+    {r:'Red Light on bare clean skin only — serums block penetration.'},
+    {r:'Green tea at 3 PM supports brightening internally.'}
+  ];
+
+  SEED.skinRLM = {title:'🔴 Mon · Tue · Wed — 3 sessions/week',
+    text:'10–15 min on clean bare skin before serums. Start PM at 7:30 on these nights. Drink Sattu while it runs. Boosts collagen, fades pigmentation, aids recovery. Not Friday (AHA-sensitised skin).'};
+
+  SEED.habits = [
+    {key:'morning',  icon:'🌅', label:'Morning routine',   sub:'Wake on time + meditation / Surya'},
+    {key:'training', icon:'🏋', label:'Training / movement',sub:'Gym, dance, or recovery'},
+    {key:'nutrition',icon:'🥗', label:'Nutrition on plan',  sub:'4 meals + sattu'},
+    {key:'supps',    icon:'💊', label:'Supplements',        sub:'AM with eggs + creatine post-gym'},
+    {key:'skin',     icon:'✦',  label:'PM skincare',        sub:'Tonight’s rotation'},
+    {key:'coursera', icon:'📊', label:'Coursera',           sub:'1 hour data analysis'},
+    {key:'apm',      icon:'🎓', label:'APM course',         sub:'Daily study block'},
+    {key:'jobs',     icon:'📩', label:'Job applications',   sub:'Daily block'}
+  ];
+
+  /* ---- 75 Hard: the 8 non-negotiables ---- */
+  SEED.hardTasks = [
+    {key:'workout', icon:'🏋', label:'Workout — 45 min',        sub:'Gym on training days; otherwise a 45-min outdoor walk/run. Never zero.'},
+    {key:'diet',    icon:'🥗', label:'Diet held',               sub:'Structured plan. Zero alcohol. Zero cheat meals.'},
+    {key:'water',   icon:'💧', label:'Water — 3.8 L',           sub:'One US gallon. Finish by ~6 pm so it doesn’t wreck sleep.'},
+    {key:'am',      icon:'🌅', label:'5 AM journal + meditate', sub:'Journal by hand, slowly — this is the handwriting practice. Then meditate.'},
+    {key:'typing',  icon:'⌨️', label:'No-look typing',          sub:'All office typing with the keyboard covered. Accuracy before speed.'},
+    {key:'read',    icon:'📖', label:'Read 10 pages',           sub:'Physical non-fiction only. No Kindle, no audiobook.'},
+    {key:'comms',   icon:'🗣', label:'Communication lesson',    sub:'One lesson, then use one technique in a real conversation that day.'},
+    {key:'photo',   icon:'📸', label:'Progress photo',          sub:'One per day. Same time, same spot.'}
+  ];
+
+  SEED.phases = [
+    {from:1,  to:25, name:'Ignition', col:'#a8321f', note:'Days 1–25 — build the reps, expect the ugly days'},
+    {from:26, to:50, name:'Grind',    col:'#8a6020', note:'Days 26–50 — the middle; this is where most quit'},
+    {from:51, to:75, name:'Forged',   col:'#256b42', note:'Days 51–75 — finish what you started'}
+  ];
+
+  /* ---- Communication roadmap: 75 rows, built from the source blocks ---- */
+  SEED.comms = (function () {
+    const blocks = [
+      [1,2,  'Intro',    'Intro to Personality Development + “From Shy to Unstoppable” PDF', 'Introduce yourself to one stranger'],
+      [3,5,  'S1',       'S1 · The Confidence Blueprint: How to End Fear + Activity',        'Speak up once where you’d normally stay silent'],
+      [6,8,  'S2',       'S2 · The Science of Confidence + Activity',                         'Open posture + steady eye contact in one conversation'],
+      [9,11, 'S3',       'S3 · Stop Caring What People Think (+ 26-pg PDF)',                  'Voice one honest, unpopular view'],
+      [12,14,'S4',       'S4 · Live Doubts Interaction with Ankit Sir',                       'Ask one question in a group setting'],
+      [15,17,'S5',       'S5 · Change Your Self-Image (+ 22-pg PDF)',                         'Rewrite how you describe yourself — then use it'],
+      [18,20,'S6',       'S6 · How to Stop Overthinking',                                     'Use “What? / So what? / Now what?” on one on-the-spot answer'],
+      [21,23,'S7',       'S7 · How to Overcome Shyness',                                      'Start a conversation cold'],
+      [24,25,'Review',   'Review your 2 weakest sessions',                                    'Record your FIRST 2-min voice memo — listen back, fix one thing'],
+      [26,32,'Pace',     'Drill: pace & pauses',                                              'Slow delivery to ~70%. Replace every “um / matlab” with a silent pause.'],
+      [33,39,'PREP',     'Drill: Point · Reason · Example · Point',                           'Structure every answer PREP. Say it out loud once for real.'],
+      [40,46,'Story',    'Drill: storytelling / STAR',                                        'Craft ONE 60-second story you can tell well. Doubles as interview prep.'],
+      [47,50,'Listen',   'Drill: labels & mirrors (Voss)',                                    'Label emotions (“It sounds like…”) + mirror the last 3 words.'],
+      [51,57,'Pitch',    'Build the 60-second “why me” pitch',                                'Rehearse the pitch aloud until it’s automatic.'],
+      [58,64,'Interview','Mock Q&A under pressure',                                           'Mock-answer tough interview questions aloud; record and refine.'],
+      [65,71,'Present',  'Deliver a real presentation',                                       'Ryze, a practice group, or straight to camera.'],
+      [72,75,'Polish',   'Final tighten',                                                     'Tighten pitch + delivery. Final voice memo — compare it to Day 25.']
+    ];
+    const vm = {25:1,32:1,39:1,46:1,53:1,60:1,67:1,74:1};
+    const out = [];
+    for (let d = 1; d <= 75; d++) {
+      const b = blocks.find(x => d >= x[0] && d <= x[1]) || blocks[blocks.length - 1];
+      out.push({ d, code: b[2] + (vm[d] ? '·VM' : ''), watch: b[3], apply: b[4], vm: !!vm[d] });
+    }
+    return out;
+  })();
+
+  /* ---- Anatomy: muscle groups drawn on a simple front/back figure ---- */
+  const MG = {
+    chest:     {l:'Chest',        s:'f', p:'<ellipse cx="41" cy="51" rx="10" ry="7.5"/><ellipse cx="59" cy="51" rx="10" ry="7.5"/>'},
+    delts:     {l:'Shoulders',    s:'f', p:'<ellipse cx="27.5" cy="43" rx="7" ry="6.5"/><ellipse cx="72.5" cy="43" rx="7" ry="6.5"/>'},
+    biceps:    {l:'Biceps',       s:'f', p:'<ellipse cx="24.5" cy="59" rx="5" ry="9"/><ellipse cx="75.5" cy="59" rx="5" ry="9"/>'},
+    forearms:  {l:'Forearms',     s:'f', p:'<ellipse cx="21.5" cy="78" rx="4.5" ry="10"/><ellipse cx="78.5" cy="78" rx="4.5" ry="10"/>'},
+    abs:       {l:'Abdominals',   s:'f', p:'<rect x="43" y="61" width="14" height="29" rx="5"/>'},
+    obliques:  {l:'Obliques',     s:'f', p:'<ellipse cx="38.5" cy="75" rx="3.6" ry="12"/><ellipse cx="61.5" cy="75" rx="3.6" ry="12"/>'},
+    quads:     {l:'Quadriceps',   s:'f', p:'<ellipse cx="42" cy="118" rx="8" ry="21"/><ellipse cx="58" cy="118" rx="8" ry="21"/>'},
+    traps:     {l:'Traps',        s:'b', p:'<path d="M150 32 L136 44 L150 56 L164 44 Z"/>'},
+    rearDelts: {l:'Rear delts',   s:'b', p:'<ellipse cx="127.5" cy="43" rx="7" ry="6.5"/><ellipse cx="172.5" cy="43" rx="7" ry="6.5"/>'},
+    lats:      {l:'Lats',         s:'b', p:'<path d="M138 50 L133 78 L150 74 L167 78 L162 50 L150 58 Z"/>'},
+    rhomboids: {l:'Rhomboids',    s:'b', p:'<rect x="142" y="49" width="16" height="12" rx="3"/>'},
+    triceps:   {l:'Triceps',      s:'b', p:'<ellipse cx="124.5" cy="59" rx="5" ry="9"/><ellipse cx="175.5" cy="59" rx="5" ry="9"/>'},
+    lowerBack: {l:'Lower back',   s:'b', p:'<rect x="142" y="78" width="16" height="13" rx="4"/>'},
+    glutes:    {l:'Glutes',       s:'b', p:'<ellipse cx="143" cy="99" rx="9" ry="8.5"/><ellipse cx="157" cy="99" rx="9" ry="8.5"/>'},
+    hamstrings:{l:'Hamstrings',   s:'b', p:'<ellipse cx="142" cy="123" rx="8" ry="19"/><ellipse cx="158" cy="123" rx="8" ry="19"/>'},
+    calves:    {l:'Calves',       s:'b', p:'<ellipse cx="142.5" cy="163" rx="6.5" ry="15"/><ellipse cx="157.5" cy="163" rx="6.5" ry="15"/>'}
+  };
+  const MG_ORDER = ['chest','delts','biceps','forearms','abs','obliques','quads','traps','rearDelts','lats','rhomboids','triceps','lowerBack','glutes','hamstrings','calves'];
+
+  /* ============================ STATE ============================ */
+  let C;                                // editable content store
+  let view       = 'plan';              // plan|hard|gym|body|todo|goals|dates|monthly|bench
+  let bodyTab    = 'food';              // food|skin|hair
+  let activeTab  = 'weekday';           // weekday|weekend
+  let activeDay  = 'saturday';          // saturday|sunday
   let gymDay     = 'monday';
   let editMode   = false;
   let editingId  = null;
-  let modalKind  = 'task';            // task | event | goal
-  let datesPeriod = 'week';           // week | month | year
+  let modalKind  = 'task';
+  let datesPeriod = 'week';
   let goalsPeriod = 'week';
-  let events = [];                    // [{id,date,title,note}]
-  let goals  = { week:[], month:[], year:[] }; // {id,text,note,done}
+  let events = [];
+  let goals  = { week:[], month:[], year:[] };
+  let hardLog = {};
+  let hardMeta = null;
+  let bench = [];
+  let hardGridDay = null;
 
-  /* ---- Helpers ---- */
-  const $  = (s) => document.querySelector(s);
+  /* ============================ HELPERS ============================ */
+  const $   = (s) => document.querySelector(s);
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   const pad = (n) => String(n).padStart(2,'0');
   const dstr = (d) => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-  const todayStr = () => dstr(new Date());
-  const dateNAgo = (n) => { const d = new Date(); d.setDate(d.getDate()-n); return dstr(d); };
+  const todayStr  = () => dstr(new Date());
+  const dateNAgo  = (n) => { const d = new Date(); d.setDate(d.getDate()-n); return dstr(d); };
+  const dateNAhead= (n) => { const d = new Date(); d.setDate(d.getDate()+n); return dstr(d); };
+  const endOfMonthStr = () => { const d = new Date(); return dstr(new Date(d.getFullYear(), d.getMonth()+1, 0)); };
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  const num = (v) => { const n = parseFloat(v); return isFinite(n) ? n : null; };
 
-  function buildDefault() {
-    const out = {};
-    for (const key in DEFAULTS)
-      out[key] = DEFAULTS[key].map(([time,label,notes]) => ({ id: uid(), time, label, notes, done:false }));
-    return out;
-  }
-  function save() { localStorage.setItem(STORE_KEY, JSON.stringify(store)); }
-  function load() {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      store = raw ? JSON.parse(raw) : buildDefault();
-      const def = buildDefault();
-      for (const k in DEFAULTS) if (!Array.isArray(store[k])) store[k] = def[k]; // add new keys (e.g. hair)
-      if (!raw) save();
-    } catch (e) { store = buildDefault(); save(); }
-    autoResetOnNewDay();
-  }
-  // Daily checklists reset each calendar day. Habit history & gym logs persist.
-  function autoResetOnNewDay() {
-    const today = new Date().toDateString();
-    if (localStorage.getItem(DAY_KEY) !== today) {
-      for (const k in store) if (k !== 'todo') store[k].forEach(t => t.done = false); // To-Do persists
-      localStorage.setItem(DAY_KEY, today);
-      save();
-    }
-  }
-
-  function currentKey()    { return activeTab === 'weekend' ? activeDay : activeTab; }
-  function activeListKey() { return (view === 'hair' || view === 'todo') ? view : currentKey(); }
-  function currentList()   { return store[activeListKey()]; }
-
-  /* ---- Time formatting ---- */
   function to12h(t) {
     if (!t) return '';
     const [h, m] = t.split(':').map(Number);
@@ -386,87 +704,392 @@
     return `${h % 12 === 0 ? 12 : h % 12}:${pad(m)} ${ap}`;
   }
   function nowHM() { const d = new Date(); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function prettyDate(ds) {
+    const d = new Date(ds + 'T12:00');
+    return d.toLocaleDateString(undefined, { weekday:'short', day:'numeric', month:'short' });
+  }
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add('hidden'), 2200);
+  }
+  function lsSet(k, v) {
+    try { localStorage.setItem(k, v); return true; }
+    catch (e) { toast('⚠ Storage full — export a backup and trim photos'); return false; }
+  }
+  function jget(k, fb) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : fb; } catch (e) { return fb; } }
 
-  /* ---- Clock ---- */
-  function tickClock() {
-    const d = new Date();
-    $('#clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
-    $('#dateLabel').textContent = d.toLocaleDateString(undefined, { weekday:'long', day:'numeric', month:'short' });
+  /* ============================ CONTENT STORE ============================ */
+  function seedContent() {
+    const mk = (rows) => rows.map(([time,label,notes]) => ({ id: uid(), time, label, notes, done:false }));
+    return {
+      v: 2,
+      schedules: { weekday: mk(SEED.schedules.weekday), saturday: mk(SEED.schedules.saturday),
+                   sunday: mk(SEED.schedules.sunday),  hair: mk(SEED.schedules.hair), todo: mk(SEED.schedules.todo) },
+      meals: clone(SEED.meals), batches: clone(SEED.batches), supps: clone(SEED.supps),
+      gym: clone(SEED.gym),
+      skinPM: clone(SEED.skinPM), skinAM: clone(SEED.skinAM), skinPath: clone(SEED.skinPath),
+      skinRules: clone(SEED.skinRules), skinRLM: clone(SEED.skinRLM),
+      habits: clone(SEED.habits), threshold: 6,
+      hardTasks: clone(SEED.hardTasks), phases: clone(SEED.phases), comms: clone(SEED.comms)
+    };
+  }
+  function saveC() { lsSet(SK.content, JSON.stringify(C)); }
+
+  function loadContent() {
+    const raw = localStorage.getItem(SK.content);
+    if (raw) {
+      try {
+        C = JSON.parse(raw);
+        const d = seedContent();
+        // heal any missing top-level collection introduced later
+        for (const k in d) if (C[k] === undefined) C[k] = d[k];
+        for (const k in d.schedules) if (!Array.isArray(C.schedules[k])) C.schedules[k] = d.schedules[k];
+        return;
+      } catch (e) { /* fall through to seed */ }
+    }
+    C = seedContent();
+    migrateV1();
+    saveC();
   }
 
-  /* ---- Habit storage (Track) ---- */
-  function getHabits(date) { try { return (JSON.parse(localStorage.getItem(HABITS_KEY) || '{}'))[date] || {}; } catch (e) { return {}; } }
+  /* v1 → v2: keep the user's edited schedules, archive Wednesday, drop nothing silently */
+  function migrateV1() {
+    const old = jget(SK.legacy, null);
+    if (!old) return;
+    ['weekday','saturday','sunday','hair','todo'].forEach(k => {
+      if (Array.isArray(old[k]) && old[k].length) C.schedules[k] = old[k].map(t => ({ ...t, id: t.id || uid() }));
+    });
+    if (Array.isArray(old.wednesday) && old.wednesday.length && !localStorage.getItem(SK.wedArch)) {
+      lsSet(SK.wedArch, JSON.stringify(old.wednesday));   // recoverable, never deleted
+    }
+    toast('Upgraded to v2 — your data carried over');
+  }
+
+  function autoResetOnNewDay() {
+    const today = new Date().toDateString();
+    if (localStorage.getItem(SK.day) !== today) {
+      for (const k in C.schedules) if (k !== 'todo') C.schedules[k].forEach(t => t.done = false);
+      lsSet(SK.day, today);
+      saveC();
+    }
+  }
+
+  function currentKey()    { return activeTab === 'weekend' ? activeDay : 'weekday'; }
+  function activeListKey() { return view === 'todo' ? 'todo' : (view === 'body' && bodyTab === 'hair') ? 'hair' : currentKey(); }
+  function currentList()   { return C.schedules[activeListKey()]; }
+  function isListView()    { return view === 'plan' || view === 'todo' || (view === 'body' && bodyTab === 'hair'); }
+
+  /* ============================ LOG STORES ============================ */
+  function getHabits(date) { return (jget(SK.habits, {}))[date] || {}; }
   function setHabit(date, key, val) {
-    let all; try { all = JSON.parse(localStorage.getItem(HABITS_KEY) || '{}'); } catch (e) { all = {}; }
+    const all = jget(SK.habits, {});
     if (!all[date]) all[date] = {};
     if (val) all[date][key] = 1; else delete all[date][key];
-    localStorage.setItem(HABITS_KEY, JSON.stringify(all));
+    lsSet(SK.habits, JSON.stringify(all));
   }
-  function dayCount(date) { const h = getHabits(date); return HABITS.reduce((c,x) => c + (h[x.key] ? 1 : 0), 0); }
-  function isWin(date) { return dayCount(date) >= STREAK_THRESHOLD; }
+  function dayCount(date) { const h = getHabits(date); return C.habits.reduce((c,x) => c + (h[x.key] ? 1 : 0), 0); }
+  function isWin(date) { return dayCount(date) >= (C.threshold || 6); }
   function currentStreak() { let s=0; for (let i=0;i<400;i++){ const d=dateNAgo(i); if(isWin(d))s++; else { if(i===0) continue; break; } } return s; }
   function bestStreak() { let best=0,run=0; for (let i=400;i>=0;i--){ if(isWin(dateNAgo(i))){ run++; if(run>best)best=run; } else run=0; } return best; }
   function habitStreak(key) { let s=0; for (let i=0;i<400;i++){ const h=getHabits(dateNAgo(i)); if(h[key])s++; else { if(i===0) continue; break; } } return s; }
 
-  /* ---- Gym log storage ---- */
-  function getGymLogs() { try { return JSON.parse(localStorage.getItem(GYMLOG_KEY) || '{}'); } catch (e) { return {}; } }
-  function setGymLogs(o) { localStorage.setItem(GYMLOG_KEY, JSON.stringify(o)); }
-  function getExLog(n) { return getGymLogs()[todayStr() + '||' + n] || null; }
+  function getGymLogs() { return jget(SK.gymlog, {}); }
+  function setGymLogs(o) { lsSet(SK.gymlog, JSON.stringify(o)); }
+  function getExLog(n, date) { return getGymLogs()[(date || todayStr()) + '||' + n] || null; }
 
-  /* ============================================================
-     RENDER — routes to the active view
-     ============================================================ */
+  function loadHard() {
+    hardLog = jget(SK.hardlog, {});
+    hardMeta = jget(SK.hardmeta, null);
+    if (!hardMeta) { hardMeta = { start: todayStr(), length: 75, attempt: 1, history: [] }; saveHardMeta(); }
+    if (!hardMeta.length) hardMeta.length = 75;
+    if (!hardMeta.attempt) hardMeta.attempt = 1;
+    if (!Array.isArray(hardMeta.history)) hardMeta.history = [];
+  }
+  function saveHardLog()  { lsSet(SK.hardlog, JSON.stringify(hardLog)); }
+  function saveHardMeta() { lsSet(SK.hardmeta, JSON.stringify(hardMeta)); }
+
+  function loadBench() { bench = jget(SK.bench, []); if (!Array.isArray(bench)) bench = []; }
+  function saveBench() { lsSet(SK.bench, JSON.stringify(bench)); }
+
+  function loadEvents() {
+    const r = jget(SK.events, null);
+    if (r) { events = r; return; }
+    events = [
+      { id: uid(), date: dateNAhead(3),  title: 'Submit 3 job applications', note: 'CV + tailored cover letter' },
+      { id: uid(), date: dateNAhead(10), title: 'Coursera module deadline',  note: 'Data Analysis' },
+      { id: uid(), date: endOfMonthStr(),title: 'Monthly review + planning', note: 'APM % · Coursera % · job tracker' }
+    ];
+    saveEvents();
+  }
+  function saveEvents() { lsSet(SK.events, JSON.stringify(events)); }
+  function loadGoals() {
+    const r = jget(SK.goals, null);
+    if (r) { goals = r; ['week','month','year'].forEach(p => { if (!Array.isArray(goals[p])) goals[p] = []; }); return; }
+    const g = (text) => ({ id: uid(), text, note:'', done:false });
+    goals = {
+      week:  [g('Apply to 10 roles'), g('Hit 4 gym sessions'), g('Finish 1 Coursera module')],
+      month: [g('Complete APM section 2'), g('Reach 80 job applications'), g('Lose 1 kg')],
+      year:  [g('Land a Product Manager role'), g('Finish APM certification'), g('Hold a 5-day training week')]
+    };
+    saveGoals();
+  }
+  function saveGoals() { lsSet(SK.goals, JSON.stringify(goals)); }
+
+  /* ============================ 75-HARD MATHS ============================ */
+  function daysBetween(a, b) { return Math.round((new Date(b + 'T00:00') - new Date(a + 'T00:00')) / 86400000); }
+  function hardDayFor(ds) { return daysBetween(hardMeta.start, ds) + 1; }
+  function hardDayNum() { return hardDayFor(todayStr()); }
+  function hardDateFor(n) { const d = new Date(hardMeta.start + 'T00:00'); d.setDate(d.getDate() + n - 1); return dstr(d); }
+  function phaseFor(n) { return (C.phases || []).find(p => n >= p.from && n <= p.to) || (C.phases || [])[0] || {name:'',col:'#006644',note:''}; }
+  function commsFor(n) { return (C.comms || []).find(x => x.d === n) || null; }
+  function hardDay(ds) { const e = hardLog[ds]; return e && e.t ? e : { t:{}, note:'', comms:'' }; }
+  function hardCount(ds) { const t = hardDay(ds).t; return C.hardTasks.reduce((a,x) => a + (t[x.key] ? 1 : 0), 0); }
+  function hardComplete(ds) { return hardCount(ds) === C.hardTasks.length; }
+  function toggleHardTask(ds, key) {
+    if (!hardLog[ds]) hardLog[ds] = { t:{}, note:'', comms:'' };
+    if (!hardLog[ds].t) hardLog[ds].t = {};
+    if (hardLog[ds].t[key]) delete hardLog[ds].t[key]; else hardLog[ds].t[key] = 1;
+    saveHardLog();
+  }
+  /* Days already closed (strictly before today) inside the current attempt that were incomplete */
+  function missedDays() {
+    const out = [], n = Math.min(hardDayNum() - 1, hardMeta.length);
+    for (let i = 1; i <= n; i++) { const ds = hardDateFor(i); if (!hardComplete(ds)) out.push({ n:i, ds, done: hardCount(ds) }); }
+    return out;
+  }
+  function restartHard() {
+    const done = hardDayNum() - 1;
+    hardMeta.history.push({ attempt: hardMeta.attempt, start: hardMeta.start, endedOn: todayStr(), reached: Math.max(0, done) });
+    hardMeta.attempt += 1;
+    hardMeta.start = todayStr();
+    saveHardMeta();
+    toast('Restarted — attempt ' + hardMeta.attempt + ', Day 1. History kept.');
+    render();
+  }
+
+  /* ============================ GENERIC RECORD EDITOR ============================
+     SPECS drive every "make this editable" surface. t: text|area|lines|num|color|
+     steps (Name :: note per line) | bool | date
+     ============================================================================= */
+  const SPECS = {
+    meals:    { one:'Meal', path:()=>C.meals, fields:[
+      {k:'name',l:'Name'},{k:'time',l:'Time'},{k:'k',l:'Calories'},{k:'p',l:'Protein'},{k:'c',l:'Carbs'},{k:'f',l:'Fat'},
+      {k:'ing',l:'Ingredients (one per line)',t:'lines'},{k:'prep',l:'Preparation (one step per line)',t:'lines'},{k:'tip',l:'Tip',t:'area'}],
+      blank:()=>({name:'',time:'',k:'',p:'',c:'',f:'',ing:[],prep:[],tip:''}) },
+    batches:  { one:'Batch meal', path:()=>C.batches, fields:[
+      {k:'name',l:'Name'},{k:'days',l:'Days'},{k:'cook',l:'Cook when'},{k:'col',l:'Colour',t:'color'},{k:'desc',l:'Description',t:'area'}],
+      blank:()=>({name:'',days:'',cook:'',col:'#006644',desc:''}) },
+    supps:    { one:'Supplement', path:()=>C.supps, fields:[{k:'n',l:'Name'},{k:'t',l:'When'}], blank:()=>({n:'',t:''}) },
+    skinPM:   { one:'PM night', path:()=>C.skinPM, fields:[
+      {k:'night',l:'Night'},{k:'active',l:'Active(s)'},{k:'col',l:'Colour',t:'color'},{k:'rlm',l:'Red Light Mask night',t:'bool'},{k:'routine',l:'Routine',t:'area'}],
+      blank:()=>({night:'',active:'',col:'#006644',rlm:false,routine:''}) },
+    skinAM:   { one:'AM routine', path:()=>C.skinAM, fields:[
+      {k:'title',l:'Title'},{k:'note',l:'Note',t:'area'},{k:'col',l:'Colour',t:'color'},
+      {k:'steps',l:'Steps — one per line, "Product :: note"',t:'lines'}],
+      blank:()=>({key:'custom',title:'',note:'',col:'#006644',steps:[]}) },
+    skinPath: { one:'Pathway', path:()=>C.skinPath, fields:[{k:'label',l:'Label'},{k:'col',l:'Colour',t:'color'},{k:'text',l:'Text',t:'area'}],
+      blank:()=>({label:'',col:'#006644',text:''}) },
+    skinRules:{ one:'Rule', path:()=>C.skinRules, fields:[{k:'r',l:'Rule',t:'area'}], blank:()=>({r:''}) },
+    habits:   { one:'Habit', path:()=>C.habits, fields:[{k:'icon',l:'Icon'},{k:'label',l:'Label'},{k:'sub',l:'Sub-text'}],
+      blank:()=>({key:'h'+uid(),icon:'✦',label:'',sub:''}) },
+    hardTasks:{ one:'Non-negotiable', path:()=>C.hardTasks, fields:[{k:'icon',l:'Icon'},{k:'label',l:'Label'},{k:'sub',l:'Detail',t:'area'}],
+      blank:()=>({key:'x'+uid(),icon:'✦',label:'',sub:''}) },
+    comms:    { one:'Comms day', path:()=>C.comms, noAdd:true, fields:[
+      {k:'d',l:'Day',t:'num',ro:true},{k:'code',l:'Code'},{k:'watch',l:'Watch / do',t:'area'},{k:'apply',l:'Apply that day',t:'area'},{k:'vm',l:'Voice-memo day',t:'bool'}] },
+    gymDays:  { one:'Training day', path:()=>C.gym, fields:[{k:'label',l:'Label (e.g. Push)'},{k:'target',l:'Target muscles'},{k:'key',l:'Key (lowercase, unique)'}],
+      blank:()=>({key:'day'+uid(),label:'New day',target:'',exs:[]}) },
+    bench:    { one:'Benchmark', path:()=>bench, save:()=>saveBench(), fields:[
+      {k:'date',l:'Date',t:'date'},{k:'wpm',l:'Typing WPM',t:'num'},{k:'acc',l:'Typing accuracy %',t:'num'},
+      {k:'weight',l:'Body weight (kg)',t:'num'},{k:'hand',l:'Handwriting note',t:'area'},{k:'comms',l:'Voice-memo note',t:'area'},
+      {k:'photo',l:'Progress / handwriting photo',t:'photo'}],
+      blank:()=>({id:uid(),date:todayStr(),wpm:null,acc:null,weight:null,hand:'',comms:'',photo:''}) }
+  };
+
+  let recSpec = null, recIdx = -1, recExtra = null, recCommit = null;
+
+  function fieldHtml(f, v) {
+    const id = 'rf-' + f.k;
+    if (f.t === 'area')  return `<div><label class="flbl">${esc(f.l)}</label><textarea id="${id}" rows="3" class="fld resize-none">${esc(v || '')}</textarea></div>`;
+    if (f.t === 'lines') return `<div><label class="flbl">${esc(f.l)}</label><textarea id="${id}" rows="5" class="fld resize-none">${esc((v || []).join('\n'))}</textarea></div>`;
+    if (f.t === 'bool')  return `<label class="flex items-center gap-3 py-1"><input id="${id}" type="checkbox" ${v ? 'checked' : ''} class="w-5 h-5 accent-[#006644]"><span class="text-sm font-semibold text-gray-700">${esc(f.l)}</span></label>`;
+    if (f.t === 'color') return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="color" value="${esc(v || '#006644')}" class="w-full h-11 bg-gray-50 border border-gray-200 rounded-xl p-1"></div>`;
+    if (f.t === 'num')   return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="number" inputmode="decimal" step="any" value="${v == null ? '' : esc(v)}" class="fld" ${f.ro ? 'readonly' : ''}></div>`;
+    if (f.t === 'date')  return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="date" value="${esc(v || todayStr())}" class="fld"></div>`;
+    if (f.t === 'photo') return `<div><label class="flbl">${esc(f.l)}</label>
+        ${v ? `<img src="${v}" class="w-full rounded-xl mb-2 border border-gray-200" alt="">` : ''}
+        <input id="${id}" type="file" accept="image/*" class="fld text-sm">
+        <input id="${id}-cur" type="hidden" value="${esc(v || '')}">
+        ${v ? `<button type="button" onclick="clearPhoto('${id}')" class="mt-2 text-xs font-semibold text-red-500">Remove photo</button>` : ''}
+        <p class="text-[11px] text-gray-400 mt-1">Downscaled to 640px to protect storage.</p></div>`;
+    return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="text" value="${esc(v || '')}" class="fld" ${f.ro ? 'readonly' : ''}></div>`;
+  }
+  function clearPhoto(id) { const c = document.getElementById(id + '-cur'); if (c) c.value = ''; const img = c.previousElementSibling; toast('Photo will be removed on save'); }
+
+  function openRec(specKey, idx, extra) {
+    recSpec = specKey; recIdx = idx; recExtra = extra || null; recCommit = null;
+    const sp = SPECS[specKey];
+    const arr = recExtra ? recExtra.arr() : sp.path();
+    const rec = idx > -1 ? arr[idx] : (sp.blank ? sp.blank() : {});
+    $('#recTitle').textContent = (idx > -1 ? 'Edit ' : 'Add ') + (recExtra && recExtra.one ? recExtra.one : sp.one);
+    $('#recFields').innerHTML = (recExtra ? recExtra.fields : sp.fields).map(f => fieldHtml(f, rec[f.k])).join('');
+    $('#recDelete').classList.toggle('hidden', idx < 0);
+    $('#recMove').classList.toggle('hidden', idx < 0);
+    $('#recMove').classList.toggle('grid', idx > -1);
+    $('#recModal').classList.remove('hidden');
+  }
+  function closeRec() { $('#recModal').classList.add('hidden'); recSpec = null; recIdx = -1; recExtra = null; recCommit = null; }
+
+  function readFields(fields, rec) {
+    const jobs = [];
+    fields.forEach(f => {
+      const el = document.getElementById('rf-' + f.k);
+      if (!el) return;
+      if (f.t === 'bool')       rec[f.k] = el.checked;
+      else if (f.t === 'lines') rec[f.k] = el.value.split('\n').map(s => s.trim()).filter(Boolean);
+      else if (f.t === 'num')   rec[f.k] = num(el.value);
+      else if (f.t === 'photo') {
+        const cur = document.getElementById('rf-' + f.k + '-cur');
+        if (el.files && el.files[0]) jobs.push(shrinkImage(el.files[0]).then(d => { rec[f.k] = d; }));
+        else rec[f.k] = cur ? cur.value : '';
+      }
+      else rec[f.k] = el.value.trim();
+    });
+    return jobs.length ? Promise.all(jobs) : null;   // null = nothing async, commit now
+  }
+
+  function shrinkImage(file, max) {
+    max = max || 640;
+    return new Promise((res) => {
+      const fr = new FileReader();
+      fr.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const sc = Math.min(1, max / Math.max(img.width, img.height));
+          const cv = document.createElement('canvas');
+          cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+          cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+          res(cv.toDataURL('image/jpeg', 0.72));
+        };
+        img.onerror = () => res('');
+        img.src = fr.result;
+      };
+      fr.onerror = () => res('');
+      fr.readAsDataURL(file);
+    });
+  }
+
+  function saveRec() {
+    const sp = SPECS[recSpec];
+    const arr = recExtra ? recExtra.arr() : sp.path();
+    const fields = recExtra ? recExtra.fields : sp.fields;
+    const rec = recIdx > -1 ? arr[recIdx] : (recExtra && recExtra.blank ? recExtra.blank() : sp.blank());
+    const commit = () => {
+      if (recIdx < 0) arr.push(rec);
+      if (recExtra && recExtra.save) recExtra.save(); else if (sp.save) sp.save(); else saveC();
+      closeRec(); render(); toast('Saved');
+    };
+    const pending = readFields(fields, rec);
+    if (pending) pending.then(commit); else commit();
+  }
+  function deleteRec() {
+    const sp = SPECS[recSpec];
+    const arr = recExtra ? recExtra.arr() : sp.path();
+    if (recIdx > -1) arr.splice(recIdx, 1);
+    if (recExtra && recExtra.save) recExtra.save(); else if (sp.save) sp.save(); else saveC();
+    closeRec(); render(); toast('Deleted');
+  }
+  function moveRec(dir) {
+    const sp = SPECS[recSpec];
+    const arr = recExtra ? recExtra.arr() : sp.path();
+    const j = recIdx + dir;
+    if (j < 0 || j >= arr.length) return;
+    const [x] = arr.splice(recIdx, 1); arr.splice(j, 0, x);
+    if (recExtra && recExtra.save) recExtra.save(); else if (sp.save) sp.save(); else saveC();
+    recIdx = j; render(); toast('Moved');
+  }
+
+  /* Small helpers shared by editable sections */
+  const editPencil = '<svg class="shrink-0 w-4 h-4 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>';
+  const secTitle = (t, addSpec, addLabel) =>
+    `<div class="flex items-end justify-between mt-5 mb-2 px-1 first:mt-1">
+       <p class="text-xs font-bold uppercase tracking-wider text-gray-400">${esc(t)}</p>
+       ${editMode && addSpec ? `<button onclick="openRec('${addSpec}',-1)" class="text-xs font-bold text-forest">+ ${esc(addLabel || 'Add')}</button>` : ''}
+     </div>`;
+  const chev = '<svg class="chev shrink-0 w-5 h-5 text-gray-300 transition-transform mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>';
+  function infoBox(title, text, color) {
+    return `<div class="rounded-2xl p-3.5 mb-1" style="background:${color}14;border-left:4px solid ${color}">
+      <p class="text-sm font-bold" style="color:${color}">${title}</p>
+      <p class="text-xs text-gray-500 leading-relaxed mt-1">${text}</p></div>`;
+  }
+  const addBtnHtml = (label, onclick) =>
+    `<button onclick="${onclick}" class="mt-3 w-full border-2 border-dashed border-forest/40 text-forest font-semibold py-3.5 rounded-2xl active:bg-forest-light transition flex items-center justify-center gap-2"><svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>${esc(label)}</button>`;
+  const tickSvg = '<svg class="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';
+
+  /* ============================ RENDER ROUTER ============================ */
   function render() {
     document.querySelectorAll('.nav-btn').forEach(b => {
       const on = b.dataset.view === view;
-      b.className = 'nav-btn shrink-0 min-w-[60px] flex flex-col items-center justify-center gap-0.5 py-2 transition ' +
+      b.className = 'nav-btn shrink-0 min-w-[58px] flex flex-col items-center justify-center gap-0.5 py-2 transition ' +
         (on ? 'text-forest' : 'text-gray-400 active:text-gray-600');
       if (on) b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
     });
-    const isList = (view === 'plan' || view === 'hair' || view === 'todo');
+    const isList = isListView();
     $('#summaryBlock').classList.toggle('hidden', !isList);
     $('#dayTabs').classList.toggle('hidden', view !== 'plan');
-    $('#editToggle').classList.toggle('hidden', !isList);
+    $('#bodyTabs').classList.toggle('hidden', view !== 'body');
+    $('#editToggle').classList.toggle('hidden', view === 'dates' || view === 'goals');
     $('#view-list').classList.toggle('hidden', !isList);
-    ['food','skin','gym','monthly','dates','goals'].forEach(v => $('#view-' + v).classList.toggle('hidden', view !== v));
+    $('#ringWidget').classList.toggle('hidden', view !== 'plan');
+    ['hard','food','skin','gym','monthly','bench','dates','goals'].forEach(v => {
+      let show = false;
+      if (v === 'food' || v === 'skin') show = (view === 'body' && bodyTab === v);
+      else show = (view === v);
+      $('#view-' + v).classList.toggle('hidden', !show);
+    });
 
+    document.querySelectorAll('.body-btn').forEach(b => {
+      const on = b.dataset.body === bodyTab;
+      b.className = 'body-btn rounded-lg py-2 text-sm font-semibold transition ' + (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
+    });
+
+    if (view === 'plan') renderRing();
     if (isList) renderList();
-    else if (view === 'food') renderFood();
-    else if (view === 'skin') renderSkin();
+    else if (view === 'hard') renderHard();
+    else if (view === 'body' && bodyTab === 'food') renderFood();
+    else if (view === 'body' && bodyTab === 'skin') renderSkin();
     else if (view === 'gym') renderGym();
     else if (view === 'monthly') renderMonthly();
+    else if (view === 'bench') renderBench();
     else if (view === 'dates') renderDates();
     else if (view === 'goals') renderGoals();
   }
 
-  /* ---- LIST view (Plan + Hair) ---- */
+  /* ============================ LIST VIEW ============================ */
   function renderList() {
     document.querySelectorAll('.tab-btn').forEach(b => {
       const on = b.dataset.tab === activeTab;
-      b.className = 'tab-btn rounded-lg py-2 text-sm font-semibold transition ' +
-        (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
+      b.className = 'tab-btn rounded-lg py-2 text-sm font-semibold transition ' + (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
     });
     document.querySelectorAll('.day-btn').forEach(b => {
       const on = b.dataset.day === activeDay;
-      b.className = 'day-btn rounded-lg py-1.5 text-xs font-semibold transition ' +
-        (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
+      b.className = 'day-btn rounded-lg py-1.5 text-xs font-semibold transition ' + (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
     });
     $('#weekendToggle').classList.toggle('hidden', activeTab !== 'weekend');
-    $('#hairNote').classList.toggle('hidden', view !== 'hair');
-    $('#addBtnLabel').textContent = view === 'hair' ? 'Add Item' : 'Add Task';
-    // To-Do always shows quick-add; reset hides while editing
+    const isHair = (view === 'body' && bodyTab === 'hair');
+    $('#hairNote').classList.toggle('hidden', !isHair);
+    $('#addBtnLabel').textContent = isHair ? 'Add Item' : 'Add Task';
     $('#addBtn').classList.toggle('hidden', !(editMode || view === 'todo'));
     $('#resetBtn').classList.toggle('hidden', editMode);
     $('#resetLabel').textContent = view === 'todo' ? 'Clear Done' : 'Reset Day';
 
-    const titles = { weekday:'Mon · Tue · Thu · Fri', wednesday:'Wednesday · Rest Day',
-                     saturday:'Saturday', sunday:'Sunday', hair:'Hair Care', todo:'To-Do List' };
+    const titles = { weekday:'Mon · Tue · Wed · Thu · Fri', saturday:'Saturday', sunday:'Sunday', hair:'Hair Care', todo:'To-Do List' };
     $('#listTitle').textContent = titles[activeListKey()];
 
     const list = currentList();
-    const ordered = view === 'plan'
+    const ordered = (view === 'plan')
       ? [...list].sort((a,b) => { if (a.done !== b.done) return a.done ? 1 : -1; return (a.time||'').localeCompare(b.time||''); })
-      : [...list].sort((a,b) => (a.done?1:0) - (b.done?1:0)); // hair: keep order, done last
+      : [...list].sort((a,b) => (a.done?1:0) - (b.done?1:0));
 
     const wrap = $('#taskList'); wrap.innerHTML = '';
     $('#emptyState').classList.toggle('hidden', list.length !== 0 || editMode);
@@ -475,19 +1098,18 @@
   }
 
   function updateSummary() {
-    if (view !== 'plan' && view !== 'hair' && view !== 'todo') return;
+    if (!isListView()) return;
     const list = currentList();
     const remaining = list.filter(t => !t.done);
     $('#remainingCount').textContent = remaining.length;
     $('#progressBar').style.width = (list.length ? Math.round((list.length - remaining.length) / list.length * 100) : 0) + '%';
-    let next;
     if (view === 'plan') {
       const now = nowHM();
       const s = [...remaining].sort((a,b) => (a.time||'').localeCompare(b.time||''));
-      next = s.find(t => (t.time||'') >= now) || s[0];
+      const next = s.find(t => (t.time||'') >= now) || s[0];
       $('#nextTask').textContent = next ? `${next.label}${next.time ? ' · ' + to12h(next.time) : ''}` : (list.length ? '🎉 All done for today' : '—');
     } else {
-      next = remaining[0];
+      const next = remaining[0];
       $('#nextTask').textContent = next ? next.label : (list.length ? '🎉 All done' : '—');
     }
   }
@@ -495,50 +1117,260 @@
   function taskCard(t) {
     const el = document.createElement('div');
     el.className = 'task-card flex items-center gap-3 bg-white rounded-2xl px-3.5 py-3 shadow-sm border border-gray-100 ' + (t.done ? 'opacity-55' : '');
-
     const left = document.createElement('button');
     left.className = 'shrink-0 flex flex-col items-center justify-center w-14';
     left.innerHTML = `
-      <div class="w-7 h-7 rounded-full flex items-center justify-center border-2 checkbox-tick ${t.done ? 'bg-forest border-forest' : 'border-gray-300'}">
-        ${t.done ? '<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : ''}
-      </div>
+      <div class="w-7 h-7 rounded-full flex items-center justify-center border-2 checkbox-tick ${t.done ? 'bg-forest border-forest' : 'border-gray-300'}">${t.done ? tickSvg : ''}</div>
       ${t.time ? `<span class="tabular text-[10px] font-semibold mt-1 ${t.done ? 'text-gray-400' : 'text-forest'}">${to12h(t.time)}</span>` : ''}`;
-
     const body = document.createElement('div');
     body.className = 'flex-1 min-w-0';
-    const note = (t.notes && t.notes !== '—')
-      ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${t.done ? 'line-through' : ''}">${esc(t.notes)}</p>` : '';
+    const note = (t.notes && t.notes !== '—') ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${t.done ? 'line-through' : ''}">${esc(t.notes)}</p>` : '';
     body.innerHTML = `<p class="text-[15px] font-semibold leading-snug ${t.done ? 'line-through text-gray-400' : 'text-gray-800'}">${esc(t.label)}</p>${note}`;
-
     if (editMode) {
       el.classList.add('cursor-pointer','active:bg-gray-50');
       const pencil = document.createElement('div');
       pencil.className = 'shrink-0 text-gray-300';
-      pencil.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>';
+      pencil.innerHTML = editPencil;
       el.append(left, body, pencil);
       el.onclick = () => openModal(t.id);
     } else {
       el.append(left, body);
-      const toggle = () => { t.done = !t.done; save(); renderList(); };
+      const toggle = () => { t.done = !t.done; saveC(); renderList(); };
       left.onclick = (e) => { e.stopPropagation(); toggle(); };
       el.onclick = toggle;
     }
     return el;
   }
 
-  /* ---- Shared section helpers (custom views) ---- */
-  const secTitle = (t) => `<p class="text-xs font-bold uppercase tracking-wider text-gray-400 mt-5 mb-2 px-1 first:mt-1">${esc(t)}</p>`;
-  const chev = '<svg class="chev shrink-0 w-5 h-5 text-gray-300 transition-transform mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>';
-  function infoBox(title, text, color) {
-    return `<div class="rounded-2xl p-3.5 mb-1" style="background:${color}14;border-left:4px solid ${color}">
-      <p class="text-sm font-bold" style="color:${color}">${esc(title)}</p>
-      <p class="text-xs text-gray-500 leading-relaxed mt-1">${text}</p></div>`;
+  /* ============================ 75 HARD ============================ */
+  function ringSvg(size, frac, colour, big, small) {
+    const r = size / 2 - 9, cx = size / 2, cir = 2 * Math.PI * r;
+    const off = cir * (1 - Math.max(0, Math.min(1, frac)));
+    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" class="shrink-0">
+      <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke-width="9" class="ring-track"/>
+      <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${colour}" stroke-width="9" stroke-linecap="round"
+        class="ring-prog" stroke-dasharray="${cir.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"
+        transform="rotate(-90 ${cx} ${cx})"/>
+      <text x="${cx}" y="${cx - 2}" text-anchor="middle" font-size="${size * 0.26}" font-weight="800" fill="currentColor" class="tabular">${big}</text>
+      <text x="${cx}" y="${cx + size * 0.17}" text-anchor="middle" font-size="${size * 0.105}" font-weight="700" fill="currentColor" opacity=".62">${small}</text>
+    </svg>`;
   }
 
-  /* ---- FOOD view ---- */
+  function hardStatus() {
+    const L = hardMeta.length, n = hardDayNum();
+    if (n < 1) return { state:'pending', n, L, remaining:L, label:'Starts in ' + (1 - n) + ' day' + (1 - n === 1 ? '' : 's') };
+    if (n > L) return { state:'done', n:L, L, remaining:0, label:'Complete — ' + L + ' days' };
+    return { state:'live', n, L, remaining: L - n, label:'Day ' + n + ' of ' + L };
+  }
+
+  function renderRing() {
+    const st = hardStatus(), ph = phaseFor(Math.max(1, Math.min(st.n, st.L)));
+    const ds = todayStr(), done = hardCount(ds), total = C.hardTasks.length;
+    const frac = st.state === 'live' ? (st.remaining / st.L) : (st.state === 'done' ? 0 : 1);
+    const big  = st.state === 'live' ? String(st.remaining) : (st.state === 'done' ? '✓' : '–');
+    const cm = commsFor(st.n);
+    $('#ringWidget').innerHTML = `
+      <div onclick="setView('hard')" class="cursor-pointer active:opacity-90 rounded-2xl p-4 text-white shadow-lg flex items-center gap-4"
+           style="background:linear-gradient(135deg,${ph.col},${ph.col}cc)">
+        <div class="text-white">${ringSvg(84, frac, '#ffffff', big, 'LEFT')}</div>
+        <div class="min-w-0 flex-1">
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">75 Hard · ${esc(ph.name)}${hardMeta.attempt > 1 ? ' · attempt ' + hardMeta.attempt : ''}</p>
+          <p class="text-xl font-bold leading-tight mt-0.5">${esc(st.label)}</p>
+          <div class="mt-2 h-1.5 bg-white/25 rounded-full overflow-hidden">
+            <div class="h-full bg-white rounded-full transition-all duration-500" style="width:${total ? Math.round(done/total*100) : 0}%"></div>
+          </div>
+          <p class="text-[11px] opacity-90 mt-1.5">${done}/${total} non-negotiables today${cm ? ' · Comms: ' + esc(cm.code) : ''}</p>
+        </div>
+        <span class="opacity-70 text-xl">›</span>
+      </div>`;
+  }
+
+  function openHardSetup() {
+    recSpec = null; recIdx = -1; recExtra = null;
+    $('#recTitle').textContent = 'Challenge setup';
+    $('#recFields').innerHTML = `
+      <div><label class="flbl">Day 1 date</label><input id="hs-start" type="date" value="${hardMeta.start}" class="fld"></div>
+      <div><label class="flbl">Length (days)</label><input id="hs-len" type="number" inputmode="numeric" value="${hardMeta.length}" class="fld"></div>
+      <div><label class="flbl">Attempt number</label><input id="hs-att" type="number" inputmode="numeric" value="${hardMeta.attempt}" class="fld"></div>
+      <p class="text-[11px] text-gray-400 leading-relaxed">Changing Day 1 re-dates every cell in the grid. Your ticked days stay attached to their real calendar dates, so nothing is lost.</p>`;
+    $('#recDelete').classList.add('hidden');
+    $('#recMove').classList.add('hidden'); $('#recMove').classList.remove('grid');
+    recCommit = () => {
+      hardMeta.start = document.getElementById('hs-start').value || todayStr();
+      hardMeta.length = Math.max(1, parseInt(document.getElementById('hs-len').value) || 75);
+      hardMeta.attempt = Math.max(1, parseInt(document.getElementById('hs-att').value) || 1);
+      saveHardMeta(); closeRec(); render(); toast('Challenge updated');
+    };
+    $('#recModal').classList.remove('hidden');
+  }
+
+  function openHardDay(n) {
+    const ds = hardDateFor(n), e = hardDay(ds), cm = commsFor(n), ph = phaseFor(n);
+    recSpec = null; recIdx = -1; recExtra = null;
+    $('#recTitle').textContent = 'Day ' + n + ' · ' + prettyDate(ds);
+    let h = `<div class="rounded-xl p-3 mb-1" style="background:${ph.col}14"><p class="text-xs font-bold" style="color:${ph.col}">${esc(ph.name)}</p>
+      ${cm ? `<p class="text-xs text-gray-600 mt-1"><b>${esc(cm.code)}</b> — ${esc(cm.watch)}</p><p class="text-xs text-gray-500 mt-1">→ ${esc(cm.apply)}</p>` : ''}</div>`;
+    C.hardTasks.forEach(t => {
+      h += `<label class="flex items-center gap-3 py-2 border-b border-gray-100">
+        <input type="checkbox" data-hk="${esc(t.key)}" ${e.t[t.key] ? 'checked' : ''} class="w-5 h-5 accent-[#006644]">
+        <span class="text-lg">${t.icon}</span>
+        <span class="text-sm font-semibold text-gray-700 flex-1">${esc(t.label)}</span></label>`;
+    });
+    h += `<div class="pt-2"><label class="flbl">Win of the day / note</label><textarea id="hd-note" rows="3" class="fld resize-none">${esc(e.note || '')}</textarea></div>`;
+    $('#recFields').innerHTML = h;
+    $('#recDelete').classList.add('hidden');
+    $('#recMove').classList.add('hidden'); $('#recMove').classList.remove('grid');
+    recCommit = () => {
+      const rec = { t:{}, note:'', comms: e.comms || '' };
+      $('#recFields').querySelectorAll('[data-hk]').forEach(cb => { if (cb.checked) rec.t[cb.dataset.hk] = 1; });
+      rec.note = document.getElementById('hd-note').value.trim();
+      if (Object.keys(rec.t).length || rec.note) hardLog[ds] = rec; else delete hardLog[ds];
+      saveHardLog(); closeRec(); render(); toast('Day ' + n + ' saved');
+    };
+    $('#recModal').classList.remove('hidden');
+  }
+
+  function renderHard() {
+    const st = hardStatus(), n = Math.max(1, Math.min(st.n, st.L)), ph = phaseFor(n);
+    const ds = todayStr(), day = hardDay(ds), done = hardCount(ds), total = C.hardTasks.length;
+    const cm = commsFor(n);
+    const frac = st.state === 'live' ? (st.remaining / st.L) : (st.state === 'done' ? 0 : 1);
+    const big  = st.state === 'live' ? String(st.remaining) : (st.state === 'done' ? '✓' : '–');
+
+    let h = `<div class="rounded-3xl p-5 text-white shadow-lg" style="background:linear-gradient(135deg,${ph.col},${ph.col}cc)">
+      <div class="flex items-center gap-5">
+        <div class="text-white">${ringSvg(124, frac, '#ffffff', big, 'DAYS LEFT')}</div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Phase · ${esc(ph.name)}</p>
+          <p class="text-2xl font-bold leading-tight mt-0.5">${esc(st.label)}</p>
+          <p class="text-xs opacity-85 leading-snug mt-1">${esc(ph.note)}</p>
+          <p class="text-[11px] opacity-80 mt-2">Day 1 · ${prettyDate(hardMeta.start)}${hardMeta.attempt > 1 ? ' · attempt ' + hardMeta.attempt : ''}
+            <button onclick="openHardSetup()" class="underline font-semibold ml-1">edit</button></p>
+        </div>
+      </div>
+      <div class="mt-4 h-2 bg-white/25 rounded-full overflow-hidden">
+        <div class="h-full bg-white rounded-full transition-all duration-700" style="width:${Math.round(((st.L - st.remaining) / st.L) * 100)}%"></div>
+      </div>
+    </div>`;
+
+    /* Missed-day warning — never automatic */
+    const missed = missedDays();
+    if (missed.length) {
+      const last = missed[missed.length - 1];
+      h += `<div class="mt-4 rounded-2xl border-2 border-red-200 bg-red-50 p-4">
+        <p class="text-sm font-bold text-red-700">⚠ ${missed.length} closed day${missed.length === 1 ? '' : 's'} incomplete</p>
+        <p class="text-xs text-red-600 leading-relaxed mt-1">Most recent: Day ${last.n} (${prettyDate(last.ds)}) closed at ${last.done}/${total}.
+          The rule says a blank on any task sends you back to Day 1. The app won’t do that to you automatically — fill the day in if you simply forgot to tick it, or restart deliberately.</p>
+        <div class="grid grid-cols-2 gap-2 mt-3">
+          <button onclick="openHardDay(${last.n})" class="bg-white text-red-700 text-sm font-bold py-2.5 rounded-xl border border-red-200 active:bg-red-100">Fix Day ${last.n}</button>
+          <button onclick="confirmRestart()" class="bg-red-600 text-white text-sm font-bold py-2.5 rounded-xl active:bg-red-700">Restart at Day 1</button>
+        </div>
+      </div>`;
+    }
+
+    /* Today's comms cue */
+    if (cm && st.state === 'live') {
+      h += secTitle('Today’s communication cue');
+      h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <div class="flex items-center gap-2">
+          <span class="text-[11px] font-bold text-white px-2 py-0.5 rounded-full" style="background:${ph.col}">${esc(cm.code)}</span>
+          ${cm.vm ? '<span class="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">🎙 Voice memo today</span>' : ''}
+          ${editMode ? `<button onclick="openRec('comms',${n - 1})" class="ml-auto text-xs font-bold text-forest">Edit</button>` : ''}
+        </div>
+        <p class="text-sm font-semibold text-gray-800 leading-snug mt-2">${esc(cm.watch)}</p>
+        <p class="text-sm text-gray-500 leading-relaxed mt-1.5">→ ${esc(cm.apply)}</p>
+      </div>`;
+    }
+
+    /* The 8 non-negotiables */
+    h += secTitle(`Today — ${done}/${total} non-negotiables`, editMode ? 'hardTasks' : null, 'Add');
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    C.hardTasks.forEach((t, i) => {
+      const on = !!day.t[t.key];
+      h += `<div class="flex items-center gap-3 px-4 py-3 ${on ? 'opacity-60' : ''}">
+        <div onclick="${editMode ? `openRec('hardTasks',${i})` : `tapHard('${esc(t.key)}')`}" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer active:opacity-70">
+          <div class="w-7 h-7 shrink-0 rounded-full flex items-center justify-center border-2 ${on ? 'bg-forest border-forest' : 'border-gray-300'}">${on ? tickSvg : ''}</div>
+          <span class="text-lg shrink-0">${t.icon}</span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold ${on ? 'line-through text-gray-400' : 'text-gray-800'}">${esc(t.label)}</p>
+            <p class="text-[11px] text-gray-400 leading-snug">${esc(t.sub)}</p>
+          </div>
+          ${editMode ? editPencil : ''}
+        </div></div>`;
+    });
+    h += '</div>';
+
+    h += `<div class="mt-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+      <label class="flbl">Win of the day</label>
+      <textarea id="hardNote" rows="2" class="fld resize-none" placeholder="One line. What went right?">${esc(day.note || '')}</textarea>
+      <button onclick="saveTodayNote()" class="mt-2 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark">Save note</button>
+    </div>`;
+
+    /* The 75-day grid */
+    h += secTitle('The 75 days — tap any day to edit');
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">';
+    (C.phases || []).forEach(p => {
+      const from = Math.max(1, p.from), to = Math.min(st.L, p.to);
+      if (from > to) return;
+      h += `<p class="text-[10px] font-bold uppercase tracking-wider mb-1.5 mt-3 first:mt-0" style="color:${p.col}">${esc(p.name)} · ${from}–${to}</p>`;
+      h += '<div class="grid grid-cols-10 gap-1">';
+      for (let i = from; i <= to; i++) {
+        const dds = hardDateFor(i), cnt = hardCount(dds), full = cnt === total;
+        const isToday = i === st.n, future = i > st.n;
+        let style = '', cls = '';
+        if (full) { style = `background:${p.col};color:#fff`; }
+        else if (future) { cls = 'bg-gray-50 text-gray-300'; }
+        else if (cnt > 0) { style = `background:${p.col}33;color:${p.col}`; }
+        else { cls = 'bg-red-50 text-red-400'; }
+        h += `<div onclick="openHardDay(${i})" title="${prettyDate(dds)} — ${cnt}/${total}"
+          class="aspect-square rounded-md flex items-center justify-center text-[10px] font-bold cursor-pointer ${cls} ${isToday ? 'ring-2 ring-offset-1 ring-gray-800' : ''}"
+          style="${style}">${i}</div>`;
+      }
+      h += '</div>';
+    });
+    h += `<div class="flex flex-wrap items-center justify-center gap-3 mt-3 text-[10px] text-gray-400">
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:${ph.col}"></span>All ${total}</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded" style="background:${ph.col}33"></span>Partial</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-50 border border-red-100"></span>Blank</span>
+      <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-50 border border-gray-200"></span>Ahead</span></div>`;
+    h += '</div>';
+
+    /* Weekly benchmark nudge */
+    if (st.state === 'live' && (n % 7 === 0 || cm && cm.vm)) {
+      h += infoBox('📈 Benchmark day', 'Day ' + n + ' is a check-in: typing WPM + accuracy on monkeytype, a photo of this week’s journal page, and a 2-min voice memo you listen back to. <b>Log it on the Bench tab.</b>', '#8a6020');
+    }
+
+    /* Attempt history */
+    if (hardMeta.history.length) {
+      h += secTitle('Previous attempts');
+      h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+      hardMeta.history.forEach(a => {
+        h += `<div class="px-4 py-2.5 flex items-center justify-between">
+          <span class="text-sm font-semibold text-gray-700">Attempt ${a.attempt}</span>
+          <span class="text-xs text-gray-400">reached day ${a.reached} · ${prettyDate(a.start)} → ${prettyDate(a.endedOn)}</span></div>`;
+      });
+      h += '</div>';
+    }
+
+    h += infoBox('The rule, and the reason', 'Miss any one task and the challenge restarts at Day 1 — that is the point of it. This app flags a missed day but never resets you on its own; the choice stays yours. Control the inputs with full attention; the WPM, the neat hand and the calm voice are downstream, and they arrive on their own.', ph.col);
+    h += '<button onclick="confirmRestart()" class="mt-3 w-full text-red-500 text-sm font-semibold py-3 active:text-red-700">↺ Restart challenge at Day 1</button>';
+
+    $('#view-hard').innerHTML = h;
+  }
+  function tapHard(key) { toggleHardTask(todayStr(), key); renderHard(); }
+  function saveTodayNote() {
+    const ds = todayStr(), v = $('#hardNote').value.trim();
+    if (!hardLog[ds]) hardLog[ds] = { t:{}, note:'', comms:'' };
+    hardLog[ds].note = v; saveHardLog(); toast('Note saved');
+  }
+  function confirmRestart() {
+    if (confirm('Restart at Day 1?\n\nYour ticked days and notes are kept and this attempt is filed in history. Only the counter resets.')) restartHard();
+  }
+
+  /* ============================ FOOD ============================ */
   function renderFood() {
-    let h = secTitle('Daily Meals') + '<div class="space-y-2.5">';
-    MEALS.forEach(m => {
+    let h = secTitle('Daily Meals', editMode ? 'meals' : null, 'Add meal') + '<div class="space-y-2.5">';
+    C.meals.forEach((m, i) => {
       h += `<details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <summary class="cursor-pointer px-4 py-3 flex items-start justify-between gap-3 active:bg-gray-50">
           <div class="min-w-0">
@@ -554,113 +1386,236 @@
         </summary>
         <div class="px-4 pb-4 border-t border-gray-50">
           <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-1">Ingredients</p>
-          ${m.ing.map(x => `<p class="text-sm text-gray-600 leading-relaxed">• ${esc(x)}</p>`).join('')}
+          ${(m.ing || []).map(x => `<p class="text-sm text-gray-600 leading-relaxed">• ${esc(x)}</p>`).join('')}
           <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-1">Preparation</p>
-          ${m.prep.map((x,j) => `<div class="flex gap-2 mt-1.5"><span class="shrink-0 w-5 h-5 rounded-full bg-forest-light text-forest text-[11px] font-bold flex items-center justify-center">${j+1}</span><p class="text-sm text-gray-600 leading-snug">${esc(x)}</p></div>`).join('')}
+          ${(m.prep || []).map((x,j) => `<div class="flex gap-2 mt-1.5"><span class="shrink-0 w-5 h-5 rounded-full bg-forest-light text-forest text-[11px] font-bold flex items-center justify-center">${j+1}</span><p class="text-sm text-gray-600 leading-snug">${esc(x)}</p></div>`).join('')}
           ${m.tip ? `<div class="mt-3 bg-amber-50 rounded-xl p-3 text-xs text-amber-800 leading-relaxed">💡 ${esc(m.tip)}</div>` : ''}
+          ${editMode ? `<button onclick="openRec('meals',${i})" class="mt-3 w-full bg-gray-100 text-gray-700 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">✎ Edit this meal</button>` : ''}
         </div></details>`;
     });
     h += '</div>';
 
-    h += secTitle('Batch Rotation') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    BATCHES.forEach(b => {
-      h += `<div class="px-4 py-3">
-        <p class="font-semibold text-[15px]" style="color:${b.col}">${esc(b.name)}</p>
-        <p class="text-xs text-gray-400 font-medium mt-0.5">${esc(b.days)} · Cook: ${esc(b.cook)}</p>
-        <p class="text-sm text-gray-600 leading-snug mt-1">${esc(b.desc)}</p></div>`;
+    h += secTitle('Batch Rotation', editMode ? 'batches' : null, 'Add batch') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    C.batches.forEach((b, i) => {
+      h += `<div ${editMode ? `onclick="openRec('batches',${i})"` : ''} class="px-4 py-3 ${editMode ? 'cursor-pointer active:bg-gray-50 flex gap-2' : ''}">
+        <div class="flex-1">
+          <p class="font-semibold text-[15px]" style="color:${b.col}">${esc(b.name)}</p>
+          <p class="text-xs text-gray-400 font-medium mt-0.5">${esc(b.days)} · Cook: ${esc(b.cook)}</p>
+          <p class="text-sm text-gray-600 leading-snug mt-1">${esc(b.desc)}</p>
+        </div>${editMode ? editPencil : ''}</div>`;
     });
     h += '</div>';
 
-    h += secTitle('Supplements') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    SUPPS.forEach(s => { h += `<div class="px-4 py-2.5 flex items-center justify-between"><span class="text-sm font-semibold text-gray-700">${esc(s.n)}</span><span class="text-xs text-gray-400">${esc(s.t)}</span></div>`; });
+    h += secTitle('Supplements', editMode ? 'supps' : null, 'Add') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    C.supps.forEach((s, i) => {
+      h += `<div ${editMode ? `onclick="openRec('supps',${i})"` : ''} class="px-4 py-2.5 flex items-center justify-between gap-2 ${editMode ? 'cursor-pointer active:bg-gray-50' : ''}">
+        <span class="text-sm font-semibold text-gray-700">${esc(s.n)}</span>
+        <span class="text-xs text-gray-400 flex items-center gap-2">${esc(s.t)}${editMode ? editPencil : ''}</span></div>`;
+    });
     h += '</div>';
-
     $('#view-food').innerHTML = h;
   }
 
-  /* ---- SKIN view ---- */
+  /* ============================ SKIN ============================ */
   function renderSkin() {
     const dow = new Date().getDay();
     const isGym = [1,2,4,5].includes(dow), isSat = dow === 6;
-    const am = isGym ? SKIN_AM.gym : isSat ? SKIN_AM.sat : SKIN_AM.rest;
-    const amCol = isGym ? '#a8321f' : isSat ? '#8a2060' : '#256b42';
+    const amIdx = isGym ? 0 : isSat ? 1 : 2;
+    const am = C.skinAM[Math.min(amIdx, C.skinAM.length - 1)] || C.skinAM[0];
     const pmIdx = dow === 0 ? 6 : dow - 1;
 
-    let h = infoBox(am.title, esc(am.note), amCol);
-    h += secTitle('AM Routine') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    am.steps.forEach((s,i) => {
+    let h = am ? infoBox(esc(am.title), esc(am.note), am.col || '#256b42') : '';
+    h += secTitle('AM Routine', editMode ? 'skinAM' : null, 'Add routine');
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    ((am && am.steps) || []).forEach((s, i) => {
+      const parts = String(s).split('::');
       h += `<div class="flex gap-3 px-4 py-3">
         <span class="shrink-0 w-6 h-6 rounded-full bg-forest-light text-forest text-xs font-bold flex items-center justify-center">${i+1}</span>
-        <div><p class="text-sm font-semibold text-gray-800">${esc(s.n)}</p><p class="text-xs text-gray-400 leading-snug mt-0.5">${esc(s.note)}</p></div></div>`;
+        <div><p class="text-sm font-semibold text-gray-800">${esc((parts[0]||'').trim())}</p>
+        ${parts[1] ? `<p class="text-xs text-gray-400 leading-snug mt-0.5">${esc(parts[1].trim())}</p>` : ''}</div></div>`;
     });
     h += '</div>';
+    if (editMode) {
+      h += '<div class="grid grid-cols-3 gap-2 mt-2">' + C.skinAM.map((r,i) =>
+        `<button onclick="openRec('skinAM',${i})" class="bg-gray-100 text-gray-600 text-xs font-semibold py-2 rounded-xl active:bg-gray-200 truncate">✎ ${esc(r.key || ('R'+(i+1)))}</button>`).join('') + '</div>';
+    }
 
-    h += secTitle('Red Light Mask') + infoBox('🔴 Mon · Tue · Wed — 3 sessions/week',
-      '10–15 min on clean bare skin before serums. Start PM at 7:30 on these nights. Drink Sattu while it runs. Boosts collagen, fades pigmentation, aids recovery. Not Friday (AHA-sensitised skin).', '#b83200');
+    h += secTitle('Red Light Mask') + infoBox(esc(C.skinRLM.title), esc(C.skinRLM.text), '#b83200');
+    if (editMode) h += `<button onclick="editRLM()" class="mt-1 w-full bg-gray-100 text-gray-600 text-xs font-semibold py-2 rounded-xl active:bg-gray-200">✎ Edit red light block</button>`;
 
-    h += secTitle('PM Rotation — Tonight Highlighted') + '<div class="space-y-2">';
-    SKIN_PM.forEach((pm,i) => {
+    h += secTitle('PM Rotation — tonight highlighted', editMode ? 'skinPM' : null, 'Add night') + '<div class="space-y-2">';
+    C.skinPM.forEach((pm, i) => {
       const tn = i === pmIdx;
-      h += `<div class="bg-white rounded-2xl shadow-sm border ${tn ? 'border-forest ring-1 ring-forest/30' : 'border-gray-100'} px-4 py-3">
-        <div class="flex items-center justify-between">
+      h += `<div ${editMode ? `onclick="openRec('skinPM',${i})"` : ''} class="bg-white rounded-2xl shadow-sm border ${tn ? 'border-forest ring-1 ring-forest/30' : 'border-gray-100'} px-4 py-3 ${editMode ? 'cursor-pointer active:bg-gray-50' : ''}">
+        <div class="flex items-center justify-between gap-2">
           <p class="text-sm font-bold" style="color:${pm.col}">${esc(pm.night)}${tn ? ' · Tonight ◉' : ''}</p>
-          ${pm.rlm ? '<span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">🔴 Red Light</span>' : ''}
+          <div class="flex items-center gap-2">${pm.rlm ? '<span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">🔴 Red Light</span>' : ''}${editMode ? editPencil : ''}</div>
         </div>
         <p class="text-xs font-semibold mt-0.5" style="color:${pm.col}">${esc(pm.active)}</p>
         <p class="text-xs text-gray-500 leading-relaxed mt-1">${esc(pm.routine)}</p></div>`;
     });
     h += '</div>';
 
-    h += secTitle('4-Pathway Pigmentation Attack') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    SKIN_PATH.forEach(p => {
-      h += `<div class="px-4 py-3"><p class="text-xs font-bold" style="color:${p.col}">${esc(p.label)}</p><p class="text-xs text-gray-500 leading-snug mt-0.5">${esc(p.text)}</p></div>`;
+    h += secTitle('4-Pathway Pigmentation Attack', editMode ? 'skinPath' : null, 'Add') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    C.skinPath.forEach((p, i) => {
+      h += `<div ${editMode ? `onclick="openRec('skinPath',${i})"` : ''} class="px-4 py-3 ${editMode ? 'cursor-pointer active:bg-gray-50 flex gap-2' : ''}">
+        <div class="flex-1"><p class="text-xs font-bold" style="color:${p.col}">${esc(p.label)}</p>
+        <p class="text-xs text-gray-500 leading-snug mt-0.5">${esc(p.text)}</p></div>${editMode ? editPencil : ''}</div>`;
     });
     h += '</div>';
 
-    h += secTitle('Rules') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    SKIN_RULES.forEach(r => { h += `<p class="px-4 py-2.5 text-sm text-gray-600 leading-snug">• ${esc(r)}</p>`; });
+    h += secTitle('Rules', editMode ? 'skinRules' : null, 'Add rule') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    C.skinRules.forEach((r, i) => {
+      h += `<div ${editMode ? `onclick="openRec('skinRules',${i})"` : ''} class="px-4 py-2.5 flex gap-2 ${editMode ? 'cursor-pointer active:bg-gray-50' : ''}">
+        <p class="text-sm text-gray-600 leading-snug flex-1">• ${esc(r.r)}</p>${editMode ? editPencil : ''}</div>`;
+    });
     h += '</div>';
-
     $('#view-skin').innerHTML = h;
   }
-
-  /* ---- GYM view ---- */
-  function setGymDay(k) { gymDay = k; renderGym(); }
-  function saveGymLog(day, ei) {
-    const ex = EX[day].exs[ei], sets = [];
-    for (let s = 0; s < ex.sets; s++) {
-      const w = parseFloat(($('#gl-'+day+'-'+ei+'-'+s+'-w')||{}).value) || 0;
-      const r = parseInt(($('#gl-'+day+'-'+ei+'-'+s+'-r')||{}).value) || 0;
-      sets.push({ w, r });
-    }
-    const logs = getGymLogs(); logs[todayStr() + '||' + ex.n] = sets; setGymLogs(logs);
-    toast('Logged ' + ex.n); renderGym();
+  function editRLM() {
+    recSpec = null; recIdx = -1; recExtra = null;
+    $('#recTitle').textContent = 'Red Light Mask';
+    $('#recFields').innerHTML =
+      `<div><label class="flbl">Title</label><input id="rl-t" class="fld" value="${esc(C.skinRLM.title)}"></div>
+       <div><label class="flbl">Text</label><textarea id="rl-x" rows="5" class="fld resize-none">${esc(C.skinRLM.text)}</textarea></div>`;
+    $('#recDelete').classList.add('hidden'); $('#recMove').classList.add('hidden'); $('#recMove').classList.remove('grid');
+    recCommit = () => { C.skinRLM = { title: document.getElementById('rl-t').value, text: document.getElementById('rl-x').value }; saveC(); closeRec(); render(); toast('Saved'); };
+    $('#recModal').classList.remove('hidden');
   }
+
+  /* ============================ ANATOMY DIAGRAM ============================ */
+  function figureSil(cx) {
+    const m = (x) => (cx + x).toFixed(1);
+    return `
+      <ellipse cx="${cx}" cy="17" rx="8.5" ry="10"/>
+      <rect x="${m(-3.5)}" y="25" width="7" height="8"/>
+      <path d="M${m(-15)} 34 Q${cx} 30 ${m(15)} 34 L${m(13)} 62 L${m(12)} 92 L${m(-12)} 92 L${m(-13)} 62 Z"/>
+      <rect x="${m(-12.5)}" y="88" width="25" height="14" rx="6"/>
+      <ellipse cx="${m(-22.5)}" cy="43" rx="8" ry="7.5"/><ellipse cx="${m(22.5)}" cy="43" rx="8" ry="7.5"/>
+      <ellipse cx="${m(-25.5)}" cy="59" rx="6" ry="10.5"/><ellipse cx="${m(25.5)}" cy="59" rx="6" ry="10.5"/>
+      <ellipse cx="${m(-28.5)}" cy="78" rx="5.5" ry="11.5"/><ellipse cx="${m(28.5)}" cy="78" rx="5.5" ry="11.5"/>
+      <ellipse cx="${m(-30)}" cy="90" rx="4" ry="4.5"/><ellipse cx="${m(30)}" cy="90" rx="4" ry="4.5"/>
+      <ellipse cx="${m(-8)}" cy="118" rx="9.5" ry="23"/><ellipse cx="${m(8)}" cy="118" rx="9.5" ry="23"/>
+      <ellipse cx="${m(-8)}" cy="143" rx="6.5" ry="5"/><ellipse cx="${m(8)}" cy="143" rx="6.5" ry="5"/>
+      <ellipse cx="${m(-7.5)}" cy="163" rx="7.5" ry="16"/><ellipse cx="${m(7.5)}" cy="163" rx="7.5" ry="16"/>
+      <ellipse cx="${m(-7.5)}" cy="184" rx="5" ry="4"/><ellipse cx="${m(7.5)}" cy="184" rx="5" ry="4"/>`;
+  }
+  function bodySVG(pri, sec) {
+    const P = new Set(pri || []), S = new Set(sec || []);
+    const PRI = '#006644', SEC = '#8fc4b0';
+    let layers = '';
+    MG_ORDER.forEach(k => {
+      const g = MG[k]; if (!g) return;
+      const hit = P.has(k) ? PRI : (S.has(k) ? SEC : null);
+      if (hit) layers += `<g class="mgroup" fill="${hit}">${g.p}</g>`;
+    });
+    return `<svg viewBox="0 0 200 200" class="w-full max-w-[300px] mx-auto" role="img" aria-label="Muscles worked">
+      <g fill="#e5e7eb">${figureSil(50)}${figureSil(150)}</g>
+      ${layers}
+      <text x="50" y="198" text-anchor="middle" font-size="8" font-weight="700" fill="#9ca3af">FRONT</text>
+      <text x="150" y="198" text-anchor="middle" font-size="8" font-weight="700" fill="#9ca3af">BACK</text>
+    </svg>`;
+  }
+  const mgChip = (k, primary) => {
+    const g = MG[k]; if (!g) return '';
+    return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${primary ? 'text-white' : 'text-forest bg-forest-light'}" style="${primary ? 'background:#006644' : ''}">${esc(g.l)}</span>`;
+  };
+  const ytSearch = (n) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(n + ' proper form technique');
+
+  /* ============================ GYM ============================ */
+  function setGymDay(k) { gymDay = k; renderGym(); }
+  function gymDayIdx() { const i = C.gym.findIndex(d => d.key === gymDay); return i > -1 ? i : 0; }
+
+  function saveGymLog(di, ei) {
+    const ex = C.gym[di].exs[ei], sets = [];
+    for (let s = 0; s < ex.sets; s++) {
+      const w = num(($('#gl-' + di + '-' + ei + '-' + s + '-w') || {}).value) || 0;
+      const r = parseInt(($('#gl-' + di + '-' + ei + '-' + s + '-r') || {}).value) || 0;
+      if (w || r) sets.push({ w, r });
+    }
+    const logs = getGymLogs(); const key = todayStr() + '||' + ex.n;
+    if (sets.length) logs[key] = sets; else delete logs[key];
+    setGymLogs(logs);
+    toast(sets.length ? 'Logged ' + ex.n : 'Cleared ' + ex.n); renderGym();
+  }
+
+  function openExEditor(di, ei) {
+    openRec('__ex', ei, {
+      one: 'Exercise',
+      arr: () => C.gym[di].exs,
+      save: () => saveC(),
+      blank: () => ({ n:'New exercise', sets:3, reps:'10–12', tgt:'', vid:'', vidT:'', pri:[], sec:[], setup:'', exec:'', key:'', avoid:'' }),
+      fields: [
+        {k:'n',l:'Exercise name'},{k:'sets',l:'Sets',t:'num'},{k:'reps',l:'Rep range'},{k:'tgt',l:'Target / working weight'},
+        {k:'vid',l:'YouTube video ID or URL'},{k:'vidT',l:'Video label'},
+        {k:'pri',l:'Primary muscles — one per line\n(' + MG_ORDER.join(', ') + ')',t:'lines'},
+        {k:'sec',l:'Secondary muscles — one per line',t:'lines'},
+        {k:'setup',l:'Setup',t:'area'},{k:'exec',l:'Execution',t:'area'},{k:'key',l:'Key cue',t:'area'},{k:'avoid',l:'Avoid',t:'area'}
+      ]
+    });
+  }
+
+  function openGymLogEdit(date, name) {
+    const logs = getGymLogs(), key = date + '||' + name, sets = logs[key] || [];
+    recSpec = null; recIdx = -1; recExtra = null;
+    $('#recTitle').textContent = name;
+    let h = `<p class="text-xs text-gray-400 -mt-2 mb-1">${prettyDate(date)} — edit or clear any set.</p>`;
+    const n = Math.max(sets.length, 1) + 1;
+    for (let s = 0; s < n; s++) {
+      const pv = sets[s];
+      h += `<div class="flex items-center gap-2">
+        <span class="shrink-0 w-7 text-xs font-bold text-gray-400">S${s+1}</span>
+        <input data-gw="${s}" type="number" inputmode="decimal" step="any" placeholder="kg"   value="${pv ? pv.w : ''}" class="fld text-center">
+        <input data-gr="${s}" type="number" inputmode="numeric" placeholder="reps" value="${pv ? pv.r : ''}" class="fld text-center"></div>`;
+    }
+    $('#recFields').innerHTML = h;
+    $('#recDelete').classList.remove('hidden'); $('#recMove').classList.add('hidden'); $('#recMove').classList.remove('grid');
+    $('#recDelete').onclick = () => { const l = getGymLogs(); delete l[key]; setGymLogs(l); closeRec(); render(); toast('Session entry deleted'); };
+    recCommit = () => {
+      const out = [];
+      $('#recFields').querySelectorAll('[data-gw]').forEach(el => {
+        const i = el.dataset.gw, w = num(el.value) || 0;
+        const r = parseInt(($('#recFields').querySelector('[data-gr="' + i + '"]') || {}).value) || 0;
+        if (w || r) out.push({ w, r });
+      });
+      const l = getGymLogs(); if (out.length) l[key] = out; else delete l[key];
+      setGymLogs(l); closeRec(); render(); toast('Saved');
+    };
+    $('#recModal').classList.remove('hidden');
+  }
+
   function renderGym() {
-    const keys = ['monday','tuesday','thursday','friday'];
-    let h = '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-3">';
-    keys.forEach(k => {
-      const on = k === gymDay;
-      h += `<button onclick="setGymDay('${k}')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${on ? 'bg-forest text-white shadow' : 'text-gray-500 active:bg-gray-200'}">${EX[k].label}</button>`;
+    if (!C.gym.some(d => d.key === gymDay)) gymDay = (C.gym[0] || {}).key || 'monday';
+    const di = gymDayIdx(), d = C.gym[di];
+
+    let h = '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-3 overflow-x-auto no-sb">';
+    C.gym.forEach(x => {
+      const on = x.key === gymDay;
+      h += `<button onclick="setGymDay('${esc(x.key)}')" class="flex-1 min-w-[70px] rounded-lg py-2 text-sm font-semibold transition ${on ? 'bg-forest text-white shadow' : 'text-gray-500 active:bg-gray-200'}">${esc(x.label)}</button>`;
     });
     h += '</div>';
+    if (editMode) {
+      h += `<div class="grid grid-cols-2 gap-2 mb-3">
+        <button onclick="openRec('gymDays',${di})" class="bg-gray-100 text-gray-600 text-xs font-semibold py-2.5 rounded-xl active:bg-gray-200">✎ Edit this day</button>
+        <button onclick="openRec('gymDays',-1)" class="bg-gray-100 text-gray-600 text-xs font-semibold py-2.5 rounded-xl active:bg-gray-200">+ Add training day</button></div>`;
+    }
 
-    const d = EX[gymDay];
-    h += infoBox(gymDay.charAt(0).toUpperCase() + gymDay.slice(1) + ' — ' + d.label,
+    h += infoBox(esc(d.label) + ' — ' + esc(d.key.charAt(0).toUpperCase() + d.key.slice(1)),
       esc(d.target) + '<br>45 min · 90 sec rest compounds · 60 sec isolations', '#a8321f');
 
     h += '<div class="space-y-2.5 mt-2">';
-    d.exs.forEach((ex,ei) => {
+    d.exs.forEach((ex, ei) => {
       const log = getExLog(ex.n);
       let logRows = '';
-      for (let s = 0; s < ex.sets; s++) {
+      for (let s = 0; s < (ex.sets || 3); s++) {
         const pv = log ? log[s] : null;
         logRows += `<div class="flex items-center gap-2 mt-2">
           <span class="shrink-0 w-6 text-xs font-bold text-gray-400">S${s+1}</span>
-          <input id="gl-${gymDay}-${ei}-${s}-w" type="number" inputmode="decimal" placeholder="kg" value="${pv ? pv.w : ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest">
-          <input id="gl-${gymDay}-${ei}-${s}-r" type="number" inputmode="numeric" placeholder="reps" value="${pv ? pv.r : ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest">
-        </div>`;
+          <input id="gl-${di}-${ei}-${s}-w" type="number" inputmode="decimal" step="any" placeholder="kg"   value="${pv ? pv.w : ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest">
+          <input id="gl-${di}-${ei}-${s}-r" type="number" inputmode="numeric" placeholder="reps" value="${pv ? pv.r : ''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest"></div>`;
       }
+      const vid = (ex.vid || '').trim();
+      const vurl = vid ? (vid.startsWith('http') ? vid : 'https://www.youtube.com/watch?v=' + vid) : '';
       h += `<details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <summary class="cursor-pointer px-4 py-3 flex items-center justify-between gap-2 active:bg-gray-50">
           <div class="min-w-0">
@@ -673,37 +1628,57 @@
           </div>
         </summary>
         <div class="px-4 pb-4 border-t border-gray-50">
-          <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-0.5">Setup</p>
+
+          <div class="grid ${vurl ? 'grid-cols-2' : 'grid-cols-1'} gap-2 mt-3">
+            ${vurl ? `<a href="${esc(vurl)}" target="_blank" rel="noopener"
+              class="flex items-center justify-center gap-1.5 bg-red-600 text-white text-sm font-semibold py-2.5 rounded-xl active:bg-red-700">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch demo</a>` : ''}
+            <a href="${esc(ytSearch(ex.n))}" target="_blank" rel="noopener"
+              class="flex items-center justify-center gap-1.5 bg-gray-100 text-gray-600 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">🔍 Search YouTube</a>
+          </div>
+          ${ex.vidT ? `<p class="text-[10px] text-gray-400 text-center mt-1.5 leading-snug">${esc(ex.vidT)}</p>` : ''}
+
+          <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-4 mb-1">Muscles worked</p>
+          <div class="bg-gray-50 rounded-2xl py-2">${bodySVG(ex.pri, ex.sec)}</div>
+          <div class="flex flex-wrap gap-1.5 mt-2 justify-center">
+            ${(ex.pri||[]).map(k => mgChip(k, true)).join('')}
+            ${(ex.sec||[]).map(k => mgChip(k, false)).join('')}
+          </div>
+          <p class="text-[10px] text-gray-400 text-center mt-1.5">Solid green = primary · pale = secondary</p>
+
+          <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-4 mb-0.5">Setup</p>
           <p class="text-sm text-gray-600 leading-snug">${esc(ex.setup)}</p>
           <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-2.5 mb-0.5">Execution</p>
           <p class="text-sm text-gray-600 leading-snug">${esc(ex.exec)}</p>
-          <div class="mt-3 bg-forest-light rounded-xl p-3 text-xs text-forest-dark leading-relaxed">⚡ ${esc(ex.key)}</div>
-          <div class="mt-2 bg-red-50 rounded-xl p-3 text-xs text-red-700 leading-relaxed">✗ Avoid: ${esc(ex.avoid)}</div>
+          ${ex.key ? `<div class="mt-3 bg-forest-light rounded-xl p-3 text-xs text-forest-dark leading-relaxed">⚡ ${esc(ex.key)}</div>` : ''}
+          ${ex.avoid ? `<div class="mt-2 bg-red-50 rounded-xl p-3 text-xs text-red-700 leading-relaxed">✗ Avoid: ${esc(ex.avoid)}</div>` : ''}
+
           <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-0.5">Log today · weight × reps</p>
           ${logRows}
-          <button onclick="saveGymLog('${gymDay}',${ei})" class="mt-3 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark transition">${log ? 'Update log' : 'Save log'}</button>
+          <button onclick="saveGymLog(${di},${ei})" class="mt-3 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark transition">${log ? 'Update log' : 'Save log'}</button>
+          ${editMode ? `<button onclick="openExEditor(${di},${ei})" class="mt-2 w-full bg-gray-100 text-gray-700 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">✎ Edit this exercise</button>` : ''}
         </div></details>`;
     });
     h += '</div>';
+    if (editMode) h += addBtnHtml('Add exercise to ' + d.label, `openExEditor(${di},-1)`);
 
-    // History
-    const recent = recentGym(21);
-    h += secTitle('Recent Logs') ;
+    const recent = recentGym(28);
+    h += secTitle('Recent logs — tap to edit');
     if (!recent.length) {
       h += '<p class="text-center text-gray-400 text-sm py-4">No sessions logged yet. Log sets above and they appear here.</p>';
     } else {
       h += '<div class="space-y-2">';
       recent.forEach(day => {
-        h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 py-3">
-          <p class="text-xs font-bold text-forest mb-1">${esc(day.date)}</p>`;
+        h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 py-3"><p class="text-xs font-bold text-forest mb-1">${esc(day.label)}</p>`;
         day.items.forEach(it => {
-          h += `<div class="flex justify-between gap-2 py-0.5"><span class="text-xs text-gray-600 truncate">${esc(it.name)}</span><span class="text-xs text-gray-400 shrink-0">${it.sets.map(s => s.w + '×' + s.r).join(' · ')}</span></div>`;
+          h += `<div onclick="openGymLogEdit('${day.date}',${JSON.stringify(it.name).replace(/"/g,'&quot;')})" class="flex justify-between gap-2 py-1 cursor-pointer active:bg-gray-50 rounded">
+            <span class="text-xs text-gray-600 truncate">${esc(it.name)}</span>
+            <span class="text-xs text-gray-400 shrink-0">${it.sets.map(s => s.w + '×' + s.r).join(' · ')}</span></div>`;
         });
         h += '</div>';
       });
       h += '</div>';
     }
-
     $('#view-gym').innerHTML = h;
   }
   function recentGym(days) {
@@ -712,20 +1687,36 @@
     Object.keys(all).forEach(k => {
       const date = k.split('||')[0], name = k.slice(date.length + 2);
       const dt = new Date(date + 'T12:00');
-      if (dt >= cut) { (byDate[date] = byDate[date] || []).push({ name, sets: all[k] }); }
+      if (dt >= cut) (byDate[date] = byDate[date] || []).push({ name, sets: all[k] });
     });
-    return Object.keys(byDate).sort().reverse().map(date => {
-      const d = new Date(date + 'T12:00');
-      return { date: d.toLocaleDateString(undefined, { weekday:'short', day:'numeric', month:'short' }), items: byDate[date] };
-    });
+    return Object.keys(byDate).sort().reverse().map(date => ({ date, label: prettyDate(date), items: byDate[date] }));
   }
 
-  /* ---- MONTHLY / TRACK view ---- */
+  /* ============================ TRACK ============================ */
   function toggleHabit(key) { const t = todayStr(); setHabit(t, key, getHabits(t)[key] ? 0 : 1); renderMonthly(); }
-  function resetMonthly() {
-    if (confirm('Delete all habit tracking and streaks? Workout logs are kept.')) {
-      localStorage.setItem(HABITS_KEY, '{}'); renderMonthly(); toast('Tracking reset');
-    }
+  function openHabitDay(ds) {
+    const cur = getHabits(ds);
+    recSpec = null; recIdx = -1; recExtra = null;
+    $('#recTitle').textContent = prettyDate(ds);
+    $('#recFields').innerHTML = C.habits.map(hb =>
+      `<label class="flex items-center gap-3 py-2 border-b border-gray-100">
+        <input type="checkbox" data-hb="${esc(hb.key)}" ${cur[hb.key] ? 'checked' : ''} class="w-5 h-5 accent-[#006644]">
+        <span class="text-lg">${hb.icon}</span><span class="text-sm font-semibold text-gray-700">${esc(hb.label)}</span></label>`).join('');
+    $('#recDelete').classList.add('hidden'); $('#recMove').classList.add('hidden'); $('#recMove').classList.remove('grid');
+    recCommit = () => {
+      $('#recFields').querySelectorAll('[data-hb]').forEach(cb => setHabit(ds, cb.dataset.hb, cb.checked ? 1 : 0));
+      closeRec(); render(); toast('Saved');
+    };
+    $('#recModal').classList.remove('hidden');
+  }
+  function editThreshold() {
+    recSpec = null; recIdx = -1; recExtra = null;
+    $('#recTitle').textContent = 'Win-day threshold';
+    $('#recFields').innerHTML = `<div><label class="flbl">Habits needed for a win day (out of ${C.habits.length})</label>
+      <input id="th-v" type="number" inputmode="numeric" min="1" max="${C.habits.length}" value="${C.threshold}" class="fld"></div>`;
+    $('#recDelete').classList.add('hidden'); $('#recMove').classList.add('hidden'); $('#recMove').classList.remove('grid');
+    recCommit = () => { C.threshold = Math.max(1, Math.min(C.habits.length, parseInt(document.getElementById('th-v').value) || 6)); saveC(); closeRec(); render(); toast('Saved'); };
+    $('#recModal').classList.remove('hidden');
   }
   function renderMonthly() {
     const cur = currentStreak(), best = bestStreak();
@@ -736,27 +1727,22 @@
     h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center"><p class="text-2xl">🏆</p><p class="tabular text-3xl font-bold text-gray-800 leading-none mt-1">${best}</p><p class="text-[10px] uppercase tracking-wide text-gray-400 mt-1">Best streak</p></div>`;
     h += '</div>';
 
-    // Today's habits
-    h += secTitle(`Today’s Habits — ${done}/${HABITS.length} done`);
+    h += secTitle(`Today’s habits — ${done}/${C.habits.length}`, editMode ? 'habits' : null, 'Add habit');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    HABITS.forEach(hab => {
+    C.habits.forEach((hab, i) => {
       const on = !!hb[hab.key];
-      h += `<div onclick="toggleHabit('${hab.key}')" class="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 ${on ? 'opacity-60' : ''}">
-        <div class="w-7 h-7 shrink-0 rounded-full flex items-center justify-center border-2 ${on ? 'bg-forest border-forest' : 'border-gray-300'}">
-          ${on ? '<svg class="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : ''}
-        </div>
+      h += `<div onclick="${editMode ? `openRec('habits',${i})` : `toggleHabit('${esc(hab.key)}')`}" class="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 ${on ? 'opacity-60' : ''}">
+        <div class="w-7 h-7 shrink-0 rounded-full flex items-center justify-center border-2 ${on ? 'bg-forest border-forest' : 'border-gray-300'}">${on ? tickSvg : ''}</div>
         <span class="text-lg shrink-0">${hab.icon}</span>
         <div class="flex-1 min-w-0"><p class="text-sm font-semibold ${on ? 'line-through text-gray-400' : 'text-gray-800'}">${esc(hab.label)}</p><p class="text-xs text-gray-400 truncate">${esc(hab.sub)}</p></div>
-        <span class="text-[10px] font-bold text-forest shrink-0">${habitStreak(hab.key) || ''}</span>
+        ${editMode ? editPencil : `<span class="text-[10px] font-bold text-forest shrink-0">${habitStreak(hab.key) || ''}</span>`}
       </div>`;
     });
     h += '</div>';
 
-    // Month calendar grid
     const now = new Date(), y = now.getFullYear(), mo = now.getMonth();
     const firstDow = new Date(y, mo, 1).getDay(), dim = new Date(y, mo+1, 0).getDate(), todayD = now.getDate();
-    const monthName = now.toLocaleDateString(undefined, { month:'long', year:'numeric' });
-    h += secTitle(monthName + ' — win days');
+    h += secTitle(now.toLocaleDateString(undefined, { month:'long', year:'numeric' }) + ' — tap a day to edit');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3">';
     h += '<div class="grid grid-cols-7 gap-1 mb-1">' + ['S','M','T','W','T','F','S'].map(d => `<div class="text-center text-[10px] font-bold text-gray-300">${d}</div>`).join('') + '</div>';
     h += '<div class="grid grid-cols-7 gap-1">';
@@ -768,60 +1754,94 @@
       else if (win) cls = 'bg-forest text-white';
       else if (c > 0) cls = 'bg-forest/20 text-forest';
       else cls = 'bg-gray-100 text-gray-400';
-      const ring = dd === todayD ? ' ring-2 ring-forest ring-offset-1' : '';
-      h += `<div class="aspect-square rounded-lg flex items-center justify-center text-[11px] font-semibold ${cls}${ring}">${dd}</div>`;
+      h += `<div onclick="openHabitDay('${ds}')" class="aspect-square rounded-lg flex items-center justify-center text-[11px] font-semibold cursor-pointer ${cls}${dd === todayD ? ' ring-2 ring-forest ring-offset-1' : ''}">${dd}</div>`;
     }
     h += '</div>';
-    h += '<div class="flex items-center justify-center gap-3 mt-3 text-[10px] text-gray-400"><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-forest"></span>Win (6+/8)</span><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-forest/20"></span>Partial</span><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100"></span>Missed</span></div>';
+    h += `<div class="flex items-center justify-center gap-3 mt-3 text-[10px] text-gray-400"><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-forest"></span>Win (${C.threshold}+/${C.habits.length})</span><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-forest/20"></span>Partial</span><span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-100"></span>Missed</span></div>`;
     h += '</div>';
 
-    // 30-day summary
     let win30 = 0, logged30 = 0;
-    for (let i = 0; i < 30; i++) { const ds = dateNAgo(i); const c = dayCount(ds); if (c > 0) logged30++; if (isWin(ds)) win30++; }
-    h += secTitle('Last 30 Days') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex justify-around text-center">';
+    for (let i = 0; i < 30; i++) { const ds = dateNAgo(i); if (dayCount(ds) > 0) logged30++; if (isWin(ds)) win30++; }
+    h += secTitle('Last 30 days') + '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex justify-around text-center">';
     h += `<div><p class="tabular text-2xl font-bold text-forest">${win30}</p><p class="text-[10px] text-gray-400 mt-0.5">Win days</p></div>`;
     h += `<div><p class="tabular text-2xl font-bold text-amber-600">${logged30}</p><p class="text-[10px] text-gray-400 mt-0.5">Days active</p></div>`;
     h += `<div><p class="tabular text-2xl font-bold text-blue-600">${Math.round(win30/30*100)}%</p><p class="text-[10px] text-gray-400 mt-0.5">Consistency</p></div>`;
     h += '</div>';
 
-    h += infoBox('How streaks work', 'A “win day” = hitting at least 6 of your 8 habits. Your streak counts consecutive win days — today doesn’t break it until midnight. The number beside each habit is its own streak.', '#256b42');
-    h += '<button onclick="resetMonthly()" class="mt-3 w-full text-red-500 text-sm font-semibold py-3 active:text-red-700">Reset all tracking data</button>';
-
+    h += infoBox('How streaks work', `A win day = hitting at least ${C.threshold} of your ${C.habits.length} habits. Your streak counts consecutive win days — today doesn’t break it until midnight. The number beside each habit is its own streak.`, '#256b42');
+    h += `<button onclick="editThreshold()" class="mt-2 w-full bg-gray-100 text-gray-600 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">✎ Change win-day threshold</button>`;
     $('#view-monthly').innerHTML = h;
   }
 
-  /* ============================================================
-     DATES (scheduler) & GOALS  — separate persistent stores
-     ============================================================ */
-  const EVENTS_KEY = 'habitTracker.events';
-  const GOALS_KEY  = 'habitTracker.goals';
-  const dateNAhead   = (n) => { const d = new Date(); d.setDate(d.getDate()+n); return dstr(d); };
-  const endOfMonthStr = () => { const d = new Date(); return dstr(new Date(d.getFullYear(), d.getMonth()+1, 0)); };
-
-  function loadEvents() {
-    try { const r = localStorage.getItem(EVENTS_KEY); if (r) { events = JSON.parse(r); return; } } catch (e) {}
-    events = [
-      { id: uid(), date: dateNAhead(3),  title: 'Submit 3 job applications', note: 'CV + tailored cover letter' },
-      { id: uid(), date: dateNAhead(10), title: 'Coursera module deadline',  note: 'Data Analysis' },
-      { id: uid(), date: endOfMonthStr(),title: 'Monthly review + planning',  note: 'APM % · Coursera % · job tracker' }
-    ];
-    saveEvents();
+  /* ============================ BENCH ============================ */
+  function sparkline(pts, colour, unit) {
+    const vals = pts.filter(p => p.v != null);
+    if (vals.length < 2) return `<p class="text-xs text-gray-400 py-6 text-center">Log at least two entries to see the trend.</p>`;
+    const W = 300, H = 90, P = 8;
+    const xs = vals.map((p,i) => P + i * ((W - 2*P) / (vals.length - 1)));
+    const lo = Math.min(...vals.map(p => p.v)), hi = Math.max(...vals.map(p => p.v));
+    const span = (hi - lo) || 1;
+    const ys = vals.map(p => H - P - ((p.v - lo) / span) * (H - 2*P));
+    const d = xs.map((x,i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + ys[i].toFixed(1)).join(' ');
+    const first = vals[0].v, last = vals[vals.length-1].v, delta = last - first;
+    return `<svg viewBox="0 0 ${W} ${H}" class="w-full"><path d="${d}" fill="none" stroke="${colour}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${xs.map((x,i) => `<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="2.6" fill="${colour}"/>`).join('')}</svg>
+      <div class="flex justify-between text-[11px] text-gray-400 mt-1">
+        <span>First ${first}${unit}</span>
+        <span class="font-bold ${delta >= 0 ? 'text-emerald-600' : 'text-red-500'}">${delta >= 0 ? '+' : ''}${Math.round(delta*10)/10}${unit}</span>
+        <span>Now ${last}${unit}</span></div>`;
   }
-  function saveEvents() { localStorage.setItem(EVENTS_KEY, JSON.stringify(events)); }
 
-  function loadGoals() {
-    try { const r = localStorage.getItem(GOALS_KEY); if (r) { goals = JSON.parse(r); ['week','month','year'].forEach(p => { if (!Array.isArray(goals[p])) goals[p] = []; }); return; } } catch (e) {}
-    const g = (text) => ({ id: uid(), text, note:'', done:false });
-    goals = {
-      week:  [g('Apply to 10 roles'), g('Hit 4 gym sessions'), g('Finish 1 Coursera module')],
-      month: [g('Complete APM section 2'), g('Reach 80 job applications'), g('Lose 1 kg')],
-      year:  [g('Land a Product Manager role'), g('Finish APM certification'), g('Hold a 5-day training week')]
-    };
-    saveGoals();
+  function renderBench() {
+    const list = [...bench].sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    const st = hardStatus();
+    let h = infoBox('📈 Weekly check-in', 'Every Sunday of the 75: typing WPM + accuracy from <b>monkeytype.com</b>, a photo of this week’s journal page, and a 2-minute voice memo you listen back to. Day 0 is your baseline — Week 10 should not look like it.', '#8a6020');
+
+    if (st.state === 'live') {
+      const last = list.length ? list[list.length-1].date : null;
+      const gap = last ? daysBetween(last, todayStr()) : null;
+      if (gap == null || gap >= 7) h += `<div class="mt-2 rounded-2xl border-2 border-amber-200 bg-amber-50 p-3.5"><p class="text-sm font-bold text-amber-800">Check-in due</p><p class="text-xs text-amber-700 mt-0.5">${gap == null ? 'No baseline logged yet — record Day 0 now.' : gap + ' days since your last benchmark.'}</p></div>`;
+    }
+
+    h += secTitle('Trends');
+    h += '<div class="space-y-3">';
+    [['wpm','Typing speed','#006644',' wpm'],['acc','Typing accuracy','#1d5fa0','%'],['weight','Body weight','#8a6020',' kg']].forEach(([k,label,col,unit]) => {
+      h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+        <p class="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">${label}</p>
+        ${sparkline(list.map(e => ({ v: e[k] == null ? null : e[k] })), col, unit)}</div>`;
+    });
+    h += '</div>';
+
+    h += secTitle('Entries', 'bench', 'Add check-in');
+    if (!list.length) {
+      h += '<p class="text-center text-gray-400 text-sm py-8">Nothing logged yet. Add your Day 0 baseline.</p>';
+    } else {
+      h += '<div class="space-y-2.5">';
+      [...list].reverse().forEach(e => {
+        const idx = bench.indexOf(e);
+        const dn = hardDayFor(e.date);
+        h += `<div onclick="openRec('bench',${idx})" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 cursor-pointer active:bg-gray-50">
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-sm font-bold text-gray-800">${prettyDate(e.date)}</p>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-forest-light text-forest">${dn >= 1 && dn <= hardMeta.length ? 'Day ' + dn : 'Off-plan'}</span>
+          </div>
+          <div class="flex flex-wrap gap-1.5 mt-2">
+            ${e.wpm != null ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${e.wpm} wpm</span>` : ''}
+            ${e.acc != null ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">${e.acc}% acc</span>` : ''}
+            ${e.weight != null ? `<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">${e.weight} kg</span>` : ''}
+          </div>
+          ${e.hand ? `<p class="text-xs text-gray-500 leading-snug mt-2"><b>Handwriting:</b> ${esc(e.hand)}</p>` : ''}
+          ${e.comms ? `<p class="text-xs text-gray-500 leading-snug mt-1"><b>Voice memo:</b> ${esc(e.comms)}</p>` : ''}
+          ${e.photo ? `<img src="${e.photo}" class="w-full rounded-xl mt-2 border border-gray-200" alt="">` : ''}
+        </div>`;
+      });
+      h += '</div>';
+    }
+    h += addBtnHtml('Add check-in', "openRec('bench',-1)");
+    $('#view-bench').innerHTML = h;
   }
-  function saveGoals() { localStorage.setItem(GOALS_KEY, JSON.stringify(goals)); }
 
-  /* date maths */
+  /* ============================ DATES & GOALS ============================ */
   function startOfToday() { const d = new Date(); d.setHours(0,0,0,0); return d; }
   function endOfPeriod(p) {
     const d = new Date(); d.setHours(23,59,59,999);
@@ -841,12 +1861,8 @@
     const fn = which === 'dates' ? 'setDatesPeriod' : 'setGoalsPeriod';
     return '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-1">' +
       [['week','Week'],['month','Month'],['year','Year']].map(([k,l]) =>
-        `<button onclick="${fn}('${k}')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${k===cur ? 'bg-forest text-white shadow' : 'text-gray-500 active:bg-gray-200'}">${l}</button>`
-      ).join('') + '</div>';
+        `<button onclick="${fn}('${k}')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${k===cur ? 'bg-forest text-white shadow' : 'text-gray-500 active:bg-gray-200'}">${l}</button>`).join('') + '</div>';
   };
-  const addBtnHtml = (label, onclick) =>
-    `<button onclick="${onclick}" class="mt-3 w-full border-2 border-dashed border-forest/40 text-forest font-semibold py-3.5 rounded-2xl active:bg-forest-light transition flex items-center justify-center gap-2"><svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>${esc(label)}</button>`;
-
   function setDatesPeriod(p) { datesPeriod = p; renderDates(); }
   function setGoalsPeriod(p) { goalsPeriod = p; renderGoals(); }
 
@@ -863,32 +1879,22 @@
         <p class="font-semibold text-[15px] text-gray-800 leading-snug">${esc(e.title)}</p>
         ${e.note ? `<p class="text-xs text-gray-400 leading-snug mt-0.5">${esc(e.note)}</p>` : ''}
       </div>
-      <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-full ${chip}">${countdown(e.date)}</span>
-    </div>`;
+      <span class="shrink-0 text-[10px] font-bold px-2 py-1 rounded-full ${chip}">${countdown(e.date)}</span></div>`;
   }
-
   function renderDates() {
     let h = periodToggle('dates', datesPeriod);
     const start = startOfToday(), end = endOfPeriod(datesPeriod);
     const sorted  = [...events].sort((a,b) => a.date.localeCompare(b.date));
     const overdue = sorted.filter(e => dayDiff(e.date) < 0);
     const within  = sorted.filter(e => { const t = new Date(e.date + 'T00:00'); return t >= start && t <= end; });
-
-    if (overdue.length) {
-      h += secTitle('⚠ Overdue');
-      h += overdue.map(eventCard).join('');
-    }
+    if (overdue.length) { h += secTitle('⚠ Overdue'); h += overdue.map(eventCard).join(''); }
     h += secTitle({ week:'This Week', month:'This Month', year:'This Year' }[datesPeriod]);
     h += within.length ? within.map(eventCard).join('')
        : `<p class="text-center text-gray-400 text-sm py-10">No events ${{week:'this week',month:'this month',year:'this year'}[datesPeriod]}. Tap “Add Event”.</p>`;
     h += addBtnHtml('Add Event', 'openEventModal(null)');
     $('#view-dates').innerHTML = h;
   }
-
-  function toggleGoal(id) {
-    const it = goals[goalsPeriod].find(x => x.id === id);
-    if (it) { it.done = !it.done; saveGoals(); renderGoals(); }
-  }
+  function toggleGoal(id) { const it = goals[goalsPeriod].find(x => x.id === id); if (it) { it.done = !it.done; saveGoals(); renderGoals(); } }
   function renderGoals() {
     let h = periodToggle('goals', goalsPeriod);
     const list = goals[goalsPeriod] || [];
@@ -897,27 +1903,21 @@
     const label = { week:'This Week', month:'This Month', year:'This Year' }[goalsPeriod];
     h += `<div class="flex items-center justify-between mt-4 mb-2 px-1"><p class="text-xs font-bold uppercase tracking-wider text-gray-400">${label} · ${done}/${list.length}</p></div>`;
     h += `<div class="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3"><div class="h-full bg-forest rounded-full transition-all duration-500" style="width:${pct}%"></div></div>`;
-    if (!list.length) {
-      h += '<p class="text-center text-gray-400 text-sm py-10">No goals yet. Tap “Add Goal”.</p>';
-    } else {
-      [...list].sort((a,b) => (a.done?1:0) - (b.done?1:0)).forEach(go => {
-        h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-3.5 py-3 mb-2.5 flex items-center gap-3 ${go.done ? 'opacity-55' : ''}">
-          <button onclick="toggleGoal('${go.id}')" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center border-2 ${go.done ? 'bg-forest border-forest' : 'border-gray-300'}">
-            ${go.done ? '<svg class="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>' : ''}
-          </button>
-          <div class="flex-1 min-w-0" onclick="openGoalModal('${go.id}')">
-            <p class="text-[15px] font-semibold leading-snug ${go.done ? 'line-through text-gray-400' : 'text-gray-800'}">${esc(go.text)}</p>
-            ${go.note ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${go.done ? 'line-through' : ''}">${esc(go.note)}</p>` : ''}
-          </div>
-          <svg onclick="openGoalModal('${go.id}')" class="shrink-0 w-5 h-5 text-gray-300" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
-        </div>`;
-      });
-    }
+    if (!list.length) h += '<p class="text-center text-gray-400 text-sm py-10">No goals yet. Tap “Add Goal”.</p>';
+    else [...list].sort((a,b) => (a.done?1:0) - (b.done?1:0)).forEach(go => {
+      h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-3.5 py-3 mb-2.5 flex items-center gap-3 ${go.done ? 'opacity-55' : ''}">
+        <button onclick="toggleGoal('${go.id}')" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center border-2 ${go.done ? 'bg-forest border-forest' : 'border-gray-300'}">${go.done ? tickSvg : ''}</button>
+        <div class="flex-1 min-w-0" onclick="openGoalModal('${go.id}')">
+          <p class="text-[15px] font-semibold leading-snug ${go.done ? 'line-through text-gray-400' : 'text-gray-800'}">${esc(go.text)}</p>
+          ${go.note ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${go.done ? 'line-through' : ''}">${esc(go.note)}</p>` : ''}
+        </div>
+        <div onclick="openGoalModal('${go.id}')" class="shrink-0">${editPencil}</div></div>`;
+    });
     h += addBtnHtml('Add Goal', 'openGoalModal(null)');
     $('#view-goals').innerHTML = h;
   }
 
-  /* ---- Modal field visibility ---- */
+  /* ============================ TASK MODAL ============================ */
   function showModalFields(kind) {
     $('#fTimeRow').classList.toggle('hidden', kind !== 'task');
     $('#fDateRow').classList.toggle('hidden', kind !== 'event');
@@ -940,29 +1940,22 @@
     else    { $('#fLabel').value = ''; $('#fNotes').value = ''; }
     $('#modal').classList.remove('hidden'); setTimeout(() => $('#fLabel').focus(), 50);
   }
-
-  /* ---- Modal (CRUD for list views) ---- */
   function openModal(id) {
-    modalKind = 'task'; showModalFields('task');
-    editingId = id;
-    const isEdit = !!id;
-    $('#modalTitle').textContent = (isEdit ? 'Edit ' : 'Add ') + (view === 'hair' ? 'Item' : 'Task');
-    $('#modalDelete').classList.toggle('hidden', !isEdit);
-    if (isEdit) {
+    modalKind = 'task'; showModalFields('task'); editingId = id;
+    const isHair = (view === 'body' && bodyTab === 'hair');
+    $('#modalTitle').textContent = (id ? 'Edit ' : 'Add ') + (isHair ? 'Item' : 'Task');
+    $('#modalDelete').classList.toggle('hidden', !id);
+    if (id) {
       const t = currentList().find(x => x.id === id);
       $('#fTime').value = t.time || ''; $('#fLabel').value = t.label; $('#fNotes').value = (t.notes && t.notes !== '—') ? t.notes : '';
-    } else {
-      $('#fTime').value = view === 'plan' ? nowHM() : ''; $('#fLabel').value = ''; $('#fNotes').value = '';
-    }
-    $('#modal').classList.remove('hidden');
-    setTimeout(() => $('#fLabel').focus(), 50);
+    } else { $('#fTime').value = view === 'plan' ? nowHM() : ''; $('#fLabel').value = ''; $('#fNotes').value = ''; }
+    $('#modal').classList.remove('hidden'); setTimeout(() => $('#fLabel').focus(), 50);
   }
   function closeModal() { $('#modal').classList.add('hidden'); editingId = null; }
   function saveModal() {
     const label = $('#fLabel').value.trim();
     if (!label) { toast('Please enter a name'); return; }
     const notes = $('#fNotes').value.trim();
-
     if (modalKind === 'event') {
       const date = $('#fDate').value || todayStr();
       if (editingId) Object.assign(events.find(x => x.id === editingId), { date, title: label, note: notes });
@@ -975,50 +1968,256 @@
       else arr.push({ id: uid(), text: label, note: notes, done: false });
       saveGoals(); renderGoals(); closeModal(); toast(editingId ? 'Saved' : 'Goal added'); return;
     }
-    // task (plan / hair / todo)
     const time = $('#fTime').value, list = currentList(), tnotes = notes || '—';
     if (editingId) Object.assign(list.find(x => x.id === editingId), { time, label, notes: tnotes });
     else list.push({ id: uid(), time, label, notes: tnotes, done: false });
-    save(); renderList(); closeModal(); toast(editingId ? 'Saved' : 'Added');
+    saveC(); renderList(); closeModal(); toast(editingId ? 'Saved' : 'Added');
   }
   function deleteCurrent() {
     if (modalKind === 'event') { const i = events.findIndex(x => x.id === editingId); if (i > -1) events.splice(i,1); saveEvents(); renderDates(); closeModal(); toast('Deleted'); return; }
     if (modalKind === 'goal')  { const a = goals[goalsPeriod]; const i = a.findIndex(x => x.id === editingId); if (i > -1) a.splice(i,1); saveGoals(); renderGoals(); closeModal(); toast('Deleted'); return; }
     const list = currentList(), i = list.findIndex(x => x.id === editingId);
     if (i > -1) list.splice(i, 1);
-    save(); renderList(); closeModal(); toast('Deleted');
+    saveC(); renderList(); closeModal(); toast('Deleted');
   }
   function resetDay() {
-    if (view === 'todo') { // clear completed to-dos
+    if (view === 'todo') {
       const list = currentList();
       for (let i = list.length - 1; i >= 0; i--) if (list[i].done) list.splice(i, 1);
-      save(); renderList(); toast('Cleared completed');
-    } else {
-      currentList().forEach(t => t.done = false); save(); renderList(); toast('Day reset');
+      saveC(); renderList(); toast('Cleared completed');
+    } else { currentList().forEach(t => t.done = false); saveC(); renderList(); toast('Day reset'); }
+  }
+  function setEditMode(on) { editMode = on; $('#editToggleLabel').textContent = on ? 'Done' : 'Edit'; render(); }
+  /* Edit mode now persists across tabs — everything is editable, so it would be
+     tedious to re-enable it on every screen. */
+  function setView(v) { view = v; window.scrollTo(0,0); render(); }
+
+  /* ==================================================================
+     XLSX EXPORT — dependency-free. Builds a real .xlsx (ZIP, stored)
+     so it works offline with nothing loaded from a CDN.
+     ================================================================== */
+  const CRC_T = (() => {
+    const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); t[n] = c >>> 0; }
+    return t;
+  })();
+  function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  const enc = new TextEncoder();
+
+  function zipStore(files) {
+    const parts = [], central = [];
+    let offset = 0;
+    const u16 = (n) => [n & 255, (n >>> 8) & 255];
+    const u32 = (n) => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
+    files.forEach(f => {
+      const name = enc.encode(f.name), data = f.data, crc = crc32(data);
+      const lh = [].concat([0x50,0x4b,0x03,0x04], u16(20), u16(0), u16(0), u16(0), u16(0),
+                            u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0));
+      parts.push(new Uint8Array(lh), name, data);
+      central.push({ name, crc, len: data.length, offset });
+      offset += lh.length + name.length + data.length;
+    });
+    const cd = [];
+    central.forEach(c => {
+      const h = [].concat([0x50,0x4b,0x01,0x02], u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+                          u32(c.crc), u32(c.len), u32(c.len), u16(c.name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(c.offset));
+      cd.push(new Uint8Array(h), c.name);
+    });
+    const cdBytes = cd.reduce((a, x) => a + x.length, 0);
+    const eocd = new Uint8Array([].concat([0x50,0x4b,0x05,0x06], u16(0), u16(0), u16(files.length), u16(files.length), u32(cdBytes), u32(offset), u16(0)));
+    const all = parts.concat(cd, [eocd]);
+    const total = all.reduce((a, x) => a + x.length, 0);
+    const out = new Uint8Array(total);
+    let p = 0; all.forEach(x => { out.set(x, p); p += x.length; });
+    return out;
+  }
+
+  const xe = (s) => String(s == null ? '' : s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c])).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
+  function colRef(i) { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
+  function sheetXml(rows) {
+    let x = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
+    rows.forEach((row, r) => {
+      x += '<row r="' + (r + 1) + '">';
+      row.forEach((v, c) => {
+        const ref = colRef(c) + (r + 1);
+        if (typeof v === 'number' && isFinite(v)) x += '<c r="' + ref + '"><v>' + v + '</v></c>';
+        else if (v === '' || v == null) { /* skip empty */ }
+        else x += '<c r="' + ref + '" t="inlineStr"><is><t xml:space="preserve">' + xe(v) + '</t></is></c>';
+      });
+      x += '</row>';
+    });
+    return x + '</sheetData></worksheet>';
+  }
+  function buildXlsx(sheets) {
+    const files = [];
+    const names = sheets.map(s => s.name.replace(/[\[\]\*\?\/\\:]/g, '').slice(0, 31));
+    files.push({ name: '[Content_Types].xml', data: enc.encode(
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Default Extension="xml" ContentType="application/xml"/>' +
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+      sheets.map((s, i) => '<Override PartName="/xl/worksheets/sheet' + (i+1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') +
+      '</Types>') });
+    files.push({ name: '_rels/.rels', data: enc.encode(
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>') });
+    files.push({ name: 'xl/workbook.xml', data: enc.encode(
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' +
+      names.map((n, i) => '<sheet name="' + xe(n) + '" sheetId="' + (i+1) + '" r:id="rId' + (i+1) + '"/>').join('') + '</sheets></workbook>') });
+    files.push({ name: 'xl/_rels/workbook.xml.rels', data: enc.encode(
+      '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      sheets.map((s, i) => '<Relationship Id="rId' + (i+1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i+1) + '.xml"/>').join('') + '</Relationships>') });
+    sheets.forEach((s, i) => files.push({ name: 'xl/worksheets/sheet' + (i+1) + '.xml', data: enc.encode(sheetXml(s.rows)) }));
+    return zipStore(files);
+  }
+  function download(bytesOrStr, filename, mime) {
+    const blob = (bytesOrStr instanceof Uint8Array) ? new Blob([bytesOrStr], { type: mime }) : new Blob([bytesOrStr], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+  }
+
+  function collectSheets() {
+    const S = [];
+    /* 75 Hard log — one row per day of the challenge */
+    const hk = C.hardTasks.map(t => t.key);
+    const hardRows = [['Day','Date','Weekday','Phase','CommsCode','CommsWatch','CommsApply'].concat(C.hardTasks.map(t => t.label)).concat(['Completed','TasksDone','TotalTasks','WinOfTheDay'])];
+    for (let i = 1; i <= hardMeta.length; i++) {
+      const ds = hardDateFor(i), e = hardDay(ds), cm = commsFor(i) || {}, ph = phaseFor(i);
+      hardRows.push([i, ds, new Date(ds + 'T12:00').toLocaleDateString(undefined, { weekday:'long' }), ph.name, cm.code || '', cm.watch || '', cm.apply || '']
+        .concat(hk.map(k => e.t[k] ? 1 : 0))
+        .concat([hardComplete(ds) ? 1 : 0, hardCount(ds), C.hardTasks.length, e.note || '']));
     }
+    S.push({ name: '75HardLog', rows: hardRows });
+
+    /* Benchmarks */
+    const bRows = [['Date','ChallengeDay','TypingWPM','TypingAccuracyPct','BodyWeightKg','HandwritingNote','VoiceMemoNote','HasPhoto']];
+    [...bench].sort((a,b) => (a.date||'').localeCompare(b.date||'')).forEach(e => {
+      const dn = hardDayFor(e.date);
+      bRows.push([e.date, (dn >= 1 && dn <= hardMeta.length) ? dn : '', e.wpm == null ? '' : e.wpm, e.acc == null ? '' : e.acc,
+                  e.weight == null ? '' : e.weight, e.hand || '', e.comms || '', e.photo ? 1 : 0]);
+    });
+    S.push({ name: 'Benchmarks', rows: bRows });
+
+    /* Gym sets */
+    const logs = getGymLogs();
+    const gRows = [['Date','ChallengeDay','Exercise','Set','WeightKg','Reps','VolumeKg']];
+    Object.keys(logs).sort().forEach(k => {
+      const date = k.split('||')[0], name = k.slice(date.length + 2), dn = hardDayFor(date);
+      (logs[k] || []).forEach((s, i) => gRows.push([date, (dn >= 1 && dn <= hardMeta.length) ? dn : '', name, i + 1, s.w, s.r, Math.round(s.w * s.r * 100) / 100]));
+    });
+    S.push({ name: 'GymSets', rows: gRows });
+
+    /* Habits */
+    const allH = jget(SK.habits, {});
+    const hRows = [['Date'].concat(C.habits.map(h => h.label)).concat(['Count','Total','WinDay'])];
+    Object.keys(allH).sort().forEach(d => {
+      hRows.push([d].concat(C.habits.map(h => allH[d][h.key] ? 1 : 0)).concat([dayCount(d), C.habits.length, isWin(d) ? 1 : 0]));
+    });
+    S.push({ name: 'Habits', rows: hRows });
+
+    /* Schedules (incl. to-do + hair) */
+    const sRows = [['List','Time','Item','Notes','DoneToday']];
+    Object.keys(C.schedules).forEach(k => (C.schedules[k] || []).forEach(t => sRows.push([k, t.time || '', t.label, (t.notes === '—' ? '' : t.notes) || '', t.done ? 1 : 0])));
+    S.push({ name: 'Schedules', rows: sRows });
+
+    /* Goals */
+    const goRows = [['Period','Goal','Note','Done']];
+    ['week','month','year'].forEach(p => (goals[p] || []).forEach(g => goRows.push([p, g.text, g.note || '', g.done ? 1 : 0])));
+    S.push({ name: 'Goals', rows: goRows });
+
+    /* Dates */
+    const dRows = [['Date','Title','Note','DaysFromToday']];
+    [...events].sort((a,b) => a.date.localeCompare(b.date)).forEach(e => dRows.push([e.date, e.title, e.note || '', dayDiff(e.date)]));
+    S.push({ name: 'Dates', rows: dRows });
+
+    /* Gym plan */
+    const pRows = [['Day','Split','Exercise','Sets','Reps','Target','PrimaryMuscles','SecondaryMuscles','VideoURL']];
+    C.gym.forEach(d => (d.exs || []).forEach(ex => pRows.push([d.key, d.label, ex.n, ex.sets, ex.reps, ex.tgt || '',
+      (ex.pri||[]).map(k => (MG[k]||{}).l || k).join(', '), (ex.sec||[]).map(k => (MG[k]||{}).l || k).join(', '),
+      ex.vid ? (ex.vid.startsWith('http') ? ex.vid : 'https://www.youtube.com/watch?v=' + ex.vid) : ''])));
+    S.push({ name: 'GymPlan', rows: pRows });
+
+    /* Nutrition */
+    const mRows = [['Meal','Time','Kcal','Protein','Carbs','Fat','Ingredients','Preparation','Tip']];
+    C.meals.forEach(m => mRows.push([m.name, m.time, m.k, m.p, m.c, m.f, (m.ing||[]).join(' | '), (m.prep||[]).join(' | '), m.tip || '']));
+    mRows.push([]); mRows.push(['Batch','Days','Cook','Description']);
+    C.batches.forEach(b => mRows.push([b.name, b.days, b.cook, b.desc]));
+    mRows.push([]); mRows.push(['Supplement','When']);
+    C.supps.forEach(s => mRows.push([s.n, s.t]));
+    S.push({ name: 'Nutrition', rows: mRows });
+
+    /* Meta */
+    const st = hardStatus();
+    const meta = [['Field','Value'],
+      ['Exported', new Date().toISOString()],
+      ['Challenge start', hardMeta.start],
+      ['Challenge length', hardMeta.length],
+      ['Attempt', hardMeta.attempt],
+      ['Current day', st.n],
+      ['Days remaining', st.remaining],
+      ['Days fully complete', (() => { let c = 0; for (let i = 1; i <= hardMeta.length; i++) if (hardComplete(hardDateFor(i))) c++; return c; })()],
+      ['Missed closed days', missedDays().length],
+      ['Habit win threshold', C.threshold],
+      ['Current habit streak', currentStreak()],
+      ['Best habit streak', bestStreak()]];
+    hardMeta.history.forEach(a => meta.push(['Attempt ' + a.attempt + ' reached day', a.reached]));
+    S.push({ name: 'Meta', rows: meta });
+    return S;
   }
 
-  /* ---- Toast ---- */
-  let toastTimer;
-  function toast(msg) {
-    const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden');
-    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add('hidden'), 1800);
+  function exportXlsx() {
+    try {
+      const bytes = buildXlsx(collectSheets());
+      download(bytes, 'MasterPlan_' + todayStr() + '.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      toast('Excel exported');
+    } catch (e) { toast('Export failed: ' + e.message); }
   }
 
-  /* ---- Edit mode ---- */
-  function setEditMode(on) {
-    editMode = on;
-    $('#editToggleLabel').textContent = on ? 'Done' : 'Edit';
-    renderList(); // renderList owns Add/Reset button visibility
+  /* ---- JSON backup / restore ---- */
+  function exportJson() {
+    const dump = { app:'MasterDailyPlan', schema:2, exportedAt:new Date().toISOString(), data:{} };
+    Object.keys(SK).forEach(k => { const v = localStorage.getItem(SK[k]); if (v != null) dump.data[SK[k]] = v; });
+    download(JSON.stringify(dump, null, 2), 'MasterPlan_backup_' + todayStr() + '.json', 'application/json');
+    toast('Backup downloaded');
+  }
+  function restoreJson(file) {
+    const fr = new FileReader();
+    fr.onload = () => {
+      let d;
+      try { d = JSON.parse(fr.result); } catch (e) { toast('Not a valid backup file'); return; }
+      if (!d || d.app !== 'MasterDailyPlan' || !d.data) { toast('Not a Master Plan backup'); return; }
+      const keys = Object.keys(d.data);
+      if (!confirm('Restore backup from ' + (d.exportedAt || 'unknown date') + '?\n\nThis replaces everything currently on this device (' + keys.length + ' data stores).')) return;
+      keys.forEach(k => localStorage.setItem(k, d.data[k]));
+      toast('Restored — reloading');
+      setTimeout(() => location.reload(), 700);
+    };
+    fr.readAsText(file);
+  }
+  function storageUsed() {
+    let n = 0;
+    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); n += k.length + (localStorage.getItem(k) || '').length; }
+    return n;
+  }
+  function reseedContent() {
+    if (!confirm('Restore the built-in content defaults?\n\nMeals, skincare, gym plan, habits, 75-Hard tasks and the comms roadmap go back to their original text. Your LOGS (ticked days, gym sets, benchmarks, streaks) are NOT touched.')) return;
+    const sched = C.schedules;
+    C = seedContent(); C.schedules = sched; saveC(); render(); toast('Content defaults restored');
+  }
+  function wipeAll() {
+    if (!confirm('Erase everything on this device?\n\nThis cannot be undone. Export a backup first if you are not certain.')) return;
+    if (!confirm('Really erase? Last chance.')) return;
+    Object.keys(SK).forEach(k => localStorage.removeItem(SK[k]));
+    location.reload();
+  }
+  function openData() {
+    $('#storageInfo').textContent = 'Using ~' + Math.round(storageUsed() / 1024) + ' KB of browser storage';
+    $('#dataModal').classList.remove('hidden');
   }
 
-  /* ---- View switching ---- */
-  function setView(v) { view = v; if (editMode) setEditMode(false); window.scrollTo(0,0); render(); }
-
-  /* ============================================================
-     WEATHER — Open-Meteo (free, no key). Cached for offline.
-     ============================================================ */
-  const WEATHER_KEY = 'habitTracker.weather';
+  /* ============================ WEATHER ============================ */
   const OXFORD = { lat: 51.7520, lon: -1.2577, city: 'Oxford' };
   const WMO = {
     0:['☀️','Clear'],1:['🌤️','Mainly clear'],2:['⛅','Partly cloudy'],3:['☁️','Overcast'],
@@ -1054,13 +2253,13 @@
       let city = pos.city;
       if (!city) { try { const g = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.lat}&longitude=${pos.lon}&localityLanguage=en`); if (g.ok) { const gj = await g.json(); city = gj.city || gj.locality || gj.principalSubdivision || null; } } catch (_) {} }
       const w = { temp: d.current.temperature_2m, code: d.current.weather_code, hi: d.daily?.temperature_2m_max?.[0], lo: d.daily?.temperature_2m_min?.[0], city: city || OXFORD.city, ts: Date.now() };
-      localStorage.setItem(WEATHER_KEY, JSON.stringify(w)); paintWeather(w);
+      lsSet(SK.weather, JSON.stringify(w)); paintWeather(w);
     } catch (e) {
-      if (!localStorage.getItem(WEATHER_KEY)) { $('#wTemp').textContent = '--°'; $('#wMeta').textContent = 'Unavailable'; $('#wIcon').textContent = '🌡️'; }
+      if (!localStorage.getItem(SK.weather)) { $('#wTemp').textContent = '--°'; $('#wMeta').textContent = 'Unavailable'; $('#wIcon').textContent = '🌡️'; }
     }
   }
   function initWeather() {
-    const cached = localStorage.getItem(WEATHER_KEY);
+    const cached = localStorage.getItem(SK.weather);
     if (cached) { try { paintWeather(JSON.parse(cached)); } catch (_) {} }
     fetchWeather();
     $('#weatherPill').onclick = () => { $('#wIcon').textContent = '⏳'; fetchWeather().then(() => toast('Weather updated')); };
@@ -1068,31 +2267,56 @@
     setInterval(fetchWeather, 1800000);
   }
 
-  /* ---- Auto-pick today's tab/day ---- */
+  /* ============================ CLOCK & INIT ============================ */
+  function tickClock() {
+    const d = new Date();
+    $('#clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    $('#dateLabel').textContent = d.toLocaleDateString(undefined, { weekday:'long', day:'numeric', month:'short' });
+  }
   function pickToday() {
     const d = new Date().getDay();
-    if (d === 3) activeTab = 'wednesday';
-    else if (d === 6) { activeTab = 'weekend'; activeDay = 'saturday'; }
+    if (d === 6)      { activeTab = 'weekend'; activeDay = 'saturday'; }
     else if (d === 0) { activeTab = 'weekend'; activeDay = 'sunday'; }
-    else activeTab = 'weekday';
-    gymDay = ({1:'monday',2:'tuesday',4:'thursday',5:'friday'})[d] || 'monday';
+    else              { activeTab = 'weekday'; }
+    const map = { 1:'monday', 2:'tuesday', 4:'thursday', 5:'friday' };
+    gymDay = map[d] || (C.gym[0] || {}).key || 'monday';
   }
 
-  /* ---- Init ---- */
   function init() {
-    load(); loadEvents(); loadGoals(); pickToday();
+    loadContent();
+    autoResetOnNewDay();
+    loadHard(); loadBench(); loadEvents(); loadGoals();
+    pickToday();
 
     document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => { activeTab = b.dataset.tab; renderList(); });
     document.querySelectorAll('.day-btn').forEach(b => b.onclick = () => { activeDay = b.dataset.day; renderList(); });
+    document.querySelectorAll('.body-btn').forEach(b => b.onclick = () => { bodyTab = b.dataset.body; window.scrollTo(0,0); render(); });
     document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => setView(b.dataset.view));
 
     $('#editToggle').onclick = () => setEditMode(!editMode);
-    $('#addBtn').onclick      = () => openModal(null);
-    $('#resetBtn').onclick    = resetDay;
-    $('#modalClose').onclick  = closeModal;
-    $('#modalSave').onclick   = saveModal;
-    $('#modalDelete').onclick = deleteCurrent;
+    $('#addBtn').onclick     = () => openModal(null);
+    $('#resetBtn').onclick   = resetDay;
+    $('#modalClose').onclick = closeModal;
+    $('#modalSave').onclick  = saveModal;
+    $('#modalDelete').onclick= deleteCurrent;
     $('#modal').onclick = (e) => { if (e.target === $('#modal')) closeModal(); };
+
+    $('#recClose').onclick  = closeRec;
+    $('#recSave').onclick   = () => (recCommit ? recCommit() : saveRec());
+    $('#recDelete').onclick = deleteRec;
+    $('#recUp').onclick     = () => moveRec(-1);
+    $('#recDown').onclick   = () => moveRec(1);
+    $('#recModal').onclick  = (e) => { if (e.target === $('#recModal')) closeRec(); };
+
+    $('#dataBtn').onclick    = openData;
+    $('#dataClose').onclick  = () => $('#dataModal').classList.add('hidden');
+    $('#dataModal').onclick  = (e) => { if (e.target === $('#dataModal')) $('#dataModal').classList.add('hidden'); };
+    $('#btnXlsx').onclick    = exportXlsx;
+    $('#btnJson').onclick    = exportJson;
+    $('#btnRestore').onclick = () => $('#fileRestore').click();
+    $('#fileRestore').onchange = (e) => { if (e.target.files[0]) restoreJson(e.target.files[0]); };
+    $('#btnSeed').onclick    = () => { $('#dataModal').classList.add('hidden'); reseedContent(); };
+    $('#btnWipe').onclick    = wipeAll;
 
     tickClock();
     setInterval(tickClock, 1000);
