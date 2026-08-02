@@ -1,6 +1,6 @@
 /* Master Daily Plan — service worker (offline + installable).
    Bump VERSION whenever you change the app to force clients to update. */
-const VERSION = 'mdp-v2';
+const VERSION = 'mdp-v3.1';
 const SHELL   = VERSION + '-shell';
 const RUNTIME = VERSION + '-runtime';
 
