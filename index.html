@@ -265,6 +265,7 @@
   const SK = {
     content : 'habitTracker.content.v3',
     archive2: 'habitTracker.content.v2.archived',
+    archive3: 'habitTracker.content.v3.archived',
     old2    : 'habitTracker.content.v2',
     legacy  : 'habitTracker.v1',
     day     : 'habitTracker.lastDay',
@@ -283,6 +284,7 @@
   };
   const START = '2026-08-03';   // Day 1 — Monday
   const LENGTH = 75;
+  const CONTENT_V = 4;          // bump when seeded PLAN content must replace what's stored
 
   const SEED = {};
 
@@ -754,7 +756,7 @@
   function seedContent() {
     const mk = (rows) => rows.map(([time,label,notes,band,only]) => ({ id: uid(), time, label, notes, band: band || '', only: only || '', done:false }));
     return {
-      v: 3,
+      v: CONTENT_V,
       schedules: { weekday: mk(SEED.schedules.weekday), weekend: mk(SEED.schedules.weekend), todo: mk(SEED.schedules.todo) },
       hardTasks: clone(SEED.hardTasks), phases: clone(SEED.phases), trainPhases: clone(SEED.trainPhases),
       comms: clone(SEED.comms), splitMap: clone(SEED.splitMap), gym: clone(SEED.gym),
@@ -780,6 +782,7 @@
           delete C.schedules.wednesday;
           saveC();
         }
+        migrateContent();
         return;
       } catch (e) {}
     }
@@ -787,6 +790,26 @@
     archiveV2();
     saveC();
   }
+  /* Seeded PLAN content (programme, schedules, rules) has to be able to replace what is
+     already stored, or a phone that installed an earlier build would keep the old plan
+     forever. Logs live in their own keys and are never touched here. The whole previous
+     content object is archived first, so nothing is destroyed. */
+  function migrateContent() {
+    if ((C.v || 0) >= CONTENT_V) return;
+    lsSet(SK.archive3, JSON.stringify(C));
+    const d = seedContent();
+    const todo = (C.schedules && Array.isArray(C.schedules.todo)) ? C.schedules.todo : null;
+    C.schedules  = d.schedules;
+    if (todo && todo.length) C.schedules.todo = todo;      // your own list stays yours
+    C.gym        = d.gym;          // programme replaced
+    C.splitMap   = d.splitMap;     // rest day moved to Mon & Thu
+    C.hardTasks  = d.hardTasks;    // Rule 1 rewritten
+    delete C.startLoads; delete C.sessionRules; delete C.expect;   // no longer rendered
+    C.v = CONTENT_V;
+    saveC();
+    toast('Training programme updated — Mon & Thu are now rest days');
+  }
+
   /* v2 content is kept, not destroyed — the plan changed, the record shouldn't vanish. */
   function archiveV2() {
     const old = localStorage.getItem(SK.old2);
@@ -835,7 +858,21 @@
   }
   function saveHardLog()  { lsSet(SK.hardlog, JSON.stringify(hardLog)); }
   function saveHardMeta() { lsSet(SK.hardmeta, JSON.stringify(hardMeta)); }
-  function loadWater() { waterLog = jget(SK.water, {}); }
+  function loadWater() { waterLog = jget(SK.water, {}); migrateWaterKeys(); }
+  /* Slot-index keys break the moment the schedule is edited. Convert to time keys once. */
+  function migrateWaterKeys() {
+    const slots = (C.diet && C.diet.water) || [];
+    let changed = false;
+    Object.keys(waterLog).forEach(date => {
+      const row = waterLog[date] || {}, out = {};
+      Object.keys(row).forEach(k => {
+        if (/^\d+$/.test(k)) { const sl = slots[+k]; if (sl) { out[sl.t] = 1; changed = true; } }
+        else out[k] = 1;
+      });
+      waterLog[date] = out;
+    });
+    if (changed) saveWater();
+  }
   function saveWater() { lsSet(SK.water, JSON.stringify(waterLog)); }
   function loadBench() {
     bench = jget(SK.bench, null);
@@ -940,11 +977,12 @@
 
   /* ============================ WATER ============================ */
   function waterFor(ds) { return waterLog[ds] || {}; }
-  function waterMl(ds) { const w = waterFor(ds); return C.diet.water.reduce((a,s,i) => a + (w[i] ? s.ml : 0), 0); }
+  function waterMl(ds) { const w = waterFor(ds); return C.diet.water.reduce((a,s) => a + (w[s.t] ? s.ml : 0), 0); }
   function waterTarget() { return C.diet.water.reduce((a,s) => a + s.ml, 0); }
   function toggleWater(ds, i) {
+    const slot = C.diet.water[i]; if (!slot) return;
     if (!waterLog[ds]) waterLog[ds] = {};
-    if (waterLog[ds][i]) delete waterLog[ds][i]; else waterLog[ds][i] = 1;
+    if (waterLog[ds][slot.t]) delete waterLog[ds][slot.t]; else waterLog[ds][slot.t] = 1;
     saveWater();
     // Hitting the full schedule ticks Rule 3 for you; dropping below unticks it.
     setHardTask(ds, 'water', waterMl(ds) >= waterTarget());
@@ -1239,7 +1277,7 @@
     const surg = inSurgical();
     let chips = '';
     C.diet.water.forEach((s,i) => {
-      const on = !!w[i];
+      const on = !!w[s.t];
       chips += `<button onclick="tapWater(${i})" class="flex-1 min-w-[54px] rounded-lg py-1.5 px-1 text-center transition ${on?'bg-blue-500 text-white':'bg-blue-50 text-blue-600 active:bg-blue-100'}">
         <span class="block text-[10px] font-bold leading-none">${esc(s.t)}</span>
         <span class="block text-[10px] leading-none mt-0.5 opacity-80">${s.ml}</span></button>`;
@@ -1771,7 +1809,7 @@
     h += secTitle('Water — ' + (tgt/1000).toFixed(1) + ' L, all in by 18:00', editMode?'water':null, 'Add slot');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
     D.water.forEach((s,i) => {
-      const on = !!w[i];
+      const on = !!w[s.t];
       h += `<div onclick="${editMode?`openRec('water',${i})`:`tapWaterD(${i})`}" class="px-4 py-2.5 flex items-center gap-3 cursor-pointer active:bg-gray-50 ${on?'opacity-60':''}">
         <div class="w-6 h-6 shrink-0 rounded-full flex items-center justify-center border-2 ${on?'bg-blue-500 border-blue-500':'border-gray-300'}">${on?tickSvg:''}</div>
         <span class="tabular text-xs font-bold text-blue-600 w-11">${esc(s.t)}</span>
@@ -2010,7 +2048,7 @@
         </div>
         <label class="block px-3 py-2.5 text-center cursor-pointer active:bg-gray-50">
           <span class="text-xs font-bold ${have?'text-forest':'text-gray-500'}">${k.icon} ${k.l}${have?' ✓':''}</span>
-          <input type="file" accept="image/*" capture="user" class="hidden" onchange="onPhotoPick(this,'${ds}','${k.k}')">
+          <input type="file" accept="image/*" ${k.k === 'face' ? 'capture="user"' : ''} class="hidden" onchange="onPhotoPick(this,'${ds}','${k.k}')">
           <span class="block text-[10px] text-gray-400 mt-0.5">${have?'Tap to replace':'Tap to add'}</span></label></div>`;
     });
     h += '</div>';
@@ -2388,7 +2426,7 @@
     const w = [['Date','Day'].concat(C.diet.water.map(s => s.t + ' (' + s.ml + 'ml)')).concat(['TotalMl','TargetMl','Hit'])];
     Object.keys(waterLog).sort().forEach(d => {
       const dn = hardDayFor(d), row = waterFor(d);
-      w.push([d, (dn>=1&&dn<=hardMeta.length)?dn:''].concat(C.diet.water.map((s,i) => row[i]?s.ml:0)).concat([waterMl(d), waterTarget(), waterMl(d)>=waterTarget()?1:0]));
+      w.push([d, (dn>=1&&dn<=hardMeta.length)?dn:''].concat(C.diet.water.map(s => row[s.t]?s.ml:0)).concat([waterMl(d), waterTarget(), waterMl(d)>=waterTarget()?1:0]));
     });
     S.push({ name:'Water', rows:w });
 
