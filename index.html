@@ -153,6 +153,7 @@
     <section id="view-hair"   class="hidden"></section>
     <section id="view-photos" class="hidden"></section>
     <section id="view-bench"  class="hidden"></section>
+    <section id="view-sadhana" class="hidden"></section>
     <section id="view-goals"  class="hidden"></section>
     <section id="view-dates"  class="hidden"></section>
   </main>
@@ -168,6 +169,7 @@
       <button data-view="diet"   class="nav-btn"><span class="text-xl leading-none">🍴</span><span class="text-[10px] font-semibold">Diet</span></button>
       <button data-view="photos" class="nav-btn"><span class="text-xl leading-none">📸</span><span class="text-[10px] font-semibold">Photos</span></button>
       <button data-view="bench"  class="nav-btn"><span class="text-xl leading-none">📈</span><span class="text-[10px] font-semibold">Bench</span></button>
+      <button data-view="sadhana" class="nav-btn"><span class="text-xl leading-none">🕉️</span><span class="text-[10px] font-semibold">Sadhana</span></button>
     </div>
   </nav>
 
@@ -187,7 +189,9 @@
           <select id="fOnly" class="fld">
             <option value="">Every weekday</option>
             <option value="gym">Training days only — Tue · Wed · Fri</option>
-            <option value="rest">Rest days only — Mon · Thu</option>
+            <option value="rest">Both rest days — Mon · Thu</option>
+            <option value="mon">Monday only</option>
+            <option value="thu">Thursday only</option>
           </select></div>
         <div><label class="flbl">Name</label><input id="fLabel" type="text" placeholder="e.g. Meditation" class="fld" /></div>
         <div><label class="flbl">Notes</label><textarea id="fNotes" rows="2" placeholder="Optional details…" class="fld resize-none"></textarea></div>
@@ -280,11 +284,12 @@
     bench   : 'habitTracker.benchlog.v3',
     photoIx : 'habitTracker.photoindex',
     weather : 'habitTracker.weather',
+    sadhana : 'habitTracker.sadhanalog',
     prefs   : 'habitTracker.prefs'
   };
   const START = '2026-08-03';   // Day 1 — Monday
   const LENGTH = 75;
-  const CONTENT_V = 4;          // bump when seeded PLAN content must replace what's stored
+  const CONTENT_V = 5;          // bump when seeded PLAN content must replace what's stored
 
   const SEED = {};
 
@@ -298,19 +303,20 @@
       ['05:00','Meditation','20 minutes · Rule 4','teal',''],
       ['05:20','Journal, longhand and slow','This is the handwriting practice · Rule 4','teal',''],
       ['05:40','Pack bag · gym kit · SPF in the bag','','','gym'],
-      ['05:40','Shoes on · layers','No gym kit today — walking','','rest'],
+      ['05:40','Shoes on · layers','No gym kit today — walking','','mon'],
       ['05:45','Walk to Gosford (8 min)','250 ml water · Rule 3','teal','gym'],
-      ['05:45','45-MINUTE OUTDOOR WALK','Rest day. Ticks Rule 1 — the streak holds. Morning, so the evening stays protected.','teal','rest'],
+      ['05:45','45-MINUTE OUTDOOR WALK','Monday rest day. Ticks Rule 1 — the streak holds.','teal','mon'],
+      ['05:45','VISHNU SAHASRANAMA · Guru mantra ×108','Thursday · 30 min. This replaced the walk — see the Rule 1 warning on the 75 tab.','amber','thu'],
       ['06:00','TRAIN — see the Gym tab','600 ml during · Rule 1','teal','gym'],
-      ['06:30','Home','','','rest'],
+      ['06:30','Home','','','mon'],
       ['06:45','Walk home','','','gym'],
       ['06:53','Shower','Hair: wash Mon · Thu · Sat — rinse other days','purple','gym'],
       ['06:53','Shower','Rinse only on a rest day — no shampoo','purple','rest'],
       ['07:02','AM skincare','Moisturiser → SPF 50. Vitamin C 2–3×/wk, optional','purple',''],
       ['07:05','Meal — shake + banana + eggs + toast','Supplements. 400 ml water. Tue: no egg · Rules 2 & 3','amber',''],
       ['07:25','PUJA','Life rule','amber',''],
-      ['07:35','SURYA JAL','Life rule','amber',''],
-      ['07:42','Bus to Oxford','','',''],
+      ['07:35','SURYA JAL — arghya + Surya Gayatri','Facing east · 2 min · life rule. Sun +108 · Mon +108 through Nov','amber',''],
+      ['07:42','Bus to Oxford — Aditya Hridayam','~10 min, read on the bus','',''],
       ['08:15','Work · deep blocks · Coursera · APM','Keyboard covered, never look · Rule 5','',''],
       ['10:00','500 ml water · Greek yogurt at 10:30','Rules 2 & 3','',''],
       ['12:45','Lunch + 500 ml','Per the prep map · Rules 2 & 3','',''],
@@ -320,6 +326,7 @@
       ['18:30','Family / personal','','',''],
       ['19:00','Dinner','Rule 2','amber',''],
       ['19:45','Sattu + PM skincare','One active only — see Body › Skin','purple',''],
+      ['19:50','Hanuman Chalisa','~8 min','amber',''],
       ['20:00','Communication lesson + apply it','Code on the 75 tab · Rule 7','',''],
       ['20:25','Read 10 pages, physical book','Rule 6','',''],
       ['20:45','Progress photo · tick all 10 boxes · screens off','Rule 8','',''],
@@ -334,7 +341,8 @@
       ['07:55','Shower + AM skincare','Sat = hair wash. Sun = rinse','purple'],
       ['08:05','Meal — shake + banana + eggs + toast','Supplements · Rules 2 & 3','amber'],
       ['08:25','PUJA','Life rule','amber'],
-      ['08:35','SURYA JAL','Life rule','amber'],
+      ['08:35','SURYA JAL — arghya + Surya Gayatri','Facing east · 2 min. Sunday: + Surya mantra ×108','amber'],
+      ['08:40','Aditya Hridayam','~10 min','amber'],
       ['10:30','Greek yogurt · 500 ml water','Rules 2 & 3',''],
       ['12:45','Lunch + 500 ml','Prerna cooks Saturday · Rules 2 & 3',''],
       ['14:00','SUNDAY ONLY — prep day','Chicken curry · boil a tray of eggs · portion the peanuts','amber'],
@@ -343,6 +351,7 @@
       ['17:00','SUNDAY ONLY — weekly benchmarks','Waist · weight · WPM · lifts · handwriting · voice memo. Bench tab.','amber'],
       ['19:00','Dinner','Rule 2','amber'],
       ['19:45','Sattu + PM skincare','Sat = Azelaic · Sun = Recovery','purple'],
+      ['19:50','Hanuman Chalisa','~8 min','amber'],
       ['20:00','Communication lesson + apply it','Rule 7',''],
       ['20:25','Read 10 pages, physical book','Rule 6',''],
       ['20:45','Progress photo · tick all 10 boxes · screens off','Rule 8',''],
@@ -356,6 +365,28 @@
       ['','Big shop before 11 September','Do it in the pre-op week — you won’t want to leave the house after'],
       ['','Textured-crop haircut','Short sides, short textured top, forward-fringed'],
       ['','Buy a 1 litre bottle','3.8 L is four refills. Counting bottles works; counting sips fails']
+    ]
+  };
+
+  /* ---------------- Sadhana ---------------
+     Fixed 7:35 arghya by choice, not computed sunrise. The daily block is split
+     because 20 minutes do not exist between 7:35 and the 7:42 bus. */
+  SEED.sadhana = {
+    daily: [
+      {k:'arghya',  name:'Surya arghya', when:'7:35', mins:2,
+       note:'Facing east, with the Surya Gayatri. Life rule — the same slot as SURYA JAL on the Plan tab.'},
+      {k:'aditya',  name:'Aditya Hridayam', when:'7:42 weekdays · 8:40 weekends', mins:10,
+       note:'Straight after the arghya. On a work day, read it on the bus to Oxford — the only unbroken ten minutes the morning has. At weekends it sits after the Surya Jal.'},
+      {k:'chalisa', name:'Hanuman Chalisa', when:'19:50 — evening', mins:8,
+       note:'Your sheet says any time. The evening is where the room is, between the sattu and the 20:00 comms block.'}
+    ],
+    weekly: [
+      {k:'sun108', day:0, name:'Om Hraam Hreem Hraum Sah Suryaya Namah ×108', mins:3, until:'',
+       note:'Folded into the arghya.'},
+      {k:'mon108', day:1, name:'Om Namah Shivaya ×108', mins:3, until:'2026-11-30',
+       note:'Added through November. The app stops showing it after 30 Nov 2026.'},
+      {k:'thu108', day:4, name:'Vishnu Sahasranama · Om Gram Greem Graum Sah Gurave Namah ×108', mins:30, until:'',
+       note:'5:45–6:15, in the slot the rest-day walk used to hold.'}
     ]
   };
 
@@ -437,7 +468,7 @@
   SEED.commsCasualty = 'One casualty, named honestly: the original “Present” block (a real presentation) no longer fits inside 75 days once the vocal work shifts back. Treat it as the capstone after Day 75 rather than pretending it squeezes in.';
 
   /* ---------------- Training split by weekday --------------- */
-  SEED.splitMap = { 1:'rest', 2:'pullA', 3:'pushB', 4:'rest', 5:'pullB', 6:'legs', 0:'pushA' };
+  SEED.splitMap = { 1:'restMon', 2:'pullA', 3:'pushB', 4:'restThu', 5:'pullB', 6:'legs', 0:'pushA' };
 
   /* ---------------- Five sessions, two rest days ---------------
      sets = number of log rows. setsL = what the programme says ("3–4").  */
@@ -445,8 +476,12 @@
     ({ n, sets, setsL: setsL || String(sets), reps, rest:'', why:'', pri, sec, vid: vid || '', vidT: vidT || '' });
 
   SEED.gym = [
-    {key:'rest', label:'Rest', day:'Monday & Thursday', lead:'Rest day', time:'5:45–6:30', mins:'45 min walk',
+    {key:'restMon', label:'Rest', day:'Monday', lead:'Rest day', time:'5:45–6:30', mins:'45 min walk',
      note:'No gym. A 45-minute outdoor walk in the morning — it ticks Rule 1, so the streak holds, and it carries the day’s steps.',
+     exs:[]},
+
+    {key:'restThu', label:'Sadhana', day:'Thursday', lead:'No training', time:'5:45–6:15', mins:'30 min',
+     note:'The walk was replaced by the Vishnu Sahasranama and the Guru mantra. Nothing in the plan satisfies Rule 1 on a Thursday — the 75 tab says so plainly.',
      exs:[]},
 
     {key:'pullA', label:'Pull A', day:'Tuesday', lead:'Heavy', time:'6:00–6:45', mins:'',
@@ -696,7 +731,7 @@
   let goalsPeriod = 'week';
   let datesPeriod = 'week';
   let events = [], goals = { week:[], month:[], year:[] };
-  let hardLog = {}, hardMeta = null, waterLog = {}, bench = [], photoIx = {};
+  let hardLog = {}, hardMeta = null, waterLog = {}, bench = [], photoIx = {}, sadhanaLog = {};
   let photosRevealed = false;
   let cmpA = null, cmpB = null, cmpKind = 'face';
 
@@ -763,7 +798,7 @@
       rebuild: clone(SEED.rebuild), diet: clone(SEED.diet),
       skinAM: clone(SEED.skinAM), skinPM: clone(SEED.skinPM), skinCan: clone(SEED.skinCan), skinAhead: clone(SEED.skinAhead),
       hairWeek: clone(SEED.hairWeek), hairStyle: clone(SEED.hairStyle),
-      outstanding: SEED.outstanding.map(t => ({ t })),
+      outstanding: SEED.outstanding.map(t => ({ t })), sadhana: clone(SEED.sadhana),
       surgical: clone(SEED.surgical), threshold: 10
     };
   }
@@ -804,6 +839,7 @@
     C.gym        = d.gym;          // programme replaced
     C.splitMap   = d.splitMap;     // rest day moved to Mon & Thu
     C.hardTasks  = d.hardTasks;    // Rule 1 rewritten
+    C.sadhana    = d.sadhana;      // devotional schedule added
     delete C.startLoads; delete C.sessionRules; delete C.expect;   // no longer rendered
     C.v = CONTENT_V;
     saveC();
@@ -833,12 +869,20 @@
 
   function scheduleKeyFor(d) { const w = d.getDay(); return (w === 0 || w === 6) ? 'weekend' : 'weekday'; }
   const isRestDay = (d) => [1,4].includes((d || new Date()).getDay());   // Monday & Thursday
+  /* Which weekday tags apply on a given date. Monday and Thursday are both rest
+     days but no longer identical — Monday walks, Thursday sits with the Sahasranama. */
+  function tagsFor(when) {
+    const w = (when || new Date()).getDay();
+    if (w === 1) return ['rest','mon'];
+    if (w === 4) return ['rest','thu'];
+    return ['gym'];
+  }
   /* Weekday rows tagged 'gym' or 'wed' show only on their own days. In edit mode
      you see all of them, so nothing is hidden from you when you go to change it. */
   function visibleRows(list, key, when) {
     if (key !== 'weekday' || editMode) return list;
-    const want = isRestDay(when) ? 'rest' : 'gym';
-    return list.filter(t => !t.only || t.only === want);
+    const want = tagsFor(when);
+    return list.filter(t => !t.only || want.includes(t.only));
   }
   function activeListKey() { return view === 'lists' ? 'todo' : activeTab; }
   function currentList()   { return C.schedules[activeListKey()]; }
@@ -884,6 +928,23 @@
   }
   function saveBench() { lsSet(SK.bench, JSON.stringify(bench)); }
   function loadPhotoIx() { photoIx = jget(SK.photoIx, {}); }
+  function loadSadhana() { sadhanaLog = jget(SK.sadhana, {}); }
+  function saveSadhana() { lsSet(SK.sadhana, JSON.stringify(sadhanaLog)); }
+  /* Weekly additions only appear on their own weekday, and only while they still run. */
+  function sadhanaWeeklyFor(ds) {
+    const w = dow(ds);
+    return (C.sadhana.weekly || []).filter(x => x.day === w && (!x.until || ds <= x.until));
+  }
+  function sadhanaItemsFor(ds) { return (C.sadhana.daily || []).concat(sadhanaWeeklyFor(ds)); }
+  function sadhanaDone(ds) { const r = sadhanaLog[ds] || {}; return sadhanaItemsFor(ds).filter(x => r[x.k]).length; }
+  function sadhanaAll(ds) { const n = sadhanaItemsFor(ds).length; return n > 0 && sadhanaDone(ds) === n; }
+  function toggleSadhana(ds, k) {
+    if (!sadhanaLog[ds]) sadhanaLog[ds] = {};
+    if (sadhanaLog[ds][k]) delete sadhanaLog[ds][k]; else sadhanaLog[ds][k] = 1;
+    saveSadhana();
+  }
+  function sadhanaStreak() { let s=0; for (let i=0;i<400;i++){ const d=dateNAgo(i); if(sadhanaAll(d))s++; else { if(i===0) continue; break; } } return s; }
+  function sadhanaMinutes(ds) { return sadhanaItemsFor(ds).reduce((a,x)=>a+(x.mins||0),0); }
   function savePhotoIx() { lsSet(SK.photoIx, JSON.stringify(photoIx)); }
 
   function getGymLogs() { return jget(SK.gymlog, {}); }
@@ -960,7 +1021,11 @@
     return 'post';
   }
   /* Rule text bends inside the window. Everything else holds. */
+  /* Thursday has no training and no walk since the Sahasranama took the slot, so
+     nothing in the plan satisfies Rule 1. Say so rather than let the box look normal. */
+  const THU_WARN = '⚠ Thursday has no workout and no walk in your plan — the Sahasranama replaced it. Nothing here satisfies Rule 1. Add movement or tick this knowing it is a blank.';
   function ruleSubFor(task, n) {
+    if (!surgicalWindow(n) && task.key === 'work' && sessionForDate(hardDateFor(n)) && sessionForDate(hardDateFor(n)).key === 'restThu') return THU_WARN;
     if (!surgicalWindow(n)) return task.sub;
     if (task.key === 'work') {
       const st = surgicalStage(n);
@@ -1004,6 +1069,13 @@
     hairWeek: { one:'Hair day', path:()=>C.hairWeek, fields:[{k:'d',l:'Day'},{k:'a',l:'Action (WASH / Rinse)'},{k:'t',l:'Detail',t:'area'}], blank:()=>({d:'',a:'Rinse',t:''}) },
     hairStyle:{ one:'Styling rule', path:()=>C.hairStyle, fields:[{k:'k',l:'Rule'},{k:'t',l:'Detail',t:'area'}], blank:()=>({k:'',t:''}) },
     outstanding:{ one:'Outstanding item', path:()=>C.outstanding, fields:[{k:'t',l:'Item',t:'area'}], blank:()=>({t:''}) },
+    sadDaily: { one:'Daily practice', path:()=>C.sadhana.daily,
+      fields:[{k:'name',l:'Practice'},{k:'when',l:'When'},{k:'mins',l:'Minutes',t:'num'},{k:'note',l:'Note',t:'area'}],
+      blank:()=>({k:'s'+uid(),name:'',when:'',mins:5,note:''}) },
+    sadWeekly:{ one:'Weekly addition', path:()=>C.sadhana.weekly,
+      fields:[{k:'name',l:'Practice'},{k:'day',l:'Weekday — 0 Sun … 6 Sat',t:'num'},{k:'mins',l:'Extra minutes',t:'num'},
+              {k:'until',l:'Runs until (blank = no end)',t:'date'},{k:'note',l:'Note',t:'area'}],
+      blank:()=>({k:'w'+uid(),name:'',day:0,mins:3,until:'',note:''}) },
     bench:    { one:'Benchmark', path:()=>bench, save:()=>saveBench(), fields:[
       {k:'date',l:'Date',t:'date'},{k:'waist',l:'Waist (in) — the headline number',t:'num'},{k:'weight',l:'Weight (kg)',t:'num'},
       {k:'wpm',l:'Typing WPM',t:'num'},{k:'acc',l:'Typing accuracy %',t:'num'},
@@ -1130,7 +1202,7 @@
     const showMap = {
       hard: view === 'hard', gym: view === 'gym', diet: view === 'diet',
       skin: view === 'body' && bodyTab === 'skin', hair: view === 'body' && bodyTab === 'hair',
-      photos: view === 'photos', bench: view === 'bench',
+      photos: view === 'photos', bench: view === 'bench', sadhana: view === 'sadhana',
       goals: view === 'lists' && listTab === 'goals', dates: view === 'lists' && listTab === 'dates'
     };
     Object.keys(showMap).forEach(k => $('#view-' + k).classList.toggle('hidden', !showMap[k]));
@@ -1153,6 +1225,7 @@
     else if (view === 'body' && bodyTab === 'hair') renderHair();
     else if (view === 'photos') renderPhotos();
     else if (view === 'bench') renderBench();
+    else if (view === 'sadhana') renderSadhana();
     else if (view === 'lists' && listTab === 'goals') renderGoals();
     else if (view === 'lists' && listTab === 'dates') renderDates();
   }
@@ -1174,9 +1247,11 @@
     $('#dayNote').classList.toggle('hidden', !(view === 'plan' && key === 'weekday'));
     if (view === 'plan' && key === 'weekday') {
       $('#dayNote').innerHTML = editMode
-        ? '✎ Editing shows every weekday row, including the ones tagged <b>GYM</b> and <b>REST</b>. Use “Shows on” in the editor to move a row between them.'
+        ? '✎ Editing shows every weekday row, including those tagged <b>GYM</b>, <b>REST</b>, <b>MON</b> and <b>THU</b>. Use “Shows on” in the editor to move a row between them.'
         : (isRestDay()
-            ? '🚶 Rest day — no gym. The 5:45 block is the 45-minute outdoor walk, and it ticks Rule 1.'
+            ? (new Date().getDay() === 1
+                ? '🚶 Monday rest day — the 5:45 block is the 45-minute outdoor walk, and it ticks Rule 1.'
+                : '🕉 Thursday — the 5:45 block is the Vishnu Sahasranama. No walk, so nothing here ticks Rule 1.')
             : '🏋 Training day. On Mondays and Thursdays this list swaps the 5:45 block for the outdoor walk automatically.');
     }
 
@@ -1215,7 +1290,7 @@
     const body = document.createElement('div');
     body.className = 'flex-1 min-w-0';
     const onlyChip = t.only === 'gym' ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 mr-1.5 align-middle">GYM</span>'
-                   : t.only === 'rest' ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 mr-1.5 align-middle">REST</span>' : '';
+                   : t.only ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 mr-1.5 align-middle">' + esc(t.only.toUpperCase()) + '</span>' : '';
     body.innerHTML = `<p class="text-[15px] font-semibold leading-snug ${t.done ? 'line-through text-gray-400' : 'text-gray-800'}">${editMode ? onlyChip : ''}${esc(t.label)}</p>` +
       (t.notes ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${t.done ? 'line-through' : ''}">${esc(t.notes)}</p>` : '');
     if (editMode) {
@@ -1404,7 +1479,7 @@
     C.hardTasks.forEach((t,i) => {
       const on = !!day.t[t.key];
       const sub = ruleSubFor(t, n);
-      const bent = surg && sub !== t.sub;
+      const bent = sub !== t.sub;
       const strk = taskStreak(t.key);
       h += `<div class="flex items-start gap-3 px-4 py-3 ${on?'opacity-60':''}">
         <div onclick="${editMode?`openRec('hardTasks',${i})`:`tapHard('${esc(t.key)}')`}" class="flex items-start gap-3 flex-1 min-w-0 cursor-pointer active:opacity-70">
@@ -1710,7 +1785,7 @@
       const isToday = new Date().getDay() === w;
       h += `<div onclick="${s?`setGymDay('${esc(s.key)}');scrollTo(0,0)`:''}" class="px-4 py-2.5 flex items-center justify-between gap-2 cursor-pointer active:bg-gray-50 ${isToday?'bg-forest-light/40':''}">
         <span class="text-sm ${isToday?'font-bold text-forest':'text-gray-600'}">${nm}</span>
-        <span class="text-xs ${s&&s.exs.length?'font-semibold text-gray-700':'text-gray-400'}">${s?esc(s.label):'—'}${e.sets?` · ${e.sets} sets · ≈${e.mins} min`:' · walk'}</span></div>`;
+        <span class="text-xs ${s&&s.exs.length?'font-semibold text-gray-700':'text-gray-400'}">${s?esc(s.label):'—'}${e.sets?` · ${e.sets} sets · ≈${e.mins} min`:(s?' · '+esc(s.mins||''):'')}</span></div>`;
     });
     h += '</div>';
 
@@ -2182,6 +2257,100 @@
     $('#view-bench').innerHTML = h;
   }
 
+  /* ============================ SADHANA ============================ */
+  const DAYNAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  function renderSadhana() {
+    const ds = todayStr(), rec = sadhanaLog[ds] || {};
+    const daily = C.sadhana.daily || [], weekly = sadhanaWeeklyFor(ds);
+    const done = sadhanaDone(ds), total = daily.length + weekly.length;
+
+    let h = `<div class="rounded-3xl p-5 text-white shadow-lg" style="background:linear-gradient(135deg,#8a6020,#8a6020cc)">
+      <div class="flex items-center gap-5">
+        <div class="text-white">${ringSvg(96, total?done/total:0, '#ffffff', done + '/' + total, 'TODAY')}</div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">Sadhana · ${esc(DAYNAMES[dow(ds)])}</p>
+          <p class="text-2xl font-bold leading-tight mt-0.5">${sadhanaMinutes(ds)} min today</p>
+          <p class="text-xs opacity-85 leading-snug mt-1">🔥 ${sadhanaStreak()}-day streak</p>
+        </div></div></div>`;
+
+    h += secTitle('Daily', editMode?'sadDaily':null, 'Add practice');
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    daily.forEach((x,i) => {
+      const on = !!rec[x.k];
+      h += `<div class="flex items-start gap-3 px-4 py-3 ${on?'opacity-60':''}">
+        <div onclick="${editMode?`openRec('sadDaily',${i})`:`tapSadhana('${esc(x.k)}')`}" class="flex items-start gap-3 flex-1 min-w-0 cursor-pointer active:opacity-70">
+          <div class="w-7 h-7 shrink-0 mt-0.5 rounded-full flex items-center justify-center border-2 ${on?'bg-forest border-forest':'border-gray-300'}">${on?tickSvg:''}</div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold ${on?'line-through text-gray-400':'text-gray-800'}">${esc(x.name)}</p>
+            <p class="text-[11px] font-bold text-amber2 mt-0.5">${esc(x.when)} · ${x.mins} min</p>
+            <p class="text-[11px] text-gray-400 leading-snug mt-0.5">${esc(x.note)}</p>
+          </div>${editMode?editPencil:''}</div></div>`;
+    });
+    h += '</div>';
+
+    h += secTitle('Today’s addition', editMode?'sadWeekly':null, 'Add weekly');
+    if (!weekly.length) {
+      h += card(`<div class="px-4 py-3"><p class="text-sm text-gray-400">Nothing extra on a ${esc(DAYNAMES[dow(ds)])}.</p></div>`);
+    } else {
+      h += '<div class="bg-white rounded-2xl shadow-sm border border-amber-300 divide-y divide-gray-100">';
+      weekly.forEach(x => {
+        const on = !!rec[x.k], i = C.sadhana.weekly.indexOf(x);
+        h += `<div class="flex items-start gap-3 px-4 py-3 ${on?'opacity-60':''}">
+          <div onclick="${editMode?`openRec('sadWeekly',${i})`:`tapSadhana('${esc(x.k)}')`}" class="flex items-start gap-3 flex-1 min-w-0 cursor-pointer active:opacity-70">
+            <div class="w-7 h-7 shrink-0 mt-0.5 rounded-full flex items-center justify-center border-2 ${on?'bg-amber2 border-amber2':'border-gray-300'}">${on?tickSvg:''}</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold ${on?'line-through text-gray-400':'text-gray-800'}">${esc(x.name)}</p>
+              <p class="text-[11px] font-bold text-amber2 mt-0.5">+${x.mins} min</p>
+              <p class="text-[11px] text-gray-400 leading-snug mt-0.5">${esc(x.note)}</p>
+            </div>${editMode?editPencil:''}</div></div>`;
+      });
+      h += '</div>';
+    }
+
+    h += secTitle('The week');
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    [0,1,2,3,4,5,6].forEach(wd => {
+      const extra = (C.sadhana.weekly||[]).filter(x => x.day === wd);
+      const isToday = dow(ds) === wd;
+      const mins = (C.sadhana.daily||[]).reduce((a,x)=>a+(x.mins||0),0) + extra.reduce((a,x)=>a+(x.mins||0),0);
+      h += `<div class="px-4 py-2.5 flex items-start justify-between gap-2 ${isToday?'bg-amber2-light':''}">
+        <span class="text-sm shrink-0 ${isToday?'font-bold text-amber2':'text-gray-600'}">${DAYNAMES[wd]}</span>
+        <span class="text-[11px] text-right ${extra.length?'text-gray-700 font-semibold':'text-gray-400'}">${extra.length?extra.map(x=>esc(x.name.split('·')[0].trim())).join(' · '):'daily only'}<span class="block text-[10px] text-gray-400 font-normal">${mins} min</span></span></div>`;
+    });
+    h += '</div>';
+
+    /* the last 30 days, so a slipping practice is visible rather than felt */
+    h += secTitle('Last 30 days');
+    let full = 0, part = 0;
+    let grid = '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-3"><div class="grid grid-cols-10 gap-1">';
+    for (let i = 29; i >= 0; i--) {
+      const dd = dateNAgo(i), cnt = sadhanaDone(dd), tot = sadhanaItemsFor(dd).length;
+      if (cnt && cnt === tot) full++; else if (cnt) part++;
+      const cls = (cnt && cnt === tot) ? 'bg-amber2 text-white' : cnt ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-300';
+      grid += `<div onclick="openSadhanaDay('${dd}')" title="${prettyDate(dd)} — ${cnt}/${tot}" class="aspect-square rounded-md flex items-center justify-center text-[9px] font-bold cursor-pointer ${cls}">${new Date(dd+'T12:00').getDate()}</div>`;
+    }
+    grid += `</div><p class="text-[11px] text-gray-400 text-center mt-2">${full} complete · ${part} partial · tap any day to edit</p></div>`;
+    h += grid;
+    h += creedBox();
+    $('#view-sadhana').innerHTML = h;
+  }
+  function tapSadhana(k) { toggleSadhana(todayStr(), k); renderSadhana(); }
+  function openSadhanaDay(ds) {
+    const rec = sadhanaLog[ds] || {};
+    const items = sadhanaItemsFor(ds);
+    const h = items.map(x =>
+      `<label class="flex items-start gap-3 py-2 border-b border-gray-100">
+         <input type="checkbox" data-sk="${esc(x.k)}" ${rec[x.k]?'checked':''} class="w-5 h-5 accent-[#8a6020] mt-0.5">
+         <span class="flex-1"><span class="block text-sm font-semibold text-gray-700">${esc(x.name)}</span>
+         <span class="block text-[11px] text-gray-400">${x.mins} min</span></span></label>`).join('');
+    openSheet(prettyDate(ds), h || '<p class="text-sm text-gray-400">Nothing scheduled.</p>', () => {
+      const out = {};
+      $('#recFields').querySelectorAll('[data-sk]').forEach(cb => { if (cb.checked) out[cb.dataset.sk] = 1; });
+      if (Object.keys(out).length) sadhanaLog[ds] = out; else delete sadhanaLog[ds];
+      saveSadhana(); closeRec(); render(); toast('Saved');
+    });
+  }
+
   /* ============================ GOALS & DATES ============================ */
   function startOfToday() { const d = new Date(); d.setHours(0,0,0,0); return d; }
   function endOfPeriod(p) {
@@ -2438,7 +2607,7 @@
     S.push({ name:'Photos', rows:ph });
 
     const sc = [['Schedule','ShowsOn','Time','Item','Notes','Band','DoneToday']];
-    const showsOn = { gym:'Tue/Wed/Fri only', rest:'Mon/Thu rest days only' };
+    const showsOn = { gym:'Tue/Wed/Fri only', rest:'Mon/Thu rest days', mon:'Monday only', thu:'Thursday only' };
     Object.keys(C.schedules).forEach(k => (C.schedules[k]||[]).forEach(t => sc.push([k, showsOn[t.only]||'All', t.time||'', t.label, t.notes||'', t.band||'', t.done?1:0])));
     S.push({ name:'Schedules', rows:sc });
 
@@ -2460,6 +2629,17 @@
     const cm = [['Day','Date','Code','Silent','Mark','Watch','Apply']];
     C.comms.forEach(c => cm.push([c.d, hardDateFor(c.d), c.code, c.silent?1:0, c.mark||'', c.watch, c.apply]));
     S.push({ name:'Comms', rows:cm });
+
+    const sd = [['Date','Day','Weekday','Practice','Kind','Minutes','Done']];
+    const seen = {};
+    Object.keys(sadhanaLog).forEach(x => seen[x] = 1);
+    for (let i = 1; i <= hardMeta.length; i++) seen[hardDateFor(i)] = 1;
+    Object.keys(seen).sort().forEach(date => {
+      const rec = sadhanaLog[date] || {}, dn = hardDayFor(date);
+      sadhanaItemsFor(date).forEach(x => sd.push([date, (dn>=1&&dn<=hardMeta.length)?dn:'',
+        DAYNAMES[dow(date)], x.name, x.day === undefined ? 'daily' : 'weekly', x.mins, rec[x.k]?1:0]));
+    });
+    S.push({ name:'Sadhana', rows:sd });
 
     const go = [['Period','Goal','Note','Done']];
     ['week','month','year'].forEach(p => (goals[p]||[]).forEach(x => go.push([p, x.text, x.note||'', x.done?1:0])));
@@ -2505,7 +2685,8 @@
     toast('Packing…');
     try {
       const files = [];
-      files.push({ name:'MasterPlan.xlsx', data: buildXlsx(collectSheets()) });
+      const sheets = collectSheets();
+      files.push({ name:'MasterPlan.xlsx', data: buildXlsx(sheets) });
       files.push({ name:'backup.json', data: enc.encode(JSON.stringify(backupObject(), null, 2)) });
       let all = [];
       try { all = await IDB.all(); } catch (e) { all = []; }
@@ -2517,25 +2698,34 @@
         if (b64) files.push({ name:'photos/' + tag + '-' + p.kind + '.jpg', data: b64ToU8(b64) });
       });
       const st = hardStatus();
+      /* Derived from the sheets actually written, so it cannot drift out of date. */
+      const SHEET_DESC = {
+        '75HardLog':'one row per day — a column per non-negotiable, plus split, comms code and water',
+        'Benchmarks':'waist, weight, WPM, accuracy and the four lifts, every check-in',
+        'GymSets':'every set logged: weight x reps, with volume',
+        'Water':'the timed water schedule, day by day',
+        'Photos':'index of which photos exist (the images are in photos/)',
+        'Schedules':'the weekday and weekend routines and the to-do list, with which days each row shows on',
+        'GymPlan':'the training sessions as programmed',
+        'Diet':'daily and Tuesday templates, prep map, supplements',
+        'Comms':'the 75-day communication sequence',
+        'Sadhana':'daily and weekly practices, day by day, with minutes',
+        'Goals':'weekly, monthly and yearly goals',
+        'Dates':'dated events',
+        'Meta':'summary figures — current day, streaks, completion, surgery dates'
+      };
+      const sheetLines = sheets.map(sh => '  ' + sh.name.padEnd(12) + (SHEET_DESC[sh.name] || '')).join('\n');
+      const photoCount = files.filter(f => f.name.indexOf('photos/') === 0).length;
       files.push({ name:'README.txt', data: enc.encode(
 `MASTER DAILY PLAN — export ${new Date().toISOString()}
 
 ${st.state==='pending'?'Not started yet':'Day '+st.n+' of '+st.L}  ·  start ${hardMeta.start}  ·  end ${hardDateFor(hardMeta.length)}  ·  attempt ${hardMeta.attempt}
 
-MasterPlan.xlsx   12 sheets:
-  75HardLog   one row per day, one column per non-negotiable, plus split, comms code and water
-  Benchmarks  waist, weight, WPM, accuracy and the four lifts, every check-in
-  GymSets     every set logged: weight x reps, with volume
-  Water       the 8-slot schedule, day by day
-  Photos      index of which photos exist (images are in photos/)
-  Schedules   the three daily routines and the to-do list
-  GymPlan     the six sessions as programmed
-  Diet        daily and Tuesday templates, prep map, supplements
-  Comms       the 75-day communication sequence
-  Goals, Dates, Meta
+MasterPlan.xlsx   ${sheets.length} sheets:
+${sheetLines}
 
 backup.json       complete app state. Restore via Data > Restore from backup.
-photos/           day-NN-YYYY-MM-DD-face.jpg and -body.jpg
+photos/           ${photoCount} file${photoCount===1?'':'s'}, named day-NN-YYYY-MM-DD-face.jpg and -body.jpg
 
 Send the whole zip to Claude and ask for the analysis you want.
 `) });
@@ -2635,7 +2825,7 @@ Send the whole zip to Claude and ask for the analysis you want.
     loadContent();
     loadHard();
     autoResetOnNewDay();
-    loadWater(); loadBench(); loadPhotoIx(); loadEvents(); loadGoals();
+    loadWater(); loadBench(); loadPhotoIx(); loadSadhana(); loadEvents(); loadGoals();
     pickToday();
 
     document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => { activeTab = b.dataset.tab; renderList(); });
