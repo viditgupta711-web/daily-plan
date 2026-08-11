@@ -161,13 +161,13 @@
   <nav class="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200" style="padding-bottom: env(safe-area-inset-bottom);">
     <div class="max-w-md mx-auto flex overflow-x-auto no-sb scroll-smooth">
       <button data-view="plan"   class="nav-btn"><span class="text-xl leading-none">🗓️</span><span class="text-[10px] font-semibold">Plan</span></button>
-      <button data-view="hard"   class="nav-btn"><span class="text-xl leading-none">🔥</span><span class="text-[10px] font-semibold">75</span></button>
+      <button data-view="lists"  class="nav-btn"><span class="text-xl leading-none">📋</span><span class="text-[10px] font-semibold">Lists</span></button>
       <button data-view="gym"    class="nav-btn"><span class="text-xl leading-none">🏋️</span><span class="text-[10px] font-semibold">Gym</span></button>
-      <button data-view="diet"   class="nav-btn"><span class="text-xl leading-none">🍴</span><span class="text-[10px] font-semibold">Diet</span></button>
       <button data-view="body"   class="nav-btn"><span class="text-xl leading-none">🧴</span><span class="text-[10px] font-semibold">Body</span></button>
+      <button data-view="hard"   class="nav-btn"><span class="text-xl leading-none">🔥</span><span class="text-[10px] font-semibold">75</span></button>
+      <button data-view="diet"   class="nav-btn"><span class="text-xl leading-none">🍴</span><span class="text-[10px] font-semibold">Diet</span></button>
       <button data-view="photos" class="nav-btn"><span class="text-xl leading-none">📸</span><span class="text-[10px] font-semibold">Photos</span></button>
       <button data-view="bench"  class="nav-btn"><span class="text-xl leading-none">📈</span><span class="text-[10px] font-semibold">Bench</span></button>
-      <button data-view="lists"  class="nav-btn"><span class="text-xl leading-none">📋</span><span class="text-[10px] font-semibold">Lists</span></button>
     </div>
   </nav>
 
@@ -186,8 +186,8 @@
         <div id="fOnlyRow" class="hidden"><label class="flbl">Shows on</label>
           <select id="fOnly" class="fld">
             <option value="">Every weekday</option>
-            <option value="gym">Gym days only — Mon · Tue · Thu · Fri</option>
-            <option value="wed">Wednesday only — rest day</option>
+            <option value="gym">Training days only — Tue · Wed · Fri</option>
+            <option value="rest">Rest days only — Mon · Thu</option>
           </select></div>
         <div><label class="flbl">Name</label><input id="fLabel" type="text" placeholder="e.g. Meditation" class="fld" /></div>
         <div><label class="flbl">Notes</label><textarea id="fNotes" rows="2" placeholder="Optional details…" class="fld resize-none"></textarea></div>
@@ -296,14 +296,14 @@
       ['05:00','Meditation','20 minutes · Rule 4','teal',''],
       ['05:20','Journal, longhand and slow','This is the handwriting practice · Rule 4','teal',''],
       ['05:40','Pack bag · gym kit · SPF in the bag','','','gym'],
-      ['05:40','Shoes on · layers','No gym kit today — walking','','wed'],
+      ['05:40','Shoes on · layers','No gym kit today — walking','','rest'],
       ['05:45','Walk to Gosford (8 min)','250 ml water · Rule 3','teal','gym'],
-      ['05:45','45-MINUTE OUTDOOR WALK','Rest day. Ticks Rule 1 — the streak holds. Morning, so the evening stays protected.','teal','wed'],
+      ['05:45','45-MINUTE OUTDOOR WALK','Rest day. Ticks Rule 1 — the streak holds. Morning, so the evening stays protected.','teal','rest'],
       ['06:00','TRAIN — see the Gym tab','600 ml during · Rule 1','teal','gym'],
-      ['06:30','Home','','','wed'],
+      ['06:30','Home','','','rest'],
       ['06:45','Walk home','','','gym'],
-      ['06:53','Shower','Hair wash Mon & Thu only — rinse other days','purple','gym'],
-      ['06:53','Shower','Rinse only — no shampoo on Wednesday','purple','wed'],
+      ['06:53','Shower','Hair: wash Mon · Thu · Sat — rinse other days','purple','gym'],
+      ['06:53','Shower','Rinse only on a rest day — no shampoo','purple','rest'],
       ['07:02','AM skincare','Moisturiser → SPF 50. Vitamin C 2–3×/wk, optional','purple',''],
       ['07:05','Meal — shake + banana + eggs + toast','Supplements. 400 ml water. Tue: no egg · Rules 2 & 3','amber',''],
       ['07:25','PUJA','Life rule','amber',''],
@@ -328,7 +328,7 @@
       ['06:00','Meditation','20 minutes · Rule 4','teal'],
       ['06:20','Journal, longhand and slow','Rule 4','teal'],
       ['06:45','Walk over to Gosford','No bus to catch today','teal'],
-      ['07:00','TRAIN — Sat Legs B · Sun Pull B','Centre opens at 7:00 · Rule 1','teal'],
+      ['07:00','TRAIN — Sat Legs · Sun Push A','Centre opens at 7:00 · Rule 1','teal'],
       ['07:55','Shower + AM skincare','Sat = hair wash. Sun = rinse','purple'],
       ['08:05','Meal — shake + banana + eggs + toast','Supplements · Rules 2 & 3','amber'],
       ['08:25','PUJA','Life rule','amber'],
@@ -359,7 +359,7 @@
 
   /* ---------------- The ten non-negotiables --------------- */
   SEED.hardTasks = [
-    {key:'work',  icon:'🏋', label:'Workout',        sub:'45 min. PPL Mon/Tue/Thu/Fri 6:00–6:45, Sat/Sun 7:00–7:45. Wednesday = 45-min outdoor walk. Never zero.'},
+    {key:'work',  icon:'🏋', label:'Workout',        sub:'Tue Pull A · Wed Push B · Fri Pull B at 6:00–6:45 · Sat Legs · Sun Push A at 7:00–7:45. Mon & Thu = 45-min outdoor walk. Never zero.'},
     {key:'diet',  icon:'🥗', label:'Diet',           sub:'Structured plan held. Zero alcohol, zero cheat meals. Toast + jam + butter is permitted and mandatory — not a cheat. Tuesday: no egg, no non-veg.'},
     {key:'water', icon:'💧', label:'Water 3.8 L',    sub:'One US gallon. Front-loaded, finished by ~18:00 so it never wrecks sleep.'},
     {key:'am',    icon:'🌅', label:'5 AM block',     sub:'Meditate 5:00–5:20. Journal by hand 5:20 onward — slow; this is the handwriting practice.'},
@@ -401,13 +401,6 @@
     {days:'Days 69–75', when:'9–16 Oct', text:'Full send. Back to Phase B loading and climbing. Expect this to feel unexpectedly good — the airway is fixed and you are sleeping properly for the first time in years.'}
   ];
 
-  SEED.expect = [
-    {w:'Weeks 1–2',  t:'Sore everywhere, especially days 2–3. Weight may tick up 1–1.5 kg — that is muscle glycogen and water arriving, not fat. Ignore it.'},
-    {w:'Weeks 3–5',  t:'Loads climbing fast. This is the newbie-gains window and it is real: ~15 years of low volume means you respond like an untrained lifter, which is an advantage, not an embarrassment.'},
-    {w:'Weeks 6–8',  t:'Surgery. Some strength and size will visibly go. It comes back roughly three times faster than it took to build.'},
-    {w:'Weeks 9–11', t:'The interesting part. With the apnoea corrected, recovery, appetite regulation and fat loss should all work better than they ever have. Watch the waist here.'}
-  ];
-
   /* ---------------- Communication map — 75 rows, exactly as gridded --------------- */
   SEED.comms = (function () {
     const blocks = [
@@ -442,90 +435,74 @@
   SEED.commsCasualty = 'One casualty, named honestly: the original “Present” block (a real presentation) no longer fits inside 75 days once the vocal work shifts back. Treat it as the capstone after Day 75 rather than pretending it squeezes in.';
 
   /* ---------------- Training split by weekday --------------- */
-  SEED.splitMap = { 1:'pushA', 2:'legsA', 3:'walk', 4:'pullA', 5:'pushB', 6:'legsB', 0:'pullB' };
+  SEED.splitMap = { 1:'rest', 2:'pullA', 3:'pushB', 4:'rest', 5:'pullB', 6:'legs', 0:'pushA' };
 
-  /* ---------------- The six sessions --------------- */
-  const EX = (n, sets, reps, rest, why, pri, sec, vid, vidT) => ({ n, sets, reps, rest, why, pri, sec, vid: vid || '', vidT: vidT || '' });
+  /* ---------------- Five sessions, two rest days ---------------
+     sets = number of log rows. setsL = what the programme says ("3–4").  */
+  const EX = (n, sets, setsL, reps, pri, sec, vid, vidT) =>
+    ({ n, sets, setsL: setsL || String(sets), reps, rest:'', why:'', pri, sec, vid: vid || '', vidT: vidT || '' });
 
   SEED.gym = [
-    {key:'pushA', label:'Push A', day:'Monday', lead:'Chest-led', time:'6:00–6:45', mins:'~42 min',
-     note:'Heaviest compound first when you are freshest, isolations last when fatigue costs least. Lateral raises sit before triceps deliberately — shoulder width is the priority, so it gets trained while you still care.',
-     exs:[
-      EX('Barbell Bench Press',3,'6–8','90s','Shoulder blades pinned back and down. Bar to lower chest, elbows ~45° — not flared to 90°.',['chest'],['delts','triceps'],'rT7DgCr-3pg','How To: Barbell Bench Press — ScottHermanFitness'),
-      EX('Seated DB Shoulder Press',3,'8–10','90s','Press slightly forward of the ears, not behind. Stop just short of locking out.',['delts'],['triceps','traps'],'qEwKCR5JCog','How To: Dumbbell Shoulder Press — ScottHermanFitness'),
-      EX('Incline DB Press',3,'10–12','60s','Bench at ~30°. Upper chest — the part that squares off the frame under a shirt.',['chest'],['delts','triceps'],'8iPEnn-ltC8','How To: Dumbbell Incline Chest Press — ScottHermanFitness'),
-      EX('DB Lateral Raise',3,'12–15','60s','The single most valuable exercise for the look you want. Light. Slight forward lean, lead with the elbows, 3 seconds down.',['delts'],['traps'],'3VcKaXpzqRo','How To: Dumbbell Side Lateral Raise — ScottHermanFitness'),
-      EX('Cable Triceps Pushdown',2,'12–15','60s','Elbows glued to your sides. Nothing else moves.',['triceps'],['forearms'],'2-LAMcpzODU','How To: Tricep Pushdown — ScottHermanFitness')]},
-
-    {key:'legsA', label:'Legs A', day:'Tuesday', lead:'Squat-led', time:'6:00–6:45', mins:'~44 min',
-     note:'Say it once, then stop hoping otherwise: ab work builds the muscle underneath but does not remove the fat above it. Your 38 inches come off through the kitchen and the deficit. Train abs because they are muscle; do not train them expecting a waist.',
-     exs:[
-      EX('Barbell Squat',3,'6–8','90s','Brace as if about to be punched. Depth to roughly parallel. Knees track over the toes.',['quads','glutes'],['hamstrings','lowerBack','abs'],'bEv6CCg2BC8','How To Get A Huge Squat With Perfect Technique — Jeff Nippard'),
-      EX('Romanian Deadlift',3,'8–10','90s','Hinge at the hips, soft knees, back flat. Chase the hamstring stretch, not the floor.',['hamstrings','glutes'],['lowerBack','forearms'],'JCXUYuzwNrM','How To: Romanian Deadlift (Barbell) — ScottHermanFitness'),
-      EX('Leg Press',2,'12–15','60s','Feet mid-platform. Do not let the lower back round off the pad at the bottom.',['quads'],['glutes','hamstrings'],'IZxyjW7MPJQ','How To: Seated Leg Press (Cybex) — ScottHermanFitness'),
-      EX('Lying Leg Curl',2,'12–15','60s','One-second squeeze at the top.',['hamstrings'],['calves'],'1Tq3QdYUuHs','How To: Prone Leg Curl (Cybex) — ScottHermanFitness'),
-      EX('Cable Crunch or Ab Wheel',2,'10–12','60s','Abs, not hip flexors — the ribs move toward the pelvis.',['abs'],['obliques'],'2fbujeH3F0E','How To: Ab Pulldown (cable crunch) — ScottHermanFitness')]},
-
-    {key:'walk', label:'Walk', day:'Wednesday', lead:'Rest day', time:'5:45–6:30', mins:'45 min',
-     note:'No gym. A 45-minute outdoor walk in the morning, keeping the rhythm and protecting your evening. That walk ticks Rule 1, so the streak holds. Hair: rinse only. Everything else unchanged.',
+    {key:'rest', label:'Rest', day:'Monday & Thursday', lead:'Rest day', time:'5:45–6:30', mins:'45 min walk',
+     note:'No gym. A 45-minute outdoor walk in the morning — it ticks Rule 1, so the streak holds, and it carries the day’s steps.',
      exs:[]},
 
-    {key:'pullA', label:'Pull A', day:'Thursday', lead:'Width-led', time:'6:00–6:45', mins:'~42 min',
-     note:'Pull days are where the V-taper is built. Waist looks smaller when the back is wider — half of the shape you are chasing is a ratio, not a measurement.',
+    {key:'pullA', label:'Pull A', day:'Tuesday', lead:'Heavy', time:'6:00–6:45', mins:'',
+     note:'',
      exs:[
-      EX('Lat Pulldown (wide)',3,'8–10','90s','Let the bar pull your shoulders up at the top — full stretch. Drive elbows down to the floor, not the bar to your chin.',['lats'],['biceps','rhomboids','rearDelts'],'CAwf7n6Luuc','How To: Lat Pulldown | 3 GOLDEN RULES — ScottHermanFitness'),
-      EX('Seated Cable Row',3,'8–10','90s','Chest tall, no rocking. Squeeze the shoulder blades together for a beat at the end.',['rhomboids','lats'],['biceps','lowerBack','traps'],'GZbfZ033f74','How To: Seated Low Row — ScottHermanFitness'),
-      EX('Chest-Supported DB Row',3,'10–12','60s','Chest on the incline bench. Removes the lower back entirely — pure back work.',['rhomboids','lats'],['biceps','rearDelts'],'',''),
-      EX('Face Pull',3,'15–20','60s','Do not skip. Rear delts and upper back — your direct counter to nine hours at a desk. Pull to the forehead, thumbs back.',['rearDelts'],['traps','rhomboids'],'rep-qVOkqgk','How To: Face Pull — ScottHermanFitness'),
-      EX('Barbell Curl',2,'10–12','60s','Elbows pinned to your ribs. If they drift forward, the weight is too heavy.',['biceps'],['forearms'],'kwG2ipFRgfo','How to Do a Barbell Curl — Howcast')]},
+      EX('Pull-up',3,'3','6–10',['lats'],['biceps','rhomboids','forearms'],'eGo4IYlbE5g','The Perfect Pull Up — Calisthenicmovement'),
+      EX('Barbell row',4,'3–4','8–12',['lats','rhomboids'],['biceps','lowerBack','rearDelts'],'kBWAon7ItDw','How To PROPERLY Barbell Row — Jeremy Ethier'),
+      EX('45° back extension',3,'3','10–15',['lowerBack','glutes'],['hamstrings'],'ph3pddpKzzw','How to Do Back Extensions — LIVESTRONG'),
+      EX('Shrug',3,'3','12–15',['traps'],['forearms'],'cJRVVxmytaM','How To: Dumbbell Shrugs — ScottHermanFitness'),
+      EX('Face pull',3,'3','12–15',['rearDelts'],['traps','rhomboids'],'rep-qVOkqgk','How To: Face Pull — ScottHermanFitness'),
+      EX('Barbell curl',3,'3','8–12',['biceps'],['forearms'],'kwG2ipFRgfo','How to Do a Barbell Curl — Howcast'),
+      EX('Seated leg curl',3,'3','10–15',['hamstrings'],['calves'],'',''),
+      EX('Standing calf raise',2,'2','12–15',['calves'],[],'-M4-G8p8fmc','How to Do a Calf Raise — Howcast')]},
 
-    {key:'pushB', label:'Push B', day:'Friday', lead:'Shoulder-led', time:'6:00–6:45', mins:'~42 min',
-     note:'Push A leads with chest, Push B leads with shoulders. Same muscles, different order, so neither is permanently trained last and tired.',
+    {key:'pushB', label:'Push B', day:'Wednesday', lead:'Shoulder lead, + squat', time:'6:00–6:45', mins:'',
+     note:'',
      exs:[
-      EX('Incline Barbell or DB Press',3,'8–10','90s','Upper chest first today while you are fresh.',['chest'],['delts','triceps'],'8iPEnn-ltC8','How To: Dumbbell Incline Chest Press — ScottHermanFitness'),
-      EX('Standing Overhead Press',3,'6–8','90s','Squeeze glutes and brace so you press the bar rather than lean back under it. Shrug at the top.',['delts'],['triceps','traps','abs'],'2yjwXTZQDDI','How To: Standing Straight-Bar Overhead Press — ScottHermanFitness'),
-      EX('Machine Chest Press',3,'10–12','60s','Machine on purpose — lets you push close to failure safely without a spotter at 6 AM.',['chest'],['delts','triceps'],'xUm0BiZCWlQ','How To: Chest Press (Cybex) — ScottHermanFitness'),
-      EX('DB Lateral Raise',3,'15–20','60s','Second weekly dose. Lighter than Monday, higher reps. Shoulders tolerate frequency well.',['delts'],['traps'],'3VcKaXpzqRo','How To: Dumbbell Side Lateral Raise — ScottHermanFitness'),
-      EX('Overhead Triceps Extension',2,'12–15','60s','Long head of the triceps — the part that adds visible arm size.',['triceps'],['delts'],'_gsUck-7M74','How to Do a Dumbbell Tricep Extension — Howcast')]},
+      EX('Back squat',4,'4','6–10',['quads','glutes'],['hamstrings','lowerBack','abs'],'bEv6CCg2BC8','How To Get A Huge Squat With Perfect Technique — Jeff Nippard'),
+      EX('Overhead press',4,'3–4','6–10',['delts'],['triceps','traps','abs'],'2yjwXTZQDDI','How To: Standing Straight-Bar Overhead Press — ScottHermanFitness'),
+      EX('Incline barbell press',3,'3','8–12',['chest'],['delts','triceps'],'SrqOu55lrYU','How To: Incline Barbell Bench Press — ScottHermanFitness'),
+      EX('Lateral raise',4,'4','12–15',['delts'],['traps'],'3VcKaXpzqRo','How To: Dumbbell Side Lateral Raise — ScottHermanFitness'),
+      EX('Overhead triceps extension',3,'3','10–15',['triceps'],['delts'],'_gsUck-7M74','How to Do a Dumbbell Tricep Extension — Howcast'),
+      EX('Standing calf raise',2,'2','12–15',['calves'],[],'-M4-G8p8fmc','How to Do a Calf Raise — Howcast'),
+      EX('Tibialis raise',2,'2','15–20',['tibialis'],[],'',''),
+      EX('Neck flexion + extension',2,'2','15–20 each',['neck'],[],'','')]},
 
-    {key:'legsB', label:'Legs B', day:'Saturday', lead:'Volume-led', time:'7:00–7:45', mins:'~44 min',
+    {key:'pullB', label:'Pull B', day:'Friday', lead:'Supported', time:'6:00–6:45', mins:'',
+     note:'',
+     exs:[
+      EX('Chin-up',3,'3','6–10',['lats','biceps'],['rhomboids','forearms'],'brhRXlOhsAM','How to Perform Chin-Ups — Buff Dudes'),
+      EX('Chest-supported dumbbell row',3,'3','8–12',['rhomboids','lats'],['biceps','rearDelts'],'',''),
+      EX('Rear delt flye',3,'3','12–15',['rearDelts'],['traps','rhomboids'],'ttvfGg9d76c','How To: Dumbbell Bent-Over Raise — ScottHermanFitness'),
+      EX('Shrug',3,'3','12–15',['traps'],['forearms'],'cJRVVxmytaM','How To: Dumbbell Shrugs — ScottHermanFitness'),
+      EX('Hammer curl',3,'3','10–12',['biceps','forearms'],[],'zC3nLlEvin4','How To: Dumbbell Hammer Curl — ScottHermanFitness'),
+      EX('Lateral raise',2,'2','12–15',['delts'],['traps'],'3VcKaXpzqRo','How To: Dumbbell Side Lateral Raise — ScottHermanFitness'),
+      EX('Suitcase carry',3,'3','30–40 m per side',['obliques','forearms'],['traps','abs'],'','')]},
+
+    {key:'legs', label:'Legs', day:'Saturday', lead:'', time:'7:00–7:45', mins:'',
      note:'Weekends start at 7:00 — the centre does not open earlier. No bus to catch, so the whole morning shifts back an hour.',
      exs:[
-      EX('Leg Press',3,'10–12','90s','Heavier today, no bar on the back. Full range without spinal loading.',['quads'],['glutes','hamstrings'],'IZxyjW7MPJQ','How To: Seated Leg Press (Cybex) — ScottHermanFitness'),
-      EX('Walking Lunge or Bulgarian Split Squat',2,'10 / leg','90s','Single-leg work. Fixes side-to-side imbalance and hits glutes hard.',['quads','glutes'],['hamstrings','calves'],'2C-uNgKwPLE','How To: Bulgarian Split Squat — ScottHermanFitness'),
-      EX('Seated Leg Curl',3,'10–12','60s','Hamstrings from a different joint angle to Tuesday.',['hamstrings'],['calves'],'',''),
-      EX('Leg Extension',2,'15','60s','Quads, finished off. Light, controlled, no locking out hard.',['quads'],[],'YyvSfVjQeL0','How To: Leg Extension (Cybex) — ScottHermanFitness'),
-      EX('Hanging Leg Raise or Plank',2,'10–12 / 45s','60s','Core, braced not crunched.',['abs'],['obliques'],'Pr1ieGZ5atk','Hanging Leg Raise | HOW-TO — ATHLEAN-X')]},
+      EX('Back squat',5,'5','6–10',['quads','glutes'],['hamstrings','lowerBack','abs'],'bEv6CCg2BC8','How To Get A Huge Squat With Perfect Technique — Jeff Nippard'),
+      EX('Romanian deadlift',3,'3','8–12',['hamstrings','glutes'],['lowerBack','forearms'],'JCXUYuzwNrM','How To: Romanian Deadlift (Barbell) — ScottHermanFitness'),
+      EX('Hip thrust',3,'3','8–12',['glutes'],['hamstrings'],'SEdqd1n0cvg','How To: Hip Thrust — ScottHermanFitness'),
+      EX('Seated leg curl',3,'3','10–15',['hamstrings'],['calves'],'',''),
+      EX('Standing calf raise',4,'3–4','10–15',['calves'],[],'-M4-G8p8fmc','How to Do a Calf Raise — Howcast'),
+      EX('Tibialis raise',2,'2','15–20',['tibialis'],[],'',''),
+      EX('Hanging leg raise',3,'3','10–15',['abs'],['obliques'],'Pr1ieGZ5atk','Hanging Leg Raise | HOW-TO — ATHLEAN-X')]},
 
-    {key:'pullB', label:'Pull B', day:'Sunday', lead:'Thickness-led', time:'7:00–7:45', mins:'~42 min',
-     note:'Your 6-inch wrists mean the arms will always look bigger for less mass than someone with thick joints. That is a genuine structural advantage — use it.',
+    {key:'pushA', label:'Push A', day:'Sunday', lead:'Chest lead', time:'7:00–7:45', mins:'',
+     note:'Weekends start at 7:00.',
      exs:[
-      EX('Chest-Supported Row',3,'8–10','90s','Heavy row first today. Back thickness — what fills out a jacket from behind.',['rhomboids','lats'],['biceps','rearDelts','traps'],'',''),
-      EX('Close-Grip Lat Pulldown',3,'10–12','60s','Neutral grip. Lower lats, and easier on the shoulders than wide grip.',['lats'],['biceps','rhomboids'],'',''),
-      EX('Cable Rear Delt Fly',3,'15–20','60s','Rear delts again. Posture, shoulder health, and the width that reads from behind.',['rearDelts'],['traps','rhomboids'],'ttvfGg9d76c','How To: Dumbbell Bent-Over Raise (same rear-delt pattern) — ScottHermanFitness'),
-      EX('Face Pull',2,'15–20','60s','Yes, again. Twice a week for nine desk hours a day is a fair trade.',['rearDelts'],['traps','rhomboids'],'rep-qVOkqgk','How To: Face Pull — ScottHermanFitness'),
-      EX('Hammer Curl',2,'12','60s','Brachialis — sits under the bicep and pushes it up. Adds width to a small-framed arm.',['biceps','forearms'],[],'zC3nLlEvin4','How To: Dumbbell Hammer Curl — ScottHermanFitness')]}
+      EX('Barbell bench press',4,'3–4','6–10',['chest'],['delts','triceps'],'rT7DgCr-3pg','How To: Barbell Bench Press — ScottHermanFitness'),
+      EX('Incline dumbbell press',3,'3','8–12',['chest'],['delts','triceps'],'8iPEnn-ltC8','How To: Dumbbell Incline Chest Press — ScottHermanFitness'),
+      EX('Lateral raise',4,'4','12–15',['delts'],['traps'],'3VcKaXpzqRo','How To: Dumbbell Side Lateral Raise — ScottHermanFitness'),
+      EX('Triceps pushdown',3,'3','10–15',['triceps'],['forearms'],'2-LAMcpzODU','How To: Tricep Pushdown — ScottHermanFitness'),
+      EX('Pallof press',3,'3','',['abs','obliques'],[],'AH_QZLm_0-s','Standing Band Resisted Pallof Press — Breathing to Heal'),
+      EX('Neck flexion + extension',2,'2','15–20 each',['neck'],[],'','')]}
   ];
-
-  SEED.sessionRules = [
-    ['0:00–0:05','Warm-up. 3 min bike or rower, then 2 light ramp-up sets on the first exercise only. Never warm up the isolations.'],
-    ['Rest','90 seconds on the first two lifts. 60 seconds on everything after. Set a timer — drifting rest is what turns 45 minutes into 65.'],
-    ['Tempo','Lower under control over ~2–3 seconds. No bouncing, no dropping. The lowering phase builds more muscle than the lifting phase and costs no extra weight.'],
-    ['Progression','Double progression. Hold the weight until you hit the top of the rep range on every set. Only then add the smallest increment available, and restart at the bottom of the range.'],
-    ['Increments','Upper body +1–2.5 kg · Lower body +2.5–5 kg. Smaller than feels satisfying. That is the point — it is how you are still progressing in October.'],
-    ['Logging','Write every set: weight × reps. Non-optional. Memory flatters you and the log does not.'],
-    ['Running late','Cut the last exercise, never the first two. Finish and catch the bus — a rushed session still ticks Rule 1.']
-  ];
-
-  SEED.startLoads = [
-    {n:'Barbell Bench Press', w:'25 kg'},   {n:'Barbell Squat', w:'30 kg (or bar only)'},
-    {n:'Overhead Press', w:'17.5 kg'},      {n:'Romanian Deadlift', w:'30 kg'},
-    {n:'Lat Pulldown', w:'27.5 kg'},        {n:'Leg Press', w:'50 kg'},
-    {n:'Seated Cable Row', w:'22.5 kg'},    {n:'Lying Leg Curl', w:'20 kg'},
-    {n:'DB Lateral Raise', w:'4 kg'},       {n:'DB Shoulder Press', w:'10 kg each'},
-    {n:'Barbell Curl', w:'12.5 kg'},        {n:'Everything else', w:'A weight you could do 3 more reps with'}
-  ];
-  SEED.startNote = 'Roughly 60% of your June numbers. They will feel insultingly light. Good — that is a correctly calibrated first week after a long layoff. Muscle memory returns in weeks; tendons and connective tissue need 2–3. Almost every restart injury happens in the first fortnight, to someone who felt fine. On the squat: if the bar alone feels awkward tomorrow, run Leg Press for the first two weeks and introduce the barbell squat in Phase B.';
 
   /* ---------------- Diet block --------------- */
   SEED.diet = {
@@ -641,7 +618,7 @@
   SEED.hairWeek = [
     {d:'Monday',    a:'WASH',  t:'Gentle shampoo, scalp only. Conditioner on the ends only — never the roots.'},
     {d:'Tuesday',   a:'Rinse', t:'Water only in the shower. No shampoo.'},
-    {d:'Wednesday', a:'Rinse', t:'Rest day — you walk rather than train, so less sweat anyway.'},
+    {d:'Wednesday', a:'Rinse', t:'Water only in the shower. No shampoo.'},
     {d:'Thursday',  a:'WASH',  t:'As Monday.'},
     {d:'Friday',    a:'Rinse', t:''},
     {d:'Saturday',  a:'WASH',  t:'As Monday.'},
@@ -696,9 +673,11 @@
     lowerBack: {l:'Lower back', s:'b', p:'<rect x="142" y="78" width="16" height="13" rx="4"/>'},
     glutes:    {l:'Glutes',     s:'b', p:'<ellipse cx="143" cy="99" rx="9" ry="8.5"/><ellipse cx="157" cy="99" rx="9" ry="8.5"/>'},
     hamstrings:{l:'Hamstrings', s:'b', p:'<ellipse cx="142" cy="123" rx="8" ry="19"/><ellipse cx="158" cy="123" rx="8" ry="19"/>'},
-    calves:    {l:'Calves',     s:'b', p:'<ellipse cx="142.5" cy="163" rx="6.5" ry="15"/><ellipse cx="157.5" cy="163" rx="6.5" ry="15"/>'}
+    calves:    {l:'Calves',     s:'b', p:'<ellipse cx="142.5" cy="163" rx="6.5" ry="15"/><ellipse cx="157.5" cy="163" rx="6.5" ry="15"/>'},
+    tibialis:  {l:'Tibialis (shin)', s:'f', p:'<ellipse cx="42.5" cy="162" rx="4.5" ry="14"/><ellipse cx="57.5" cy="162" rx="4.5" ry="14"/>'},
+    neck:      {l:'Neck',       s:'f', p:'<rect x="46" y="25" width="8" height="8" rx="2"/><rect x="146" y="25" width="8" height="8" rx="2"/>'}
   };
-  const MG_ORDER = ['chest','delts','biceps','forearms','abs','obliques','quads','traps','rearDelts','lats','rhomboids','triceps','lowerBack','glutes','hamstrings','calves'];
+  const MG_ORDER = ['chest','delts','biceps','forearms','abs','obliques','quads','tibialis','neck','traps','rearDelts','lats','rhomboids','triceps','lowerBack','glutes','hamstrings','calves'];
   const BAND = { amber:'#8a6020', teal:'#1f7a65', purple:'#5e3d9a' };
 
   /* ============================ STATE ============================ */
@@ -779,8 +758,7 @@
       schedules: { weekday: mk(SEED.schedules.weekday), weekend: mk(SEED.schedules.weekend), todo: mk(SEED.schedules.todo) },
       hardTasks: clone(SEED.hardTasks), phases: clone(SEED.phases), trainPhases: clone(SEED.trainPhases),
       comms: clone(SEED.comms), splitMap: clone(SEED.splitMap), gym: clone(SEED.gym),
-      sessionRules: clone(SEED.sessionRules), startLoads: clone(SEED.startLoads), rebuild: clone(SEED.rebuild),
-      expect: clone(SEED.expect), diet: clone(SEED.diet),
+      rebuild: clone(SEED.rebuild), diet: clone(SEED.diet),
       skinAM: clone(SEED.skinAM), skinPM: clone(SEED.skinPM), skinCan: clone(SEED.skinCan), skinAhead: clone(SEED.skinAhead),
       hairWeek: clone(SEED.hairWeek), hairStyle: clone(SEED.hairStyle),
       outstanding: SEED.outstanding.map(t => ({ t })),
@@ -831,12 +809,12 @@
   }
 
   function scheduleKeyFor(d) { const w = d.getDay(); return (w === 0 || w === 6) ? 'weekend' : 'weekday'; }
-  const isRestDay = (d) => (d || new Date()).getDay() === 3;   // Wednesday
+  const isRestDay = (d) => [1,4].includes((d || new Date()).getDay());   // Monday & Thursday
   /* Weekday rows tagged 'gym' or 'wed' show only on their own days. In edit mode
      you see all of them, so nothing is hidden from you when you go to change it. */
   function visibleRows(list, key, when) {
     if (key !== 'weekday' || editMode) return list;
-    const want = isRestDay(when) ? 'wed' : 'gym';
+    const want = isRestDay(when) ? 'rest' : 'gym';
     return list.filter(t => !t.only || t.only === want);
   }
   function activeListKey() { return view === 'lists' ? 'todo' : activeTab; }
@@ -977,7 +955,6 @@
     hardTasks:{ one:'Non-negotiable', path:()=>C.hardTasks, fields:[{k:'icon',l:'Icon'},{k:'label',l:'Label'},{k:'sub',l:'Detail',t:'area'}], blank:()=>({key:'x'+uid(),icon:'✦',label:'',sub:''}) },
     comms:    { one:'Comms day', path:()=>C.comms, noAdd:true, fields:[{k:'d',l:'Day',t:'num',ro:true},{k:'code',l:'Code'},{k:'watch',l:'Watch / do',t:'area'},{k:'apply',l:'Apply that day',t:'area'},{k:'silent',l:'Silent block (no speaking)',t:'bool'}] },
     gymDays:  { one:'Session', path:()=>C.gym, fields:[{k:'label',l:'Label'},{k:'day',l:'Weekday'},{k:'lead',l:'Lead'},{k:'time',l:'Time'},{k:'mins',l:'Duration'},{k:'note',l:'Note',t:'area'},{k:'key',l:'Key (unique)'}], blank:()=>({key:'s'+uid(),label:'New session',day:'',lead:'',time:'',mins:'',note:'',exs:[]}) },
-    startLoads:{one:'Starting load', path:()=>C.startLoads, fields:[{k:'n',l:'Lift'},{k:'w',l:'Week-1 weight'}], blank:()=>({n:'',w:''}) },
     dietStd:  { one:'Meal row', path:()=>C.diet.standard, fields:[{k:'t',l:'Time'},{k:'f',l:'Food'},{k:'n',l:'Note',t:'area'},{k:'k',l:'Kcal',t:'num'},{k:'p',l:'Protein g',t:'num'},{k:'c',l:'Carbs g',t:'num'},{k:'fa',l:'Fat g',t:'num'}], blank:()=>({t:'',f:'',n:'',k:0,p:0,c:0,fa:0}) },
     dietTue:  { one:'Tuesday row', path:()=>C.diet.tuesday, fields:[{k:'t',l:'Time'},{k:'f',l:'Food'},{k:'n',l:'Note',t:'area'}], blank:()=>({t:'',f:'',n:''}) },
     water:    { one:'Water slot', path:()=>C.diet.water, fields:[{k:'t',l:'Time'},{k:'ml',l:'Millilitres',t:'num'},{k:'n',l:'Note'}], blank:()=>({t:'',ml:500,n:''}) },
@@ -1154,15 +1131,15 @@
     $('#resetBtn').classList.toggle('hidden', editMode);
     $('#resetLabel').textContent = isTodo ? 'Clear Done' : 'Reset Day';
     const key = activeListKey();
-    const titles = { weekday: isRestDay() ? 'Wednesday — rest day' : 'Mon · Tue · Thu · Fri', weekend:'Saturday · Sunday', todo:'To-Do' };
+    const titles = { weekday: isRestDay() ? 'Rest day — Mon & Thu' : 'Tue · Wed · Fri — training', weekend:'Saturday · Sunday', todo:'To-Do' };
     $('#listTitle').textContent = titles[key];
     $('#dayNote').classList.toggle('hidden', !(view === 'plan' && key === 'weekday'));
     if (view === 'plan' && key === 'weekday') {
       $('#dayNote').innerHTML = editMode
-        ? '✎ Editing shows every weekday row, including the ones tagged <b>GYM</b> and <b>WED</b>. Use “Shows on” in the editor to move a row between them.'
+        ? '✎ Editing shows every weekday row, including the ones tagged <b>GYM</b> and <b>REST</b>. Use “Shows on” in the editor to move a row between them.'
         : (isRestDay()
-            ? '🚶 Wednesday — no gym. The 5:45 block is the 45-minute outdoor walk, and it ticks Rule 1. Hair: rinse only.'
-            : '🏋 Gym day. On Wednesdays this list swaps the 5:45 block for the outdoor walk automatically.');
+            ? '🚶 Rest day — no gym. The 5:45 block is the 45-minute outdoor walk, and it ticks Rule 1.'
+            : '🏋 Training day. On Mondays and Thursdays this list swaps the 5:45 block for the outdoor walk automatically.');
     }
 
     const list = visibleRows(currentList(), key);
@@ -1200,7 +1177,7 @@
     const body = document.createElement('div');
     body.className = 'flex-1 min-w-0';
     const onlyChip = t.only === 'gym' ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 mr-1.5 align-middle">GYM</span>'
-                   : t.only === 'wed' ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 mr-1.5 align-middle">WED</span>' : '';
+                   : t.only === 'rest' ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 mr-1.5 align-middle">REST</span>' : '';
     body.innerHTML = `<p class="text-[15px] font-semibold leading-snug ${t.done ? 'line-through text-gray-400' : 'text-gray-800'}">${editMode ? onlyChip : ''}${esc(t.label)}</p>` +
       (t.notes ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${t.done ? 'line-through' : ''}">${esc(t.notes)}</p>` : '');
     if (editMode) {
@@ -1250,7 +1227,7 @@
       <div onclick="setView('hard')" class="cursor-pointer active:opacity-90 rounded-2xl p-4 text-white shadow-lg flex items-center gap-4" style="background:linear-gradient(135deg,${col},${col}cc)">
         <div class="text-white">${ringSvg(84, frac, '#ffffff', big, 'LEFT')}</div>
         <div class="min-w-0 flex-1">
-          <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">${surg ? 'Surgical clause' : esc(ph.name)} · ${esc(tp.name)}${hardMeta.attempt>1?' · attempt '+hardMeta.attempt:''}</p>
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">${surg ? 'Surgical clause' : esc(ph.name)}${hardMeta.attempt>1?' · attempt '+hardMeta.attempt:''}</p>
           <p class="text-xl font-bold leading-tight mt-0.5">${esc(st.label)}</p>
           <div class="mt-2 h-1.5 bg-white/25 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full transition-all duration-500" style="width:${total?Math.round(done/total*100):0}%"></div></div>
           <p class="text-[11px] opacity-90 mt-1.5">${done}/${total} boxes${sess?' · '+esc(sess.label):''}${cm?' · '+esc(cm.code):''}</p>
@@ -1329,7 +1306,7 @@
       <div class="flex items-center gap-5">
         <div class="text-white">${ringSvg(124, frac, '#ffffff', big, 'DAYS LEFT')}</div>
         <div class="min-w-0">
-          <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">${esc(ph.name)} · Training ${esc(tp.key)} ${esc(tp.name)}</p>
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-80">${esc(ph.name)}</p>
           <p class="text-2xl font-bold leading-tight mt-0.5">${esc(st.label)}</p>
           <p class="text-xs opacity-85 leading-snug mt-1">${esc(ph.note)}</p>
           <p class="text-[11px] opacity-80 mt-2">Day 1 ${shortDate(hardMeta.start)} → Day ${st.L} ${shortDate(hardDateFor(st.L))}
@@ -1539,17 +1516,6 @@
   function setGymDay(k) { gymDay = k; renderGym(); }
   function gymIdx() { const i = C.gym.findIndex(d => d.key === gymDay); return i > -1 ? i : 0; }
 
-  /* Double progression: when every set hit the top of the range, suggest the increment. */
-  function topOfRange(reps) { const m = String(reps).match(/(\d+)\s*[–-]\s*(\d+)/); if (m) return parseInt(m[2]); const s = String(reps).match(/(\d+)/); return s ? parseInt(s[1]) : null; }
-  function isLower(ex) { return (ex.pri||[]).some(k => ['quads','hamstrings','glutes','calves'].includes(k)); }
-  function progressionHint(ex) {
-    const log = getExLog(ex.n); if (!log || !log.length) return '';
-    const top = topOfRange(ex.reps); if (!top) return '';
-    const full = log.length >= (ex.sets || 3) && log.every(s => s.r >= top && s.w > 0);
-    if (!full) return '';
-    const inc = isLower(ex) ? '+2.5–5 kg' : '+1–2.5 kg';
-    return `<div class="mt-2 bg-forest-light rounded-xl p-3 text-xs text-forest-dark leading-relaxed">✔ Every set hit ${top} reps. Add ${inc} next session and restart at the bottom of the range.</div>`;
-  }
   function saveGymLog(di, ei) {
     const ex = C.gym[di].exs[ei], sets = [];
     for (let s = 0; s < (ex.sets||3); s++) {
@@ -1564,9 +1530,9 @@
   }
   function openExEditor(di, ei) {
     openRec('__ex', ei, { one:'Exercise', arr:()=>C.gym[di].exs, save:()=>saveC(),
-      blank:()=>({n:'New exercise',sets:3,reps:'10–12',rest:'60s',why:'',pri:[],sec:[],vid:'',vidT:''}),
-      fields:[{k:'n',l:'Exercise name'},{k:'sets',l:'Sets',t:'num'},{k:'reps',l:'Rep range'},{k:'rest',l:'Rest'},
-        {k:'why',l:'What matters',t:'area'},{k:'vid',l:'YouTube video ID or URL'},{k:'vidT',l:'Video label'},
+      blank:()=>({n:'New exercise',sets:3,setsL:'3',reps:'10–12',rest:'',why:'',pri:[],sec:[],vid:'',vidT:''}),
+      fields:[{k:'n',l:'Exercise name'},{k:'sets',l:'Sets — how many log rows',t:'num'},{k:'setsL',l:'Sets as written (e.g. 3–4)'},{k:'reps',l:'Rep range'},
+        {k:'why',l:'Note (optional)',t:'area'},{k:'vid',l:'YouTube video ID or URL'},{k:'vidT',l:'Video label'},
         {k:'pri',l:'Primary muscles — one per line\n('+MG_ORDER.join(', ')+')',t:'lines'},{k:'sec',l:'Secondary muscles — one per line',t:'lines'}] });
   }
   function openGymLogEdit(date, name) {
@@ -1590,20 +1556,26 @@
     }, () => { const l = getGymLogs(); delete l[key]; setGymLogs(l); closeRec(); render(); toast('Deleted'); });
   }
 
+  /* Rough clock: ~2 min per working set, plus a 5-minute warm-up. Not gospel —
+     it exists so you find out a session overruns before you are standing in it. */
+  function sessionMinutes(d) {
+    const sets = (d.exs || []).reduce((a, ex) => a + (parseInt(ex.sets) || 0), 0);
+    return { sets, mins: sets ? 5 + sets * 2 : 0 };
+  }
+  function slotMinutes(d) {
+    const m = String(d.time || '').match(/(\d+):(\d+)[–-](\d+):(\d+)/);
+    if (!m) return null;
+    return (+m[3] * 60 + +m[4]) - (+m[1] * 60 + +m[2]);
+  }
+
   function renderGym() {
-    const st = hardStatus(), n = Math.max(1, Math.min(st.n, st.L)), tp = trainPhaseFor(n);
+    const st = hardStatus(), n = Math.max(1, Math.min(st.n, st.L));
     const todaySess = sessionForDate(todayStr());
     if (!C.gym.some(d => d.key === gymDay)) gymDay = (todaySess || C.gym[0]).key;
     const di = gymIdx(), d = C.gym[di];
     const surg = st.state === 'live' && surgicalWindow(n);
 
-    let h = `<div class="rounded-2xl p-4 mb-3" style="background:${tp.col}14;border-left:4px solid ${tp.col}">
-      <div class="flex items-center justify-between gap-2">
-        <p class="text-sm font-bold" style="color:${tp.col}">Phase ${esc(tp.key)} · ${esc(tp.name)} — days ${tp.from}–${tp.to}</p>
-        <span class="text-[10px] font-bold text-gray-400">Day ${st.n}</span></div>
-      <p class="text-xs font-semibold text-gray-700 mt-1.5">${esc(tp.rule)}</p>
-      <p class="text-xs text-gray-500 leading-relaxed mt-1">${esc(tp.note)}</p></div>`;
-
+    let h = '';
     if (surg) {
       const stage = surgicalStage(n);
       h += `<div class="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 mb-3">
@@ -1616,7 +1588,7 @@
       h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
       C.rebuild.forEach(r => { h += `<div class="px-4 py-3"><p class="text-xs font-bold text-gray-700">${esc(r.days)} <span class="text-gray-400 font-medium">· ${esc(r.when)}</span></p><p class="text-xs text-gray-500 leading-snug mt-1">${esc(r.text)}</p></div>`; });
       h += '</div>';
-      h += `<button onclick="setGymDay('${esc((todaySess||C.gym[0]).key)}');scrollTo(0,0)" class="mt-3 w-full bg-gray-100 text-gray-600 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">Show the split anyway</button>`;
+      h += `<button onclick="setGymDay('${esc((todaySess||C.gym[0]).key)}');scrollTo(0,0)" class="mt-3 w-full bg-gray-100 text-gray-600 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">Show the programme anyway</button>`;
       h += creedBox();
       $('#view-gym').innerHTML = h;
       return;
@@ -1625,26 +1597,37 @@
     h += '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-3 overflow-x-auto no-sb">';
     C.gym.forEach(x => {
       const on = x.key === gymDay, isToday = todaySess && todaySess.key === x.key;
-      h += `<button onclick="setGymDay('${esc(x.key)}')" class="shrink-0 min-w-[62px] rounded-lg py-2 px-2 text-[13px] font-semibold transition ${on?'bg-forest text-white shadow':'text-gray-500 active:bg-gray-200'}">${esc(x.label)}${isToday?' •':''}</button>`;
+      h += `<button onclick="setGymDay('${esc(x.key)}')" class="shrink-0 min-w-[60px] rounded-lg py-2 px-2 text-[13px] font-semibold transition ${on?'bg-forest text-white shadow':'text-gray-500 active:bg-gray-200'}">${esc(x.label)}${isToday?' •':''}</button>`;
     });
     h += '</div>';
     if (editMode) h += `<div class="grid grid-cols-2 gap-2 mb-3">
       <button onclick="openRec('gymDays',${di})" class="bg-gray-100 text-gray-600 text-xs font-semibold py-2.5 rounded-xl active:bg-gray-200">✎ Edit this session</button>
       <button onclick="openRec('gymDays',-1)" class="bg-gray-100 text-gray-600 text-xs font-semibold py-2.5 rounded-xl active:bg-gray-200">+ Add session</button></div>`;
 
-    h += infoBox(`${esc(d.label)} · ${esc(d.day)}`, `${esc(d.lead)} · ${esc(d.time)} · ${esc(d.mins)}<br>${esc(d.note)}`, d.key === 'walk' ? '#1f7a65' : '#a8321f');
+    const est = sessionMinutes(d), slot = slotMinutes(d);
+    const over = slot && est.mins > slot;
+    h += `<div class="rounded-2xl p-4 mb-1" style="background:${d.exs.length?'#a8321f':'#1f7a65'}14;border-left:4px solid ${d.exs.length?'#a8321f':'#1f7a65'}">
+      <div class="flex items-start justify-between gap-2">
+        <div><p class="text-sm font-bold" style="color:${d.exs.length?'#a8321f':'#1f7a65'}">${esc(d.label)} · ${esc(d.day)}</p>
+          <p class="text-xs text-gray-500 mt-0.5">${esc(d.lead||'')}${d.lead?' · ':''}${esc(d.time)}</p></div>
+        ${est.sets ? `<div class="text-right shrink-0"><p class="tabular text-sm font-bold ${over?'text-amber-700':'text-gray-600'}">≈${est.mins} min</p>
+          <p class="text-[10px] text-gray-400">${est.sets} working sets</p></div>` : ''}
+      </div>
+      ${d.note ? `<p class="text-xs text-gray-500 leading-relaxed mt-2">${esc(d.note)}</p>` : ''}
+      ${over ? `<p class="text-[11px] text-amber-800 leading-snug mt-2 bg-amber-50 rounded-lg p-2">⏱ This overruns the ${slot}-minute slot by about ${est.mins-slot} min at ~2 min a set. Cut from the bottom if the clock beats you — a shortened session still ticks Rule 1.</p>` : ''}
+    </div>`;
 
     if (!d.exs.length) {
       h += card(`<div class="p-5 text-center"><p class="text-4xl">🚶</p>
         <p class="text-base font-bold text-gray-800 mt-2">45-minute outdoor walk</p>
-        <p class="text-xs text-gray-500 leading-relaxed mt-1">5:45–6:30, before work. It ticks Rule 1, so the streak holds, and it carries the day’s steps. No gym, no kit — shoes and a coat.</p>
+        <p class="text-xs text-gray-500 leading-relaxed mt-1">5:45–6:30, before work. It ticks Rule 1, so the streak holds, and it carries the day’s steps. Shoes and a coat — no kit.</p>
         <button onclick="tapHard('work')" class="mt-3 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark">${hardDay(todayStr()).t.work?'✓ Rule 1 ticked today':'Tick Rule 1 — walk done'}</button></div>`, 'mt-2');
     } else {
       h += '<div class="space-y-2.5 mt-2">';
       d.exs.forEach((ex, ei) => {
         const log = getExLog(ex.n);
         let rows = '';
-        for (let s = 0; s < (ex.sets||3); s++) {
+        for (let s = 0; s < (parseInt(ex.sets)||3); s++) {
           const pv = log ? log[s] : null;
           rows += `<div class="flex items-center gap-2 mt-2"><span class="shrink-0 w-6 text-xs font-bold text-gray-400">S${s+1}</span>
             <input id="gl-${di}-${ei}-${s}-w" type="number" inputmode="decimal" step="any" placeholder="kg" value="${pv?pv.w:''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest">
@@ -1652,16 +1635,14 @@
         }
         const vid = (ex.vid||'').trim();
         const vurl = vid ? (vid.startsWith('http') ? vid : 'https://www.youtube.com/watch?v=' + vid) : '';
-        const start = (C.startLoads.find(s => s.n.toLowerCase() === ex.n.toLowerCase()) || {}).w;
+        const prescr = (ex.setsL || ex.sets) + (ex.reps ? ' × ' + ex.reps : ' sets');
         h += `<details class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <summary class="cursor-pointer px-4 py-3 flex items-center justify-between gap-2 active:bg-gray-50">
             <div class="min-w-0"><p class="font-semibold text-[15px] text-gray-800 leading-snug">${ei+1}. ${esc(ex.n)}</p>
-              <p class="text-xs text-gray-400 mt-0.5">${ex.sets} × ${esc(ex.reps)} · rest ${esc(ex.rest)}</p></div>
+              <p class="text-xs text-gray-400 mt-0.5">${esc(prescr)}</p></div>
             <div class="flex items-center gap-2 shrink-0">${log?'<span class="text-[11px] font-bold text-emerald-600">✓</span>':''}${chev}</div>
           </summary>
           <div class="px-4 pb-4 border-t border-gray-50">
-            <div class="mt-3 bg-gray-50 rounded-xl p-3"><p class="text-xs text-gray-600 leading-relaxed">${esc(ex.why)}</p></div>
-            ${start && tp.key === 'A' ? `<div class="mt-2 bg-blue-50 rounded-xl p-3 text-xs text-blue-800 leading-relaxed">Week 1 starting load: <b>${esc(start)}</b> — roughly 60% of your June numbers. It should feel insultingly light.</div>` : ''}
             <div class="grid ${vurl?'grid-cols-2':'grid-cols-1'} gap-2 mt-3">
               ${vurl?`<a href="${esc(vurl)}" target="_blank" rel="noopener" class="flex items-center justify-center gap-1.5 bg-red-600 text-white text-sm font-semibold py-2.5 rounded-xl active:bg-red-700"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch demo</a>`:''}
               <a href="${esc(ytSearch(ex.n))}" target="_blank" rel="noopener" class="flex items-center justify-center gap-1.5 bg-gray-100 text-gray-600 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">🔍 Search YouTube</a></div>
@@ -1670,8 +1651,9 @@
             <div class="bg-gray-50 rounded-2xl py-2">${bodySVG(ex.pri, ex.sec)}</div>
             <div class="flex flex-wrap gap-1.5 mt-2 justify-center">${(ex.pri||[]).map(k=>mgChip(k,true)).join('')}${(ex.sec||[]).map(k=>mgChip(k,false)).join('')}</div>
             <p class="text-[10px] text-gray-400 text-center mt-1.5">Solid green = primary · pale = secondary</p>
+            ${ex.why?`<div class="mt-3 bg-gray-50 rounded-xl p-3"><p class="text-xs text-gray-600 leading-relaxed">${esc(ex.why)}</p></div>`:''}
             <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-0.5">Log today · weight × reps</p>
-            ${rows}${progressionHint(ex)}
+            ${rows}
             <button onclick="saveGymLog(${di},${ei})" class="mt-3 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark transition">${log?'Update log':'Save log'}</button>
             ${editMode?`<button onclick="openExEditor(${di},${ei})" class="mt-2 w-full bg-gray-100 text-gray-700 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">✎ Edit this exercise</button>`:''}
           </div></details>`;
@@ -1680,18 +1662,19 @@
       if (editMode) h += addBtnHtml('Add exercise to ' + d.label, `openExEditor(${di},-1)`);
     }
 
-    h += secTitle('How to run every session');
+    h += secTitle('The week');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    C.sessionRules.forEach(([k,v]) => { h += `<div class="px-4 py-2.5"><p class="text-xs font-bold text-forest">${esc(k)}</p><p class="text-xs text-gray-500 leading-snug mt-0.5">${esc(v)}</p></div>`; });
+    [1,2,3,4,5,6,0].forEach(w => {
+      const key = C.splitMap[String(w)] || C.splitMap[w];
+      const s = C.gym.find(g => g.key === key);
+      const nm = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][w];
+      const e = s ? sessionMinutes(s) : { sets:0, mins:0 };
+      const isToday = new Date().getDay() === w;
+      h += `<div onclick="${s?`setGymDay('${esc(s.key)}');scrollTo(0,0)`:''}" class="px-4 py-2.5 flex items-center justify-between gap-2 cursor-pointer active:bg-gray-50 ${isToday?'bg-forest-light/40':''}">
+        <span class="text-sm ${isToday?'font-bold text-forest':'text-gray-600'}">${nm}</span>
+        <span class="text-xs ${s&&s.exs.length?'font-semibold text-gray-700':'text-gray-400'}">${s?esc(s.label):'—'}${e.sets?` · ${e.sets} sets · ≈${e.mins} min`:' · walk'}</span></div>`;
+    });
     h += '</div>';
-
-    if (tp.key === 'A' || tp.key === 'D') {
-      h += secTitle('Week 1 starting loads', editMode?'startLoads':null, 'Add');
-      h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-      C.startLoads.forEach((s,i) => { h += `<div ${editMode?`onclick="openRec('startLoads',${i})"`:''} class="px-4 py-2 flex items-center justify-between gap-2 ${editMode?'cursor-pointer active:bg-gray-50':''}"><span class="text-sm text-gray-700">${esc(s.n)}</span><span class="text-sm font-bold text-forest">${esc(s.w)}</span></div>`; });
-      h += '</div>';
-      h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${esc(SEED.startNote)}</p>`;
-    }
 
     const recent = recentGym(28);
     h += secTitle('Recent logs — tap to edit');
@@ -1710,11 +1693,6 @@
       });
       h += '</div>';
     }
-
-    h += secTitle('What to expect — so you don’t misread it');
-    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    C.expect.forEach(e => { h += `<div class="px-4 py-2.5"><p class="text-xs font-bold text-gray-700">${esc(e.w)}</p><p class="text-xs text-gray-500 leading-snug mt-0.5">${esc(e.t)}</p></div>`; });
-    h += '</div>';
     h += creedBox();
     $('#view-gym').innerHTML = h;
   }
@@ -2422,12 +2400,12 @@
     S.push({ name:'Photos', rows:ph });
 
     const sc = [['Schedule','ShowsOn','Time','Item','Notes','Band','DoneToday']];
-    const showsOn = { gym:'Mon/Tue/Thu/Fri only', wed:'Wednesday only' };
+    const showsOn = { gym:'Tue/Wed/Fri only', rest:'Mon/Thu rest days only' };
     Object.keys(C.schedules).forEach(k => (C.schedules[k]||[]).forEach(t => sc.push([k, showsOn[t.only]||'All', t.time||'', t.label, t.notes||'', t.band||'', t.done?1:0])));
     S.push({ name:'Schedules', rows:sc });
 
-    const gp = [['SessionKey','Session','Weekday','Time','#','Exercise','Sets','Reps','Rest','WhatMatters','Primary','Secondary','VideoURL']];
-    C.gym.forEach(d => (d.exs||[]).forEach((ex,i) => gp.push([d.key, d.label, d.day, d.time, i+1, ex.n, ex.sets, ex.reps, ex.rest, ex.why,
+    const gp = [['SessionKey','Session','Weekday','Time','#','Exercise','Sets','SetsAsWritten','Reps','Note','Primary','Secondary','VideoURL']];
+    C.gym.forEach(d => (d.exs||[]).forEach((ex,i) => gp.push([d.key, d.label, d.day, d.time, i+1, ex.n, ex.sets, ex.setsL||String(ex.sets), ex.reps, ex.why||'',
       (ex.pri||[]).map(k=>(MG[k]||{}).l||k).join(', '), (ex.sec||[]).map(k=>(MG[k]||{}).l||k).join(', '),
       ex.vid ? (ex.vid.startsWith('http')?ex.vid:'https://www.youtube.com/watch?v='+ex.vid) : ''])));
     S.push({ name:'GymPlan', rows:gp });
