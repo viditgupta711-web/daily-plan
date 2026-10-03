@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#006644" />
+  <meta name="theme-color" content="#073f45" />
   <title>Master Daily Plan</title>
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
@@ -14,13 +14,16 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="My Plan" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: { extend: {
-        colors: { forest: { DEFAULT:'#006644', dark:'#004d33', light:'#e6f2ee', mid:'#00875a' },
+        colors: { brand: { DEFAULT:'#0e7c7b', dark:'#0a5c5c', light:'#e2f3f2', mid:'#14a3a0', ink:'#063f43', mist:'#f2f7f7' },
                   amber2: { DEFAULT:'#8a6020', light:'#fdf6e7' } },
-        fontFamily: { sans: ['system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] } } }
+        fontFamily: { sans: ['Inter','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'] } } }
     }
   </script>
   <style>
@@ -31,7 +34,7 @@
     .checkbox-tick { transition: all .18s ease; }
     .modal-backdrop { backdrop-filter: blur(2px); }
     input[type=time]::-webkit-calendar-picker-indicator,
-    input[type=date]::-webkit-calendar-picker-indicator { filter: invert(28%) sepia(86%) saturate(1352%) hue-rotate(135deg) brightness(94%) contrast(101%); }
+    input[type=date]::-webkit-calendar-picker-indicator { filter: invert(28%) sepia(86%) saturate(1352%) hue-rotate(150deg) brightness(94%) contrast(101%); }
     ::-webkit-scrollbar { width: 0; height: 0; }
     .no-sb::-webkit-scrollbar { display: none; }
     summary::-webkit-details-marker { display: none; }
@@ -40,21 +43,62 @@
     .ring-track { stroke: rgba(255,255,255,.22); }
     .ring-prog  { transition: stroke-dashoffset .8s cubic-bezier(.4,0,.2,1); }
     .fld { width:100%; background:#f9fafb; border:1px solid #e5e7eb; border-radius:.75rem; padding:.7rem 1rem; font-size:16px; color:#1f2937; outline:none; }
-    .fld:focus { border-color:#006644; box-shadow:0 0 0 3px rgba(0,102,68,.15); }
+    .fld:focus { border-color:#0e7c7b; box-shadow:0 0 0 3px rgba(14,124,123,.15); }
     .flbl { display:block; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.35rem; }
     .sheet { max-height: 86vh; overflow-y: auto; }
     .ph-blur { filter: blur(14px); transition: filter .25s ease; }
     .drop { transition: height .5s cubic-bezier(.4,0,.2,1); }
+
+    /* ===== Teal design layer ===== */
+    body { font-feature-settings: "cv11","ss01"; }
+    .app-bg { background:
+      radial-gradient(900px 420px at 110% -10%, rgba(20,163,160,.07), transparent 60%),
+      #f2f7f7; }
+    ::selection { background:#bfe8e5; color:#063f43; }
+    .hdr { position:relative; overflow:hidden;
+      background:
+        radial-gradient(120% 90% at 100% 0%, rgba(94,234,212,.24) 0%, rgba(94,234,212,0) 55%),
+        radial-gradient(80% 70% at -10% 110%, rgba(6,40,44,.55) 0%, rgba(6,40,44,0) 60%),
+        linear-gradient(160deg, #073f45 0%, #0b6466 46%, #0e8a86 100%);
+      box-shadow: 0 10px 30px -14px rgba(7,63,69,.55); }
+    .hdr::before { content:""; position:absolute; right:-70px; top:-90px; width:240px; height:240px; border-radius:50%;
+      border:1px solid rgba(255,255,255,.10); pointer-events:none; }
+    .hdr::after  { content:""; position:absolute; right:-20px; top:-40px; width:150px; height:150px; border-radius:50%;
+      border:1px solid rgba(255,255,255,.08); pointer-events:none; }
+    .hdr > * { position:relative; z-index:1; }
+    .hdr .bg-white\/15, .hdr .bg-white\/10 { box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    #clock { font-weight:700; letter-spacing:-.04em; font-feature-settings:"tnum"; text-shadow:0 2px 14px rgba(0,0,0,.12); }
+    #progressBar { background: linear-gradient(90deg,#5eead4,#ffffff); box-shadow:0 0 12px rgba(94,234,212,.6); }
+
+    body .shadow-sm { box-shadow: 0 1px 1px rgba(7,63,69,.03), 0 6px 18px -10px rgba(7,63,69,.20); }
+    body .border-gray-100 { border-color:#e3eded; }
+    body .shadow-lg { box-shadow: 0 14px 30px -14px rgba(7,63,69,.45); }
+    .task-card { transition: opacity .25s ease, background-color .2s ease, transform .12s ease; }
+    .task-card:active { transform: scale(.985); }
+    button { -webkit-touch-callout:none; }
+
+    .navbar { background: rgba(255,255,255,.88); backdrop-filter: saturate(180%) blur(18px); -webkit-backdrop-filter: saturate(180%) blur(18px);
+      border-top:1px solid rgba(14,124,123,.10); box-shadow: 0 -8px 24px -18px rgba(7,63,69,.35); }
+    .nav-btn { flex:1 1 0; min-width:44px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+      padding:8px 0 7px; color:#8a9b9b; transition: color .2s; }
+    .nav-btn .nav-ic { display:flex; align-items:center; justify-content:center; width:40px; height:28px; border-radius:999px;
+      font-size:18px; line-height:1; filter: grayscale(.55) opacity(.75); transition: background .25s, filter .25s, transform .25s; }
+    .nav-btn .nav-lb { font-size:10px; font-weight:600; letter-spacing:.01em; white-space:nowrap; }
+    .nav-btn:active .nav-ic { transform: scale(.92); }
+    .nav-btn.on { color:#0a5c5c; }
+    .nav-btn.on .nav-ic { background:#d4eeec; filter:none; transform: translateY(-1px); box-shadow: inset 0 0 0 1px rgba(14,124,123,.12); }
+    .nav-btn.on .nav-lb { font-weight:700; }
+    #toast { background:#063f43; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen antialiased">
+<body class="app-bg text-gray-800 min-h-screen antialiased">
 
   <!-- ===================== HEADER ===================== -->
-  <header class="sticky top-0 z-30 bg-forest text-white shadow-lg" style="padding-top: env(safe-area-inset-top);">
+  <header class="hdr sticky top-0 z-30 text-white" style="padding-top: env(safe-area-inset-top);">
     <div class="max-w-md mx-auto px-5 pt-4 pb-4">
       <div class="flex items-start justify-between">
         <div>
-          <p id="dateLabel" class="text-forest-light/80 text-xs font-medium tracking-wide uppercase">—</p>
+          <p id="dateLabel" class="text-brand-light/80 text-xs font-medium tracking-wide uppercase">—</p>
           <h1 id="clock" class="tabular text-5xl font-bold leading-none mt-1">--:--:--</h1>
         </div>
         <div class="shrink-0 flex flex-col items-end gap-2">
@@ -74,7 +118,7 @@
             <span id="wIcon" class="text-xl leading-none">⏳</span>
             <span class="text-right leading-none">
               <span id="wTemp" class="tabular text-base font-bold text-white block leading-none">--°</span>
-              <span id="wMeta" class="text-[10px] text-forest-light/90 block leading-none mt-1 whitespace-nowrap">Locating…</span>
+              <span id="wMeta" class="text-[10px] text-brand-light/90 block leading-none mt-1 whitespace-nowrap">Locating…</span>
             </span>
           </button>
         </div>
@@ -84,15 +128,15 @@
         <div class="mt-4 flex items-center gap-3">
           <div class="bg-white/15 rounded-xl px-3 py-2 text-center min-w-[78px]">
             <p id="remainingCount" class="tabular text-2xl font-bold leading-none">0</p>
-            <p class="text-[10px] text-forest-light/90 uppercase tracking-wide mt-0.5">Remaining</p>
+            <p class="text-[10px] text-brand-light/90 uppercase tracking-wide mt-0.5">Remaining</p>
           </div>
           <div class="flex-1 bg-white/15 rounded-xl px-3 py-2 min-w-0">
-            <p class="text-[10px] text-forest-light/90 uppercase tracking-wide">Next Up</p>
+            <p class="text-[10px] text-brand-light/90 uppercase tracking-wide">Next Up</p>
             <p id="nextTask" class="text-sm font-semibold leading-tight truncate mt-0.5">—</p>
           </div>
         </div>
         <div class="mt-3 h-1.5 bg-white/20 rounded-full overflow-hidden">
-          <div id="progressBar" class="h-full bg-white rounded-full transition-all duration-500" style="width:0%"></div>
+          <div id="progressBar" class="h-full rounded-full transition-all duration-500" style="width:0%"></div>
         </div>
       </div>
     </div>
@@ -113,14 +157,6 @@
       </div>
     </div>
 
-    <!-- Lists sub-tabs -->
-    <div id="listTabs" class="hidden max-w-md mx-auto px-3 pb-3">
-      <div class="grid grid-cols-3 gap-1 bg-white/10 rounded-xl p-1">
-        <button data-list="todo"  class="list-btn rounded-lg py-2 text-sm font-semibold transition">📝 To-Do</button>
-        <button data-list="goals" class="list-btn rounded-lg py-2 text-sm font-semibold transition">🎯 Goals</button>
-        <button data-list="dates" class="list-btn rounded-lg py-2 text-sm font-semibold transition">📅 Dates</button>
-      </div>
-    </div>
   </header>
 
   <!-- ===================== MAIN ===================== -->
@@ -131,7 +167,7 @@
     <section id="view-list">
       <div class="flex items-center justify-between mb-3 px-1">
         <p id="listTitle" class="text-xs font-bold uppercase tracking-wider text-gray-400">Schedule</p>
-        <button id="resetBtn" class="flex items-center gap-1 text-xs font-semibold text-forest active:text-forest-dark">
+        <button id="resetBtn" class="flex items-center gap-1 text-xs font-semibold text-brand active:text-brand-dark">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
           <span id="resetLabel">Reset Day</span>
@@ -139,7 +175,7 @@
       </div>
       <p id="dayNote" class="hidden text-[11px] text-gray-500 leading-snug mb-3 px-1 bg-gray-100 rounded-lg p-2.5"></p>
       <div id="taskList" class="space-y-2.5"></div>
-      <button id="addBtn" class="hidden mt-4 w-full border-2 border-dashed border-forest/40 text-forest font-semibold py-3.5 rounded-2xl active:bg-forest-light transition flex items-center justify-center gap-2">
+      <button id="addBtn" class="hidden mt-4 w-full border-2 border-dashed border-brand/40 text-brand font-semibold py-3.5 rounded-2xl active:bg-brand-light transition flex items-center justify-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
         <span id="addBtnLabel">Add Task</span>
       </button>
@@ -154,22 +190,19 @@
     <section id="view-photos" class="hidden"></section>
     <section id="view-bench"  class="hidden"></section>
     <section id="view-sadhana" class="hidden"></section>
-    <section id="view-goals"  class="hidden"></section>
-    <section id="view-dates"  class="hidden"></section>
   </main>
 
   <!-- ===================== BOTTOM NAV ===================== -->
-  <nav class="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-200" style="padding-bottom: env(safe-area-inset-bottom);">
-    <div class="max-w-md mx-auto flex overflow-x-auto no-sb scroll-smooth">
-      <button data-view="plan"   class="nav-btn"><span class="text-xl leading-none">🗓️</span><span class="text-[10px] font-semibold">Plan</span></button>
-      <button data-view="lists"  class="nav-btn"><span class="text-xl leading-none">📋</span><span class="text-[10px] font-semibold">Lists</span></button>
-      <button data-view="gym"    class="nav-btn"><span class="text-xl leading-none">🏋️</span><span class="text-[10px] font-semibold">Gym</span></button>
-      <button data-view="body"   class="nav-btn"><span class="text-xl leading-none">🧴</span><span class="text-[10px] font-semibold">Body</span></button>
-      <button data-view="hard"   class="nav-btn"><span class="text-xl leading-none">🔥</span><span class="text-[10px] font-semibold">75</span></button>
-      <button data-view="diet"   class="nav-btn"><span class="text-xl leading-none">🍴</span><span class="text-[10px] font-semibold">Diet</span></button>
-      <button data-view="photos" class="nav-btn"><span class="text-xl leading-none">📸</span><span class="text-[10px] font-semibold">Photos</span></button>
-      <button data-view="bench"  class="nav-btn"><span class="text-xl leading-none">📈</span><span class="text-[10px] font-semibold">Bench</span></button>
-      <button data-view="sadhana" class="nav-btn"><span class="text-xl leading-none">🕉️</span><span class="text-[10px] font-semibold">Sadhana</span></button>
+  <nav class="navbar fixed bottom-0 inset-x-0 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
+    <div class="max-w-md mx-auto flex overflow-x-auto no-sb">
+      <button data-view="plan" class="nav-btn"><span class="nav-ic">🗓️</span><span class="nav-lb">Plan</span></button>
+      <button data-view="diet" class="nav-btn"><span class="nav-ic">🍴</span><span class="nav-lb">Diet</span></button>
+      <button data-view="sadhana" class="nav-btn"><span class="nav-ic">🕉️</span><span class="nav-lb">Sadhana</span></button>
+      <button data-view="gym" class="nav-btn"><span class="nav-ic">🏋️</span><span class="nav-lb">Gym</span></button>
+      <button data-view="body" class="nav-btn"><span class="nav-ic">🧴</span><span class="nav-lb">Body</span></button>
+      <button data-view="hard" class="nav-btn"><span class="nav-ic">🔥</span><span class="nav-lb">75</span></button>
+      <button data-view="photos" class="nav-btn"><span class="nav-ic">📸</span><span class="nav-lb">Photos</span></button>
+      <button data-view="bench" class="nav-btn"><span class="nav-ic">📈</span><span class="nav-lb">Bench</span></button>
     </div>
   </nav>
 
@@ -189,6 +222,9 @@
           <select id="fOnly" class="fld">
             <option value="">Every weekday</option>
             <option value="gym">Training days only — Tue · Wed · Fri</option>
+            <option value="gosford">Gosford mornings — Tue · Fri</option>
+            <option value="wed">Wednesday only (office gym day)</option>
+            <option value="nowed">Every weekday except Wednesday</option>
             <option value="rest">Both rest days — Mon · Thu</option>
             <option value="mon">Monday only</option>
             <option value="thu">Thursday only</option>
@@ -198,7 +234,7 @@
       </div>
       <div class="flex gap-3 mt-6">
         <button id="modalDelete" class="hidden flex-1 bg-red-50 text-red-600 font-semibold py-3.5 rounded-xl active:bg-red-100 transition">Delete</button>
-        <button id="modalSave" class="flex-[2] bg-forest text-white font-semibold py-3.5 rounded-xl active:bg-forest-dark transition shadow-md shadow-forest/30">Save</button>
+        <button id="modalSave" class="flex-[2] bg-brand text-white font-semibold py-3.5 rounded-xl active:bg-brand-dark transition shadow-md shadow-brand/30">Save</button>
       </div>
     </div>
   </div>
@@ -219,7 +255,7 @@
       </div>
       <div class="flex gap-3 mt-4">
         <button id="recDelete" class="hidden flex-1 bg-red-50 text-red-600 font-semibold py-3.5 rounded-xl active:bg-red-100 transition">Delete</button>
-        <button id="recSave" class="flex-[2] bg-forest text-white font-semibold py-3.5 rounded-xl active:bg-forest-dark transition shadow-md shadow-forest/30">Save</button>
+        <button id="recSave" class="flex-[2] bg-brand text-white font-semibold py-3.5 rounded-xl active:bg-brand-dark transition shadow-md shadow-brand/30">Save</button>
       </div>
     </div>
   </div>
@@ -244,7 +280,7 @@
       </div>
       <p class="text-xs text-gray-400 leading-relaxed mb-4">Everything lives on this device. The ZIP is the complete backup — the JSON alone does not carry photos.</p>
       <div class="space-y-2.5">
-        <button id="btnZip"  class="w-full bg-forest text-white font-semibold py-3.5 rounded-xl active:bg-forest-dark transition shadow-md shadow-forest/30">⇩ Export everything (.zip)</button>
+        <button id="btnZip"  class="w-full bg-brand text-white font-semibold py-3.5 rounded-xl active:bg-brand-dark transition shadow-md shadow-brand/30">⇩ Export everything (.zip)</button>
         <button id="btnXlsx" class="w-full bg-gray-100 text-gray-700 font-semibold py-3.5 rounded-xl active:bg-gray-200 transition">⇩ Spreadsheet only (.xlsx)</button>
         <button id="btnJson" class="w-full bg-gray-100 text-gray-700 font-semibold py-3.5 rounded-xl active:bg-gray-200 transition">⇩ Backup without photos (.json)</button>
         <button id="btnRestore" class="w-full bg-gray-100 text-gray-700 font-semibold py-3.5 rounded-xl active:bg-gray-200 transition">⇧ Restore from backup</button>
@@ -295,21 +331,22 @@
 
   /* ---------------- Schedules — from the Master Daily Routine ----------------
      One weekday list. The 5th field is "only": '' = every weekday,
-     'gym' = Mon/Tue/Thu/Fri, 'wed' = Wednesday (rest day). The Plan tab swaps
+     'gym' = Tue/Wed/Fri, 'gosford' = Tue/Fri mornings, 'wed' = Wednesday only
+     (Push B at the office gym after work), 'nowed' = every weekday but Wednesday. The Plan tab swaps
      the morning block automatically, so there is no separate Wednesday tab. */
   SEED.schedules = {
     weekday: [
       ['04:30','Wake · bullet coffee + 1 tbsp ghee','500 ml water · Rules 2 & 3','amber',''],
       ['05:00','Meditation','20 minutes · Rule 4','teal',''],
       ['05:20','Journal, longhand and slow','This is the handwriting practice · Rule 4','teal',''],
-      ['05:40','Pack bag · gym kit · SPF in the bag','','','gym'],
+      ['05:40','Pack bag · gym kit · SPF in the bag','Wednesday: kit goes to the office','','gym'],
       ['05:40','Shoes on · layers','No gym kit today — walking','','mon'],
-      ['05:45','Walk to Gosford (8 min)','250 ml water · Rule 3','teal','gym'],
+      ['05:45','Walk to Gosford (8 min)','250 ml water · Rule 3','teal','gosford'],
       ['05:45','45-MINUTE OUTDOOR WALK','Monday rest day. Ticks Rule 1 — the streak holds.','teal','mon'],
       ['05:45','VISHNU SAHASRANAMA · Guru mantra ×108','Thursday · 30 min. This replaced the walk — see the Rule 1 warning on the 75 tab.','amber','thu'],
-      ['06:00','TRAIN — see the Gym tab','600 ml during · Rule 1','teal','gym'],
+      ['06:00','TRAIN — see the Gym tab','600 ml during · Rule 1','teal','gosford'],
       ['06:30','Home','','','mon'],
-      ['06:45','Walk home','','','gym'],
+      ['06:45','Walk home','','','gosford'],
       ['06:53','Shower','Hair: wash Mon · Thu · Sat — rinse other days','purple','gym'],
       ['06:53','Shower','Rinse only on a rest day — no shampoo','purple','rest'],
       ['07:02','AM skincare','Moisturiser → SPF 50. Vitamin C 2–3×/wk, optional','purple',''],
@@ -322,7 +359,9 @@
       ['12:45','Lunch + 500 ml','Per the prep map · Rules 2 & 3','',''],
       ['15:00','600 ml · peanuts + green tea at 15:30','Last caffeine of the day','',''],
       ['16:30','450 ml — last full glass','Sips only after 18:00 · Rule 3','',''],
-      ['17:40','Commute home','','',''],
+      ['17:00','TRAIN Push B — office gym','600 ml during · Rule 1 · shower there','teal','wed'],
+      ['17:40','Commute home','','','nowed'],
+      ['17:50','Commute home','After the office session','','wed'],
       ['18:30','Family / personal','','',''],
       ['19:00','Dinner','Rule 2','amber',''],
       ['19:45','Sattu + PM skincare','One active only — see Body › Skin','purple',''],
@@ -392,7 +431,7 @@
 
   /* ---------------- The ten non-negotiables --------------- */
   SEED.hardTasks = [
-    {key:'work',  icon:'🏋', label:'Workout',        sub:'Tue Pull A · Wed Push B · Fri Pull B at 6:00–6:45 · Sat Legs · Sun Push A at 7:00–7:45. Mon & Thu = 45-min outdoor walk. Never zero.'},
+    {key:'work',  icon:'🏋', label:'Workout',        sub:'Tue Pull A · Fri Pull B at 6:00–6:45 (Gosford) · Wed Push B at 17:00–17:45 (office gym) · Sat Legs · Sun Push A at 7:00–7:45. Mon & Thu = 45-min outdoor walk. Never zero.'},
     {key:'diet',  icon:'🥗', label:'Diet',           sub:'Structured plan held. Zero alcohol, zero cheat meals. Toast + jam + butter is permitted and mandatory — not a cheat. Tuesday: no egg, no non-veg.'},
     {key:'water', icon:'💧', label:'Water 3.8 L',    sub:'One US gallon. Front-loaded, finished by ~18:00 so it never wrecks sleep.'},
     {key:'am',    icon:'🌅', label:'5 AM block',     sub:'Meditate 5:00–5:20. Journal by hand 5:20 onward — slow; this is the handwriting practice.'},
@@ -407,7 +446,7 @@
   SEED.phases = [
     {from:1,  to:25, name:'Ignition', col:'#a8321f', note:'Days 1–25 — build the reps, expect the ugly days'},
     {from:26, to:50, name:'Grind',    col:'#8a6020', note:'Days 26–50 — the middle; this is where most quit'},
-    {from:51, to:75, name:'Forged',   col:'#256b42', note:'Days 51–75 — finish what you started'}
+    {from:51, to:75, name:'Forged',   col:'#0f6b6e', note:'Days 51–75 — finish what you started'}
   ];
 
   /* Training phases from the PPL sheet */
@@ -415,7 +454,7 @@
     {from:1,  to:14, key:'A', name:'Groove',  col:'#1d5fa0',
      rule:'Every set stops 3–4 reps short of failure.',
      note:'Deliberately easy. You are teaching movement patterns and letting tendons catch up, not testing yourself. The urge to go heavy on Day 3 is the single most common way this ends in a strain.'},
-    {from:15, to:39, key:'B', name:'Build',   col:'#006644',
+    {from:15, to:39, key:'B', name:'Build',   col:'#0e7c7b',
      rule:'Double progression, pushing to 1–2 reps in reserve.',
      note:'This is your only uninterrupted training window before surgery. Make it count.'},
     {from:40, to:54, key:'C', name:'Surgery', col:'#8a6020',
@@ -496,8 +535,8 @@
       EX('Seated leg curl',3,'3','10–15',['hamstrings'],['calves'],'',''),
       EX('Standing calf raise',2,'2','12–15',['calves'],[],'-M4-G8p8fmc','How to Do a Calf Raise — Howcast')]},
 
-    {key:'pushB', label:'Push B', day:'Wednesday', lead:'Shoulder lead, + squat', time:'6:00–6:45', mins:'',
-     note:'',
+    {key:'pushB', label:'Push B', day:'Wednesday', lead:'Shoulder lead, + squat · office gym', time:'17:00–17:45', mins:'',
+     note:'Office gym, straight after work. Pack the kit in the morning and shower there before the commute home.',
      exs:[
       EX('Back squat',4,'4','6–10',['quads','glutes'],['hamstrings','lowerBack','abs'],'bEv6CCg2BC8','How To Get A Huge Squat With Perfect Technique — Jeff Nippard'),
       EX('Overhead press',4,'3–4','6–10',['delts'],['triceps','traps','abs'],'2yjwXTZQDDI','How To: Standing Straight-Bar Overhead Press — ScottHermanFitness'),
@@ -715,11 +754,11 @@
     neck:      {l:'Neck',       s:'f', p:'<rect x="46" y="25" width="8" height="8" rx="2"/><rect x="146" y="25" width="8" height="8" rx="2"/>'}
   };
   const MG_ORDER = ['chest','delts','biceps','forearms','abs','obliques','quads','tibialis','neck','traps','rearDelts','lats','rhomboids','triceps','lowerBack','glutes','hamstrings','calves'];
-  const BAND = { amber:'#8a6020', teal:'#1f7a65', purple:'#5e3d9a' };
+  const BAND = { amber:'#8a6020', teal:'#0f766e', purple:'#5e3d9a' };
 
   /* ============================ STATE ============================ */
   let C, prefs;
-  let view      = 'plan';        // plan|hard|gym|diet|body|photos|bench|lists
+  let view      = 'plan';        // plan|diet|sadhana|gym|body|hard|photos|bench
   let bodyTab   = 'skin';
   let listTab   = 'todo';
   let activeTab = 'weekday';     // weekday|wednesday|weekend
@@ -799,7 +838,7 @@
       skinAM: clone(SEED.skinAM), skinPM: clone(SEED.skinPM), skinCan: clone(SEED.skinCan), skinAhead: clone(SEED.skinAhead),
       hairWeek: clone(SEED.hairWeek), hairStyle: clone(SEED.hairStyle),
       outstanding: SEED.outstanding.map(t => ({ t })), sadhana: clone(SEED.sadhana),
-      surgical: clone(SEED.surgical), threshold: 10
+      surgical: clone(SEED.surgical), threshold: 10, patches: { wedOffice: 1 }
     };
   }
   function saveC() { lsSet(SK.content, JSON.stringify(C)); }
@@ -808,6 +847,7 @@
     if (raw) {
       try {
         C = JSON.parse(raw);
+        if (!C.patches) C.patches = {};   // before defaults fill in, so in-place patches still run
         const d = seedContent();
         for (const k in d) if (C[k] === undefined) C[k] = d[k];
         for (const k in d.schedules) if (!Array.isArray(C.schedules[k])) C.schedules[k] = d.schedules[k];
@@ -818,6 +858,7 @@
           saveC();
         }
         migrateContent();
+        patchWedOffice();
         return;
       } catch (e) {}
     }
@@ -844,6 +885,39 @@
     C.v = CONTENT_V;
     saveC();
     toast('Training programme updated — Mon & Thu are now rest days');
+  }
+
+  /* Wednesday's session moved to the office gym after work. Applied once, in place,
+     to content already on the phone — only the rows involved change. The previous
+     content object is archived first. */
+  function patchWedOffice() {
+    C.patches = C.patches || {};
+    if (C.patches.wedOffice) return;
+    lsSet('habitTracker.content.prewed.archived', JSON.stringify(C));
+    const wk = (C.schedules && C.schedules.weekday) || [];
+    const row = (time, label, notes, band, only) => ({ id: uid(), time, label, notes, band, only, done:false });
+    wk.forEach(t => {
+      const l = (t.label || '').trim();
+      if (t.only === 'gym' && (/^walk to gosford/i.test(l) || /^train — see the gym tab$/i.test(l) || /^walk home$/i.test(l))) t.only = 'gosford';
+      if (!t.only && /^commute home$/i.test(l)) t.only = 'nowed';
+    });
+    if (!wk.some(t => t.only === 'wed')) {
+      wk.push(row('17:00','TRAIN Push B — office gym','600 ml during · Rule 1 · shower there','teal','wed'));
+      wk.push(row('17:50','Commute home','After the office session','','wed'));
+    }
+    const pb = (C.gym || []).find(g => g.key === 'pushB');
+    if (pb) {
+      if (!pb.time || pb.time === '6:00–6:45') pb.time = '17:00–17:45';
+      if (!pb.note) pb.note = 'Office gym, straight after work. Pack the kit in the morning and shower there before the commute home.';
+      if (pb.lead === 'Shoulder lead, + squat') pb.lead = 'Shoulder lead, + squat · office gym';
+    }
+    const w = (C.hardTasks || []).find(h => h.key === 'work');
+    if (w && w.sub === 'Tue Pull A · Wed Push B · Fri Pull B at 6:00–6:45 · Sat Legs · Sun Push A at 7:00–7:45. Mon & Thu = 45-min outdoor walk. Never zero.') w.sub = 'Tue Pull A · Fri Pull B at 6:00–6:45 (Gosford) · Wed Push B at 17:00–17:45 (office gym) · Sat Legs · Sun Push A at 7:00–7:45. Mon & Thu = 45-min outdoor walk. Never zero.';
+    (C.phases || []).forEach(p => { if (p.col === '#256b42') p.col = '#0f6b6e'; });
+    (C.trainPhases || []).forEach(p => { if (p.col === '#00' + '6644') p.col = '#0e7c7b'; });
+    C.patches.wedOffice = 1;
+    saveC();
+    toast('Wednesday gym moved to the office, after work');
   }
 
   /* v2 content is kept, not destroyed — the plan changed, the record shouldn't vanish. */
@@ -873,9 +947,10 @@
      days but no longer identical — Monday walks, Thursday sits with the Sahasranama. */
   function tagsFor(when) {
     const w = (when || new Date()).getDay();
-    if (w === 1) return ['rest','mon'];
-    if (w === 4) return ['rest','thu'];
-    return ['gym'];
+    if (w === 1) return ['rest','mon','nowed'];
+    if (w === 4) return ['rest','thu','nowed'];
+    if (w === 3) return ['gym','wed'];                 // Push B at the office gym, after work
+    return ['gym','gosford','nowed'];
   }
   /* Weekday rows tagged 'gym' or 'wed' show only on their own days. In edit mode
      you see all of them, so nothing is hidden from you when you go to change it. */
@@ -1065,7 +1140,7 @@
     supps:    { one:'Supplement', path:()=>C.diet.supps, fields:[{k:'n',l:'Name'},{k:'t',l:'Detail',t:'area'},{k:'flag',l:'Flag'}], blank:()=>({n:'',t:'',flag:''}) },
     dietRules:{ one:'Diet rule', path:()=>C.diet.rules, noObj:true, fields:[{k:'v',l:'Rule',t:'area'}] },
     skinAM:   { one:'AM step', path:()=>C.skinAM, fields:[{k:'n',l:'Step'},{k:'t',l:'Detail',t:'area'}], blank:()=>({n:'',t:''}) },
-    skinPM:   { one:'PM night', path:()=>C.skinPM, fields:[{k:'night',l:'Night'},{k:'active',l:'Active'},{k:'col',l:'Colour',t:'color'},{k:'routine',l:'Routine',t:'area'}], blank:()=>({night:'',active:'',col:'#006644',routine:''}) },
+    skinPM:   { one:'PM night', path:()=>C.skinPM, fields:[{k:'night',l:'Night'},{k:'active',l:'Active'},{k:'col',l:'Colour',t:'color'},{k:'routine',l:'Routine',t:'area'}], blank:()=>({night:'',active:'',col:'#0e7c7b',routine:''}) },
     hairWeek: { one:'Hair day', path:()=>C.hairWeek, fields:[{k:'d',l:'Day'},{k:'a',l:'Action (WASH / Rinse)'},{k:'t',l:'Detail',t:'area'}], blank:()=>({d:'',a:'Rinse',t:''}) },
     hairStyle:{ one:'Styling rule', path:()=>C.hairStyle, fields:[{k:'k',l:'Rule'},{k:'t',l:'Detail',t:'area'}], blank:()=>({k:'',t:''}) },
     outstanding:{ one:'Outstanding item', path:()=>C.outstanding, fields:[{k:'t',l:'Item',t:'area'}], blank:()=>({t:''}) },
@@ -1090,8 +1165,8 @@
     const id = 'rf-' + f.k;
     if (f.t === 'area')  return `<div><label class="flbl">${esc(f.l)}</label><textarea id="${id}" rows="3" class="fld resize-none">${esc(v || '')}</textarea></div>`;
     if (f.t === 'lines') return `<div><label class="flbl">${esc(f.l)}</label><textarea id="${id}" rows="5" class="fld resize-none">${esc((v || []).join('\n'))}</textarea></div>`;
-    if (f.t === 'bool')  return `<label class="flex items-center gap-3 py-1"><input id="${id}" type="checkbox" ${v ? 'checked' : ''} class="w-5 h-5 accent-[#006644]"><span class="text-sm font-semibold text-gray-700">${esc(f.l)}</span></label>`;
-    if (f.t === 'color') return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="color" value="${esc(v || '#006644')}" class="w-full h-11 bg-gray-50 border border-gray-200 rounded-xl p-1"></div>`;
+    if (f.t === 'bool')  return `<label class="flex items-center gap-3 py-1"><input id="${id}" type="checkbox" ${v ? 'checked' : ''} class="w-5 h-5 accent-[#0e7c7b]"><span class="text-sm font-semibold text-gray-700">${esc(f.l)}</span></label>`;
+    if (f.t === 'color') return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="color" value="${esc(v || '#0e7c7b')}" class="w-full h-11 bg-gray-50 border border-gray-200 rounded-xl p-1"></div>`;
     if (f.t === 'num')   return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="number" inputmode="decimal" step="any" value="${v == null ? '' : esc(v)}" class="fld" ${f.ro ? 'readonly' : ''}></div>`;
     if (f.t === 'date')  return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="date" value="${esc(v || todayStr())}" class="fld"></div>`;
     return `<div><label class="flbl">${esc(f.l)}</label><input id="${id}" type="text" value="${esc(v || '')}" class="fld" ${f.ro ? 'readonly' : ''}></div>`;
@@ -1171,7 +1246,7 @@
   const secTitle = (t, addSpec, addLabel) =>
     `<div class="flex items-end justify-between mt-5 mb-2 px-1 first:mt-1">
        <p class="text-xs font-bold uppercase tracking-wider text-gray-400">${esc(t)}</p>
-       ${editMode && addSpec ? `<button onclick="openRec('${addSpec}',-1)" class="text-xs font-bold text-forest">+ ${esc(addLabel || 'Add')}</button>` : ''}
+       ${editMode && addSpec ? `<button onclick="openRec('${addSpec}',-1)" class="text-xs font-bold text-brand">+ ${esc(addLabel || 'Add')}</button>` : ''}
      </div>`;
   function infoBox(title, text, color) {
     return `<div class="rounded-2xl p-3.5 mb-1" style="background:${color}14;border-left:4px solid ${color}">
@@ -1180,21 +1255,20 @@
   }
   const card = (inner, extra) => `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 ${extra || ''}">${inner}</div>`;
   const addBtnHtml = (label, onclick) =>
-    `<button onclick="${onclick}" class="mt-3 w-full border-2 border-dashed border-forest/40 text-forest font-semibold py-3.5 rounded-2xl active:bg-forest-light transition flex items-center justify-center gap-2"><svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>${esc(label)}</button>`;
+    `<button onclick="${onclick}" class="mt-3 w-full border-2 border-dashed border-brand/40 text-brand font-semibold py-3.5 rounded-2xl active:bg-brand-light transition flex items-center justify-center gap-2"><svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>${esc(label)}</button>`;
   const creedBox = () => `<p class="text-[11px] text-gray-400 leading-relaxed text-center mt-6 px-2 italic">${esc(SEED.creed)}</p>`;
 
   /* ============================ RENDER ROUTER ============================ */
   function render() {
     document.querySelectorAll('.nav-btn').forEach(b => {
       const on = b.dataset.view === view;
-      b.className = 'nav-btn shrink-0 min-w-[58px] flex flex-col items-center justify-center gap-0.5 py-2 transition ' + (on ? 'text-forest' : 'text-gray-400 active:text-gray-600');
+      b.className = 'nav-btn' + (on ? ' on' : '');
       if (on) b.scrollIntoView({ inline:'center', block:'nearest', behavior:'smooth' });
     });
     const isList = isListView();
     $('#summaryBlock').classList.toggle('hidden', !isList);
     $('#dayTabs').classList.toggle('hidden', view !== 'plan');
     $('#bodyTabs').classList.toggle('hidden', view !== 'body');
-    $('#listTabs').classList.toggle('hidden', view !== 'lists');
     $('#editToggle').classList.toggle('hidden', view === 'photos');
     $('#view-list').classList.toggle('hidden', !isList);
     $('#ringWidget').classList.toggle('hidden', view !== 'plan');
@@ -1202,18 +1276,13 @@
     const showMap = {
       hard: view === 'hard', gym: view === 'gym', diet: view === 'diet',
       skin: view === 'body' && bodyTab === 'skin', hair: view === 'body' && bodyTab === 'hair',
-      photos: view === 'photos', bench: view === 'bench', sadhana: view === 'sadhana',
-      goals: view === 'lists' && listTab === 'goals', dates: view === 'lists' && listTab === 'dates'
+      photos: view === 'photos', bench: view === 'bench', sadhana: view === 'sadhana'
     };
     Object.keys(showMap).forEach(k => $('#view-' + k).classList.toggle('hidden', !showMap[k]));
 
     document.querySelectorAll('.body-btn').forEach(b => {
       const on = b.dataset.body === bodyTab;
-      b.className = 'body-btn rounded-lg py-2 text-sm font-semibold transition ' + (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
-    });
-    document.querySelectorAll('.list-btn').forEach(b => {
-      const on = b.dataset.list === listTab;
-      b.className = 'list-btn rounded-lg py-2 text-sm font-semibold transition ' + (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
+      b.className = 'body-btn rounded-lg py-2 text-sm font-semibold transition ' + (on ? 'bg-white text-brand shadow' : 'text-white/80 active:bg-white/10');
     });
 
     if (view === 'plan') { renderRing(); renderWaterWidget(); }
@@ -1226,15 +1295,13 @@
     else if (view === 'photos') renderPhotos();
     else if (view === 'bench') renderBench();
     else if (view === 'sadhana') renderSadhana();
-    else if (view === 'lists' && listTab === 'goals') renderGoals();
-    else if (view === 'lists' && listTab === 'dates') renderDates();
   }
 
   /* ============================ LIST VIEW ============================ */
   function renderList() {
     document.querySelectorAll('.tab-btn').forEach(b => {
       const on = b.dataset.tab === activeTab;
-      b.className = 'tab-btn rounded-lg py-2 text-[13px] font-semibold transition ' + (on ? 'bg-white text-forest shadow' : 'text-white/80 active:bg-white/10');
+      b.className = 'tab-btn rounded-lg py-2 text-[13px] font-semibold transition ' + (on ? 'bg-white text-brand shadow' : 'text-white/80 active:bg-white/10');
     });
     const isTodo = view === 'lists';
     $('#addBtnLabel').textContent = isTodo ? 'Add To-Do' : 'Add Task';
@@ -1242,17 +1309,19 @@
     $('#resetBtn').classList.toggle('hidden', editMode);
     $('#resetLabel').textContent = isTodo ? 'Clear Done' : 'Reset Day';
     const key = activeListKey();
-    const titles = { weekday: isRestDay() ? 'Rest day — Mon & Thu' : 'Tue · Wed · Fri — training', weekend:'Saturday · Sunday', todo:'To-Do' };
+    const titles = { weekday: isRestDay() ? 'Rest day — Mon & Thu' : (new Date().getDay() === 3 ? 'Wednesday — office gym after work' : 'Tue · Fri — Gosford training'), weekend:'Saturday · Sunday', todo:'To-Do' };
     $('#listTitle').textContent = titles[key];
     $('#dayNote').classList.toggle('hidden', !(view === 'plan' && key === 'weekday'));
     if (view === 'plan' && key === 'weekday') {
       $('#dayNote').innerHTML = editMode
-        ? '✎ Editing shows every weekday row, including those tagged <b>GYM</b>, <b>REST</b>, <b>MON</b> and <b>THU</b>. Use “Shows on” in the editor to move a row between them.'
+        ? '✎ Editing shows every weekday row, including those tagged <b>GYM</b>, <b>TUE·FRI AM</b>, <b>WED</b>, <b>NOT WED</b>, <b>REST</b>, <b>MON</b> and <b>THU</b>. Use “Shows on” in the editor to move a row between them.'
         : (isRestDay()
             ? (new Date().getDay() === 1
                 ? '🚶 Monday rest day — the 5:45 block is the 45-minute outdoor walk, and it ticks Rule 1.'
                 : '🕉 Thursday — the 5:45 block is the Vishnu Sahasranama. No walk, so nothing here ticks Rule 1.')
-            : '🏋 Training day. On Mondays and Thursdays this list swaps the 5:45 block for the outdoor walk automatically.');
+            : (new Date().getDay() === 3
+                ? '🏢 Wednesday — no Gosford this morning. Push B is at the office gym, 17:00–17:45; pack the kit.'
+                : '🏋 Gosford training day. Mondays and Thursdays swap the 5:45 block automatically; Wednesday trains at the office after work.'));
     }
 
     const list = visibleRows(currentList(), key);
@@ -1280,17 +1349,19 @@
   }
   function taskCard(t) {
     const el = document.createElement('div');
-    const bar = t.band && BAND[t.band] ? `border-left:4px solid ${BAND[t.band]}` : '';
+    const bar = t.band && BAND[t.band] ? `box-shadow: inset 4px 0 0 ${BAND[t.band]}, 0 1px 1px rgba(7,63,69,.03), 0 6px 18px -10px rgba(7,63,69,.20)` : '';
     el.className = 'task-card flex items-center gap-3 bg-white rounded-2xl px-3.5 py-3 shadow-sm border border-gray-100 ' + (t.done ? 'opacity-55' : '');
     if (bar) el.setAttribute('style', bar);
     const left = document.createElement('button');
     left.className = 'shrink-0 flex flex-col items-center justify-center w-14';
-    left.innerHTML = `<div class="w-7 h-7 rounded-full flex items-center justify-center border-2 checkbox-tick ${t.done ? 'bg-forest border-forest' : 'border-gray-300'}">${t.done ? tickSvg : ''}</div>
-      ${t.time ? `<span class="tabular text-[10px] font-semibold mt-1 ${t.done ? 'text-gray-400' : 'text-forest'}">${to12h(t.time)}</span>` : ''}`;
+    left.innerHTML = `<div class="w-7 h-7 rounded-full flex items-center justify-center border-2 checkbox-tick ${t.done ? 'bg-brand border-brand' : 'border-gray-300'}">${t.done ? tickSvg : ''}</div>
+      ${t.time ? `<span class="tabular text-[10px] font-semibold mt-1 ${t.done ? 'text-gray-400' : 'text-brand'}">${to12h(t.time)}</span>` : ''}`;
     const body = document.createElement('div');
     body.className = 'flex-1 min-w-0';
-    const onlyChip = t.only === 'gym' ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 mr-1.5 align-middle">GYM</span>'
-                   : t.only ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 mr-1.5 align-middle">' + esc(t.only.toUpperCase()) + '</span>' : '';
+    const ONLY_LBL = { gym:'GYM', gosford:'TUE·FRI AM', wed:'WED', nowed:'NOT WED' };
+    const onlyChip = !t.only ? ''
+      : '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded mr-1.5 align-middle ' + (ONLY_LBL[t.only] ? 'bg-teal-50 text-teal-700' : 'bg-amber-50 text-amber-700') + '">'
+        + esc(ONLY_LBL[t.only] || t.only.toUpperCase()) + '</span>';
     body.innerHTML = `<p class="text-[15px] font-semibold leading-snug ${t.done ? 'line-through text-gray-400' : 'text-gray-800'}">${editMode ? onlyChip : ''}${esc(t.label)}</p>` +
       (t.notes ? `<p class="text-xs text-gray-400 leading-snug mt-0.5 ${t.done ? 'line-through' : ''}">${esc(t.notes)}</p>` : '');
     if (editMode) {
@@ -1375,7 +1446,7 @@
       <div><label class="flbl">Day 1 date</label><input id="hs-start" type="date" value="${hardMeta.start}" class="fld"></div>
       <div><label class="flbl">Length (days)</label><input id="hs-len" type="number" inputmode="numeric" value="${hardMeta.length}" class="fld"></div>
       <div><label class="flbl">Attempt number</label><input id="hs-att" type="number" inputmode="numeric" value="${hardMeta.attempt}" class="fld"></div>
-      <label class="flex items-center gap-3 py-1"><input id="hs-walk" type="checkbox" ${prefs.clearedToWalk?'checked':''} class="w-5 h-5 accent-[#006644]"><span class="text-sm font-semibold text-gray-700">Surgeon has cleared me to walk</span></label>
+      <label class="flex items-center gap-3 py-1"><input id="hs-walk" type="checkbox" ${prefs.clearedToWalk?'checked':''} class="w-5 h-5 accent-[#0e7c7b]"><span class="text-sm font-semibold text-gray-700">Surgeon has cleared me to walk</span></label>
       <p class="text-[11px] text-gray-400 leading-relaxed">Ticked days stay attached to their real calendar dates, so changing Day 1 re-dates the grid without losing anything.</p>`,
       () => {
         hardMeta.start = document.getElementById('hs-start').value || START;
@@ -1393,7 +1464,7 @@
       ${cm ? `<p class="text-xs text-gray-600 mt-1"><b>${esc(cm.code)}</b> — ${esc(cm.watch)}</p><p class="text-xs text-gray-500 mt-1">→ ${esc(cm.apply)}</p>` : ''}</div>`;
     C.hardTasks.forEach(t => {
       h += `<label class="flex items-center gap-3 py-2 border-b border-gray-100">
-        <input type="checkbox" data-hk="${esc(t.key)}" ${e.t[t.key]?'checked':''} class="w-5 h-5 accent-[#006644]">
+        <input type="checkbox" data-hk="${esc(t.key)}" ${e.t[t.key]?'checked':''} class="w-5 h-5 accent-[#0e7c7b]">
         <span class="text-lg">${t.icon}</span><span class="text-sm font-semibold text-gray-700 flex-1">${esc(t.label)}</span></label>`;
     });
     h += `<div class="pt-2"><label class="flbl">Win of the day / note</label><textarea id="hd-note" rows="3" class="fld resize-none">${esc(e.note||'')}</textarea></div>`;
@@ -1465,9 +1536,9 @@
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-[11px] font-bold text-white px-2 py-0.5 rounded-full" style="background:${col}">${esc(cm.code)}</span>
           ${cm.silent ? '<span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full">🤐 Silent — write, don’t speak</span>' : ''}
-          ${cm.mark === 'VM' ? '<span class="text-[11px] font-bold text-forest bg-forest-light px-2 py-0.5 rounded-full">🎙 Voice memo today</span>' : ''}
+          ${cm.mark === 'VM' ? '<span class="text-[11px] font-bold text-brand bg-brand-light px-2 py-0.5 rounded-full">🎙 Voice memo today</span>' : ''}
           ${cm.mark === 'WR' ? '<span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full">✍ Written review today</span>' : ''}
-          ${editMode ? `<button onclick="openRec('comms',${n-1})" class="ml-auto text-xs font-bold text-forest">Edit</button>` : ''}
+          ${editMode ? `<button onclick="openRec('comms',${n-1})" class="ml-auto text-xs font-bold text-brand">Edit</button>` : ''}
         </div>
         <p class="text-sm font-semibold text-gray-800 leading-snug mt-2">${esc(cm.watch)}</p>
         <p class="text-sm text-gray-500 leading-relaxed mt-1.5">→ ${esc(cm.apply)}</p>
@@ -1483,20 +1554,20 @@
       const strk = taskStreak(t.key);
       h += `<div class="flex items-start gap-3 px-4 py-3 ${on?'opacity-60':''}">
         <div onclick="${editMode?`openRec('hardTasks',${i})`:`tapHard('${esc(t.key)}')`}" class="flex items-start gap-3 flex-1 min-w-0 cursor-pointer active:opacity-70">
-          <div class="w-7 h-7 shrink-0 mt-0.5 rounded-full flex items-center justify-center border-2 ${on?'bg-forest border-forest':'border-gray-300'}">${on?tickSvg:''}</div>
+          <div class="w-7 h-7 shrink-0 mt-0.5 rounded-full flex items-center justify-center border-2 ${on?'bg-brand border-brand':'border-gray-300'}">${on?tickSvg:''}</div>
           <span class="text-lg shrink-0 mt-0.5">${t.icon}</span>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold ${on?'line-through text-gray-400':'text-gray-800'}">${i+1}. ${esc(t.label)}</p>
             <p class="text-[11px] leading-snug mt-0.5 ${bent?'text-amber-700 font-medium':'text-gray-400'}">${esc(sub)}</p>
           </div>
-          ${editMode ? editPencil : (strk > 1 ? `<span class="text-[10px] font-bold text-forest shrink-0 mt-1">${strk}</span>` : '')}
+          ${editMode ? editPencil : (strk > 1 ? `<span class="text-[10px] font-bold text-brand shrink-0 mt-1">${strk}</span>` : '')}
         </div></div>`;
     });
     h += '</div>';
 
     h += card(`<div class="p-4"><label class="flbl">Win of the day</label>
       <textarea id="hardNote" rows="2" class="fld resize-none" placeholder="One line. What went right?">${esc(day.note||'')}</textarea>
-      <button onclick="saveTodayNote()" class="mt-2 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark">Save note</button></div>`, 'mt-2');
+      <button onclick="saveTodayNote()" class="mt-2 w-full bg-brand text-white text-sm font-semibold py-2.5 rounded-xl active:bg-brand-dark">Save note</button></div>`, 'mt-2');
 
     /* Streaks */
     h += secTitle('Streak');
@@ -1542,8 +1613,8 @@
     for (let dd = 1; dd <= dim; dd++) {
       const dds = dstr(new Date(y,mo,dd)), c = hardCount(dds), win = isWin(dds), future = dd > todayD;
       const dn = hardDayFor(dds), inPlan = dn >= 1 && dn <= st.L;
-      let cls = future ? 'bg-gray-50 text-gray-300' : win ? 'bg-forest text-white' : c > 0 ? 'bg-forest/20 text-forest' : 'bg-gray-100 text-gray-400';
-      h += `<div onclick="${inPlan?`openHardDay(${dn})`:''}" class="aspect-square rounded-lg flex items-center justify-center text-[11px] font-semibold ${inPlan?'cursor-pointer':''} ${cls}${dd===todayD?' ring-2 ring-forest ring-offset-1':''}">${dd}</div>`;
+      let cls = future ? 'bg-gray-50 text-gray-300' : win ? 'bg-brand text-white' : c > 0 ? 'bg-brand/20 text-brand' : 'bg-gray-100 text-gray-400';
+      h += `<div onclick="${inPlan?`openHardDay(${dn})`:''}" class="aspect-square rounded-lg flex items-center justify-center text-[11px] font-semibold ${inPlan?'cursor-pointer':''} ${cls}${dd===todayD?' ring-2 ring-brand ring-offset-1':''}">${dd}</div>`;
     }
     h += '</div></div>';
 
@@ -1583,7 +1654,7 @@
     let h = '<div class="space-y-1.5">';
     C.comms.forEach(c => {
       const dds = hardDateFor(c.d), sg = surgicalWindow(c.d);
-      h += `<div onclick="closeRec();openHardDay(${c.d})" class="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer ${sg?'bg-amber-50':'bg-gray-50'} ${c.d===st.n?'ring-2 ring-forest':''}">
+      h += `<div onclick="closeRec();openHardDay(${c.d})" class="flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer ${sg?'bg-amber-50':'bg-gray-50'} ${c.d===st.n?'ring-2 ring-brand':''}">
         <span class="tabular text-[11px] font-bold text-gray-400 w-6">${c.d}</span>
         <span class="text-[11px] text-gray-400 w-14">${shortDate(dds)}</span>
         <span class="text-xs font-bold ${sg?'text-amber-800':'text-gray-700'} flex-1">${esc(c.code)}</span>
@@ -1613,7 +1684,7 @@
     let layers = '';
     MG_ORDER.forEach(k => {
       const g = MG[k]; if (!g) return;
-      const hit = P.has(k) ? '#006644' : (S.has(k) ? '#8fc4b0' : null);
+      const hit = P.has(k) ? '#0e7c7b' : (S.has(k) ? '#8fd3cf' : null);
       if (hit) layers += `<g fill="${hit}">${g.p}</g>`;
     });
     return `<svg viewBox="0 0 200 200" class="w-full max-w-[300px] mx-auto" role="img" aria-label="Muscles worked">
@@ -1622,7 +1693,7 @@
       <text x="150" y="198" text-anchor="middle" font-size="8" font-weight="700" fill="#9ca3af">BACK</text></svg>`;
   }
   const mgChip = (k, primary) => { const g = MG[k]; if (!g) return '';
-    return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${primary?'text-white':'text-forest bg-forest-light'}" style="${primary?'background:#006644':''}">${esc(g.l)}</span>`; };
+    return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${primary?'text-white':'text-brand bg-brand-light'}" style="${primary?'background:#0e7c7b':''}">${esc(g.l)}</span>`; };
   const ytSearch = (n) => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(n + ' proper form technique');
 
   /* ============================ GYM ============================ */
@@ -1710,7 +1781,7 @@
     h += '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-3 overflow-x-auto no-sb">';
     C.gym.forEach(x => {
       const on = x.key === gymDay, isToday = todaySess && todaySess.key === x.key;
-      h += `<button onclick="setGymDay('${esc(x.key)}')" class="shrink-0 min-w-[60px] rounded-lg py-2 px-2 text-[13px] font-semibold transition ${on?'bg-forest text-white shadow':'text-gray-500 active:bg-gray-200'}">${esc(x.label)}${isToday?' •':''}</button>`;
+      h += `<button onclick="setGymDay('${esc(x.key)}')" class="shrink-0 min-w-[60px] rounded-lg py-2 px-2 text-[13px] font-semibold transition ${on?'bg-brand text-white shadow':'text-gray-500 active:bg-gray-200'}">${esc(x.label)}${isToday?' •':''}</button>`;
     });
     h += '</div>';
     if (editMode) h += `<div class="grid grid-cols-2 gap-2 mb-3">
@@ -1734,7 +1805,7 @@
       h += card(`<div class="p-5 text-center"><p class="text-4xl">🚶</p>
         <p class="text-base font-bold text-gray-800 mt-2">45-minute outdoor walk</p>
         <p class="text-xs text-gray-500 leading-relaxed mt-1">5:45–6:30, before work. It ticks Rule 1, so the streak holds, and it carries the day’s steps. Shoes and a coat — no kit.</p>
-        <button onclick="tapHard('work')" class="mt-3 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark">${hardDay(todayStr()).t.work?'✓ Rule 1 ticked today':'Tick Rule 1 — walk done'}</button></div>`, 'mt-2');
+        <button onclick="tapHard('work')" class="mt-3 w-full bg-brand text-white text-sm font-semibold py-2.5 rounded-xl active:bg-brand-dark">${hardDay(todayStr()).t.work?'✓ Rule 1 ticked today':'Tick Rule 1 — walk done'}</button></div>`, 'mt-2');
     } else {
       h += '<div class="space-y-2.5 mt-2">';
       d.exs.forEach((ex, ei) => {
@@ -1743,8 +1814,8 @@
         for (let s = 0; s < (parseInt(ex.sets)||3); s++) {
           const pv = log ? log[s] : null;
           rows += `<div class="flex items-center gap-2 mt-2"><span class="shrink-0 w-6 text-xs font-bold text-gray-400">S${s+1}</span>
-            <input id="gl-${di}-${ei}-${s}-w" type="number" inputmode="decimal" step="any" placeholder="kg" value="${pv?pv.w:''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest">
-            <input id="gl-${di}-${ei}-${s}-r" type="number" inputmode="numeric" placeholder="reps" value="${pv?pv.r:''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-forest"></div>`;
+            <input id="gl-${di}-${ei}-${s}-w" type="number" inputmode="decimal" step="any" placeholder="kg" value="${pv?pv.w:''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-brand">
+            <input id="gl-${di}-${ei}-${s}-r" type="number" inputmode="numeric" placeholder="reps" value="${pv?pv.r:''}" class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-center outline-none focus:border-brand"></div>`;
         }
         const vid = (ex.vid||'').trim();
         const vurl = vid ? (vid.startsWith('http') ? vid : 'https://www.youtube.com/watch?v=' + vid) : '';
@@ -1767,7 +1838,7 @@
             ${ex.why?`<div class="mt-3 bg-gray-50 rounded-xl p-3"><p class="text-xs text-gray-600 leading-relaxed">${esc(ex.why)}</p></div>`:''}
             <p class="text-[11px] font-bold uppercase tracking-wide text-gray-400 mt-3 mb-0.5">Log today · weight × reps</p>
             ${rows}
-            <button onclick="saveGymLog(${di},${ei})" class="mt-3 w-full bg-forest text-white text-sm font-semibold py-2.5 rounded-xl active:bg-forest-dark transition">${log?'Update log':'Save log'}</button>
+            <button onclick="saveGymLog(${di},${ei})" class="mt-3 w-full bg-brand text-white text-sm font-semibold py-2.5 rounded-xl active:bg-brand-dark transition">${log?'Update log':'Save log'}</button>
             ${editMode?`<button onclick="openExEditor(${di},${ei})" class="mt-2 w-full bg-gray-100 text-gray-700 text-sm font-semibold py-2.5 rounded-xl active:bg-gray-200">✎ Edit this exercise</button>`:''}
           </div></details>`;
       });
@@ -1783,8 +1854,8 @@
       const nm = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][w];
       const e = s ? sessionMinutes(s) : { sets:0, mins:0 };
       const isToday = new Date().getDay() === w;
-      h += `<div onclick="${s?`setGymDay('${esc(s.key)}');scrollTo(0,0)`:''}" class="px-4 py-2.5 flex items-center justify-between gap-2 cursor-pointer active:bg-gray-50 ${isToday?'bg-forest-light/40':''}">
-        <span class="text-sm ${isToday?'font-bold text-forest':'text-gray-600'}">${nm}</span>
+      h += `<div onclick="${s?`setGymDay('${esc(s.key)}');scrollTo(0,0)`:''}" class="px-4 py-2.5 flex items-center justify-between gap-2 cursor-pointer active:bg-gray-50 ${isToday?'bg-brand-light/40':''}">
+        <span class="text-sm ${isToday?'font-bold text-brand':'text-gray-600'}">${nm}</span>
         <span class="text-xs ${s&&s.exs.length?'font-semibold text-gray-700':'text-gray-400'}">${s?esc(s.label):'—'}${e.sets?` · ${e.sets} sets · ≈${e.mins} min`:(s?' · '+esc(s.mins||''):'')}</span></div>`;
     });
     h += '</div>';
@@ -1796,7 +1867,7 @@
       h += '<div class="space-y-2">';
       recent.forEach(day => {
         const s = sessionForDate(day.date);
-        h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 py-3"><p class="text-xs font-bold text-forest mb-1">${esc(day.label)}${s?' · '+esc(s.label):''}</p>`;
+        h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-4 py-3"><p class="text-xs font-bold text-brand mb-1">${esc(day.label)}${s?' · '+esc(s.label):''}</p>`;
         day.items.forEach(it => {
           h += `<div onclick="openGymLogEdit('${day.date}',${JSON.stringify(it.name).replace(/"/g,'&quot;')})" class="flex justify-between gap-2 py-1 cursor-pointer active:bg-gray-50 rounded">
             <span class="text-xs text-gray-600 truncate">${esc(it.name)}</span>
@@ -1843,8 +1914,8 @@
     h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${esc(D.headline)}</p>`;
 
     h += `<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mt-4">
-      <button onclick="setDietTab('std')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${dietTab==='std'?'bg-forest text-white shadow':'text-gray-500 active:bg-gray-200'}">Every day</button>
-      <button onclick="setDietTab('tue')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${dietTab==='tue'?'bg-forest text-white shadow':'text-gray-500 active:bg-gray-200'}">Tuesday — veg${isTue?' •':''}</button></div>`;
+      <button onclick="setDietTab('std')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${dietTab==='std'?'bg-brand text-white shadow':'text-gray-500 active:bg-gray-200'}">Every day</button>
+      <button onclick="setDietTab('tue')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${dietTab==='tue'?'bg-brand text-white shadow':'text-gray-500 active:bg-gray-200'}">Tuesday — veg${isTue?' •':''}</button></div>`;
 
     if (dietTab === 'std') {
       h += secTitle('The daily template', editMode?'dietStd':null, 'Add row');
@@ -1852,7 +1923,7 @@
       D.standard.forEach((r,i) => {
         h += `<div ${editMode?`onclick="openRec('dietStd',${i})"`:''} class="px-4 py-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
           <div class="flex items-start gap-3">
-            <span class="tabular text-xs font-bold text-forest shrink-0 w-11 mt-0.5">${esc(r.t)}</span>
+            <span class="tabular text-xs font-bold text-brand shrink-0 w-11 mt-0.5">${esc(r.t)}</span>
             <div class="flex-1 min-w-0"><p class="text-sm font-semibold text-gray-800 leading-snug">${esc(r.f)}</p>
               ${r.n?`<p class="text-[11px] text-gray-400 leading-snug mt-0.5">${esc(r.n)}</p>`:''}
               <div class="flex flex-wrap gap-1 mt-1.5">
@@ -1871,7 +1942,7 @@
       h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
       D.tuesday.forEach((r,i) => {
         h += `<div ${editMode?`onclick="openRec('dietTue',${i})"`:''} class="px-4 py-3 flex items-start gap-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
-          <span class="tabular text-xs font-bold text-forest shrink-0 w-11 mt-0.5">${esc(r.t)}</span>
+          <span class="tabular text-xs font-bold text-brand shrink-0 w-11 mt-0.5">${esc(r.t)}</span>
           <div class="flex-1 min-w-0"><p class="text-sm font-semibold text-gray-800 leading-snug">${esc(r.f)}</p>
             ${r.n?`<p class="text-[11px] text-gray-400 leading-snug mt-0.5">${esc(r.n)}</p>`:''}</div>${editMode?editPencil:''}</div>`;
       });
@@ -1901,7 +1972,7 @@
     D.prep.forEach((r,i) => {
       h += `<div ${editMode?`onclick="openRec('prep',${i})"`:''} class="px-4 py-2.5 ${editMode?'cursor-pointer active:bg-gray-50':''}">
         <div class="flex items-center justify-between gap-2"><span class="text-xs font-bold text-gray-700">${esc(r.d)}</span>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${r.who.startsWith('YOU')?'bg-forest-light text-forest':'bg-gray-100 text-gray-500'}">${esc(r.who)}</span></div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${r.who.startsWith('YOU')?'bg-brand-light text-brand':'bg-gray-100 text-gray-500'}">${esc(r.who)}</span></div>
         ${(r.l||r.dn)?`<p class="text-[11px] text-gray-500 leading-snug mt-1">${r.l?'L: '+esc(r.l):''}${r.l&&r.dn?' · ':''}${r.dn?'D: '+esc(r.dn):''}</p>`:''}</div>`;
     });
     h += '</div>';
@@ -1933,7 +2004,7 @@
     h += secTitle('Six rules that survive everything else', editMode?'dietRules':null, 'Add rule');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
     D.rules.forEach((r,i) => { h += `<div ${editMode?`onclick="openRec('dietRules',${i})"`:''} class="px-4 py-2.5 flex gap-2 ${editMode?'cursor-pointer active:bg-gray-50':''}">
-      <span class="text-xs font-bold text-forest shrink-0">${i+1}</span><p class="text-xs text-gray-600 leading-snug flex-1">${esc(r)}</p>${editMode?editPencil:''}</div>`; });
+      <span class="text-xs font-bold text-brand shrink-0">${i+1}</span><p class="text-xs text-gray-600 leading-snug flex-1">${esc(r)}</p>${editMode?editPencil:''}</div>`; });
     h += '</div>';
     h += creedBox();
     $('#view-diet').innerHTML = h;
@@ -1950,7 +2021,7 @@
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
     C.skinAM.forEach((s,i) => {
       h += `<div ${editMode?`onclick="openRec('skinAM',${i})"`:''} class="flex gap-3 px-4 py-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
-        <span class="shrink-0 w-6 h-6 rounded-full bg-forest-light text-forest text-xs font-bold flex items-center justify-center">${i+1}</span>
+        <span class="shrink-0 w-6 h-6 rounded-full bg-brand-light text-brand text-xs font-bold flex items-center justify-center">${i+1}</span>
         <div class="flex-1"><p class="text-sm font-semibold text-gray-800">${esc(s.n)}</p><p class="text-xs text-gray-400 leading-snug mt-0.5">${esc(s.t)}</p></div>${editMode?editPencil:''}</div>`;
     });
     h += '</div>';
@@ -1960,7 +2031,7 @@
     h += '<div class="space-y-2">';
     C.skinPM.forEach((p,i) => {
       const tn = i === pmIdx;
-      h += `<div ${editMode?`onclick="openRec('skinPM',${i})"`:''} class="bg-white rounded-2xl shadow-sm border ${tn?'border-forest ring-1 ring-forest/30':'border-gray-100'} px-4 py-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
+      h += `<div ${editMode?`onclick="openRec('skinPM',${i})"`:''} class="bg-white rounded-2xl shadow-sm border ${tn?'border-brand ring-1 ring-brand/30':'border-gray-100'} px-4 py-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
         <div class="flex items-center justify-between gap-2">
           <p class="text-sm font-bold" style="color:${p.col}">${esc(p.night)}${tn?' · Tonight ◉':''}</p>
           <div class="flex items-center gap-2"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:${p.col}1a;color:${p.col}">${esc(p.active)}</span>${editMode?editPencil:''}</div></div>
@@ -1981,7 +2052,7 @@
 
     h += secTitle('Through surgery and into December');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    C.skinAhead.forEach(a => { h += `<div class="px-4 py-3"><p class="text-xs font-bold text-forest">${esc(a.when)}</p><p class="text-xs text-gray-500 leading-snug mt-1">${esc(a.t)}</p></div>`; });
+    C.skinAhead.forEach(a => { h += `<div class="px-4 py-3"><p class="text-xs font-bold text-brand">${esc(a.when)}</p><p class="text-xs text-gray-500 leading-snug mt-1">${esc(a.t)}</p></div>`; });
     h += '</div>';
     h += creedBox();
     $('#view-skin').innerHTML = h;
@@ -1994,8 +2065,8 @@
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
     C.hairWeek.forEach((x,i) => {
       const tn = i === idx, wash = String(x.a).toUpperCase() === 'WASH';
-      h += `<div ${editMode?`onclick="openRec('hairWeek',${i})"`:''} class="px-4 py-3 flex items-start gap-3 ${tn?'bg-forest-light/40':''} ${editMode?'cursor-pointer active:bg-gray-50':''}">
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 mt-0.5 ${wash?'bg-forest text-white':'bg-gray-100 text-gray-500'}">${esc(x.a)}</span>
+      h += `<div ${editMode?`onclick="openRec('hairWeek',${i})"`:''} class="px-4 py-3 flex items-start gap-3 ${tn?'bg-brand-light/40':''} ${editMode?'cursor-pointer active:bg-gray-50':''}">
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 mt-0.5 ${wash?'bg-brand text-white':'bg-gray-100 text-gray-500'}">${esc(x.a)}</span>
         <div class="flex-1 min-w-0"><p class="text-sm font-semibold text-gray-800">${esc(x.d)}${tn?' · Today':''}</p>
           ${x.t?`<p class="text-xs text-gray-400 leading-snug mt-0.5">${esc(x.t)}</p>`:''}</div>${editMode?editPencil:''}</div>`;
     });
@@ -2006,7 +2077,7 @@
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
     C.hairStyle.forEach((x,i) => {
       h += `<div ${editMode?`onclick="openRec('hairStyle',${i})"`:''} class="px-4 py-3 flex gap-2 ${editMode?'cursor-pointer active:bg-gray-50':''}">
-        <div class="flex-1"><p class="text-xs font-bold text-forest">${esc(x.k)}</p><p class="text-xs text-gray-500 leading-snug mt-0.5">${esc(x.t)}</p></div>${editMode?editPencil:''}</div>`;
+        <div class="flex-1"><p class="text-xs font-bold text-brand">${esc(x.k)}</p><p class="text-xs text-gray-500 leading-snug mt-0.5">${esc(x.t)}</p></div>${editMode?editPencil:''}</div>`;
     });
     h += '</div>';
 
@@ -2114,7 +2185,7 @@
     h += '<div class="grid grid-cols-2 gap-3">';
     PH_KINDS.forEach(k => {
       const have = photoIx[photoKey(ds, k.k)];
-      h += `<div class="bg-white rounded-2xl shadow-sm border ${have?'border-forest':'border-gray-100'} overflow-hidden">
+      h += `<div class="bg-white rounded-2xl shadow-sm border ${have?'border-brand':'border-gray-100'} overflow-hidden">
         <div class="relative aspect-[3/4] bg-gray-100 flex items-center justify-center">
           ${have ? `<img data-ph="${photoKey(ds,k.k)}" class="absolute inset-0 w-full h-full object-cover ${blur?'ph-blur':''}" alt="">`
                  : `<span class="text-5xl opacity-25">${k.icon}</span>`}
@@ -2122,7 +2193,7 @@
           ${have ? `<button onclick="viewPhoto('${ds}','${k.k}')" class="absolute inset-0"></button>` : ''}
         </div>
         <label class="block px-3 py-2.5 text-center cursor-pointer active:bg-gray-50">
-          <span class="text-xs font-bold ${have?'text-forest':'text-gray-500'}">${k.icon} ${k.l}${have?' ✓':''}</span>
+          <span class="text-xs font-bold ${have?'text-brand':'text-gray-500'}">${k.icon} ${k.l}${have?' ✓':''}</span>
           <input type="file" accept="image/*" ${k.k === 'face' ? 'capture="user"' : ''} class="hidden" onchange="onPhotoPick(this,'${ds}','${k.k}')">
           <span class="block text-[10px] text-gray-400 mt-0.5">${have?'Tap to replace':'Tap to add'}</span></label></div>`;
     });
@@ -2150,9 +2221,9 @@
     h += secTitle('Settings');
     h += card(`<div class="divide-y divide-gray-100">
       <label class="flex items-center justify-between px-4 py-3"><span class="text-sm font-semibold text-gray-700">Blur photos by default</span>
-        <input type="checkbox" ${prefs.blurPhotos?'checked':''} onchange="setBlurPref(this.checked)" class="w-5 h-5 accent-[#006644]"></label>
+        <input type="checkbox" ${prefs.blurPhotos?'checked':''} onchange="setBlurPref(this.checked)" class="w-5 h-5 accent-[#0e7c7b]"></label>
       <label class="flex items-center justify-between px-4 py-3"><span class="text-sm font-semibold text-gray-700">Framing guide overlay</span>
-        <input type="checkbox" ${prefs.overlay?'checked':''} onchange="setOverlayPref(this.checked)" class="w-5 h-5 accent-[#006644]"></label>
+        <input type="checkbox" ${prefs.overlay?'checked':''} onchange="setOverlayPref(this.checked)" class="w-5 h-5 accent-[#0e7c7b]"></label>
       <div class="px-4 py-3"><p class="text-[11px] text-gray-400 leading-relaxed">Photos live in this browser’s database, not in the JSON backup — export the <b>ZIP</b> to take them with you. Using ~${Math.round(bytes/1024)} KB.</p></div>
     </div>`);
     $('#view-photos').innerHTML = h;
@@ -2216,7 +2287,7 @@
 
     h += secTitle('The rest');
     h += '<div class="space-y-3">';
-    [['weight','Body weight','#8a6020',' kg',true],['wpm','Typing speed','#006644',' wpm',false],['acc','Typing accuracy','#1d5fa0','%',false]].forEach(([k,l,c,u,inv]) => {
+    [['weight','Body weight','#8a6020',' kg',true],['wpm','Typing speed','#0e7c7b',' wpm',false],['acc','Typing accuracy','#1d5fa0','%',false]].forEach(([k,l,c,u,inv]) => {
       h += card(`<div class="p-4"><p class="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">${l}</p>${chartLine(rows.map(r=>({v:r[k]})), c, u, inv)}</div>`);
     });
     h += card(`<div class="p-4"><p class="text-xs font-bold uppercase tracking-wide text-gray-400 mb-2">Lifts — bench / OHP / pulldown / row</p>
@@ -2279,7 +2350,7 @@
       const on = !!rec[x.k];
       h += `<div class="flex items-start gap-3 px-4 py-3 ${on?'opacity-60':''}">
         <div onclick="${editMode?`openRec('sadDaily',${i})`:`tapSadhana('${esc(x.k)}')`}" class="flex items-start gap-3 flex-1 min-w-0 cursor-pointer active:opacity-70">
-          <div class="w-7 h-7 shrink-0 mt-0.5 rounded-full flex items-center justify-center border-2 ${on?'bg-forest border-forest':'border-gray-300'}">${on?tickSvg:''}</div>
+          <div class="w-7 h-7 shrink-0 mt-0.5 rounded-full flex items-center justify-center border-2 ${on?'bg-brand border-brand':'border-gray-300'}">${on?tickSvg:''}</div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold ${on?'line-through text-gray-400':'text-gray-800'}">${esc(x.name)}</p>
             <p class="text-[11px] font-bold text-amber2 mt-0.5">${esc(x.when)} · ${x.mins} min</p>
@@ -2370,15 +2441,15 @@
   const periodToggle = (which, cur) => {
     const fn = which === 'dates' ? 'setDatesPeriod' : 'setGoalsPeriod';
     return '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-1">' + [['week','Week'],['month','Month'],['year','Year']].map(([k,l]) =>
-      `<button onclick="${fn}('${k}')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${k===cur?'bg-forest text-white shadow':'text-gray-500 active:bg-gray-200'}">${l}</button>`).join('') + '</div>';
+      `<button onclick="${fn}('${k}')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${k===cur?'bg-brand text-white shadow':'text-gray-500 active:bg-gray-200'}">${l}</button>`).join('') + '</div>';
   };
   function setDatesPeriod(p) { datesPeriod = p; renderDates(); }
   function setGoalsPeriod(p) { goalsPeriod = p; renderGoals(); }
   function eventCard(e) {
     const n = dayDiff(e.date), isToday = n === 0, over = n < 0;
-    const chip = over ? 'bg-red-50 text-red-600' : isToday ? 'bg-forest text-white' : 'bg-forest-light text-forest';
+    const chip = over ? 'bg-red-50 text-red-600' : isToday ? 'bg-brand text-white' : 'bg-brand-light text-brand';
     const d = new Date(e.date + 'T00:00');
-    return `<div onclick="openEventModal('${e.id}')" class="bg-white rounded-2xl shadow-sm border ${isToday?'border-forest':'border-gray-100'} px-4 py-3 mb-2.5 flex items-center gap-3 cursor-pointer active:bg-gray-50">
+    return `<div onclick="openEventModal('${e.id}')" class="bg-white rounded-2xl shadow-sm border ${isToday?'border-brand':'border-gray-100'} px-4 py-3 mb-2.5 flex items-center gap-3 cursor-pointer active:bg-gray-50">
       <div class="shrink-0 w-12 text-center"><p class="text-[10px] font-bold uppercase text-gray-400 leading-none">${d.toLocaleDateString(undefined,{month:'short'})}</p>
         <p class="tabular text-xl font-bold text-gray-800 leading-tight">${d.getDate()}</p></div>
       <div class="flex-1 min-w-0"><p class="font-semibold text-[15px] text-gray-800 leading-snug">${esc(e.title)}</p>
@@ -2403,11 +2474,11 @@
     const list = goals[goalsPeriod] || [];
     const done = list.filter(x => x.done).length, pct = list.length ? Math.round(done/list.length*100) : 0;
     h += `<div class="flex items-center justify-between mt-4 mb-2 px-1"><p class="text-xs font-bold uppercase tracking-wider text-gray-400">${{week:'This Week',month:'This Month',year:'This Year'}[goalsPeriod]} · ${done}/${list.length}</p></div>`;
-    h += `<div class="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3"><div class="h-full bg-forest rounded-full transition-all duration-500" style="width:${pct}%"></div></div>`;
+    h += `<div class="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3"><div class="h-full bg-brand rounded-full transition-all duration-500" style="width:${pct}%"></div></div>`;
     if (!list.length) h += '<p class="text-center text-gray-400 text-sm py-10">No goals yet.</p>';
     else [...list].sort((a,b) => (a.done?1:0)-(b.done?1:0)).forEach(g => {
       h += `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-3.5 py-3 mb-2.5 flex items-center gap-3 ${g.done?'opacity-55':''}">
-        <button onclick="toggleGoal('${g.id}')" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center border-2 ${g.done?'bg-forest border-forest':'border-gray-300'}">${g.done?tickSvg:''}</button>
+        <button onclick="toggleGoal('${g.id}')" class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center border-2 ${g.done?'bg-brand border-brand':'border-gray-300'}">${g.done?tickSvg:''}</button>
         <div class="flex-1 min-w-0" onclick="openGoalModal('${g.id}')"><p class="text-[15px] font-semibold leading-snug ${g.done?'line-through text-gray-400':'text-gray-800'}">${esc(g.text)}</p>
           ${g.note?`<p class="text-xs text-gray-400 leading-snug mt-0.5">${esc(g.note)}</p>`:''}</div>
         <div onclick="openGoalModal('${g.id}')" class="shrink-0">${editPencil}</div></div>`;
@@ -2830,7 +2901,6 @@ Send the whole zip to Claude and ask for the analysis you want.
 
     document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => { activeTab = b.dataset.tab; renderList(); });
     document.querySelectorAll('.body-btn').forEach(b => b.onclick = () => { bodyTab = b.dataset.body; window.scrollTo(0,0); render(); });
-    document.querySelectorAll('.list-btn').forEach(b => b.onclick = () => { listTab = b.dataset.list; window.scrollTo(0,0); render(); });
     document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => setView(b.dataset.view));
 
     $('#editToggle').onclick = () => setEditMode(!editMode);
