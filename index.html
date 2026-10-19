@@ -142,10 +142,9 @@
     </div>
 
     <!-- Plan day tabs -->
-    <div id="dayTabs" class="max-w-md mx-auto px-3 pb-3">
+    <div id="dayTabs" class="hidden max-w-md mx-auto px-3 pb-3">
       <div class="grid grid-cols-2 gap-1 bg-white/10 rounded-xl p-1">
         <button data-tab="weekday" class="tab-btn rounded-lg py-2 text-[13px] font-semibold transition">Weekdays</button>
-        <button data-tab="weekend" class="tab-btn rounded-lg py-2 text-[13px] font-semibold transition">Weekend</button>
       </div>
     </div>
 
@@ -220,14 +219,9 @@
         <div id="fDateRow" class="hidden"><label class="flbl">Date</label><input id="fDate" type="date" class="fld" /></div>
         <div id="fOnlyRow" class="hidden"><label class="flbl">Shows on</label>
           <select id="fOnly" class="fld">
-            <option value="">Every weekday</option>
+            <option value="">Every day</option>
             <option value="gym">Training days only — Tue · Wed · Fri</option>
-            <option value="gosford">Gosford mornings — Tue · Fri</option>
-            <option value="wed">Wednesday only (office gym day)</option>
-            <option value="nowed">Every weekday except Wednesday</option>
-            <option value="rest">Both rest days — Mon · Thu</option>
-            <option value="mon">Monday only</option>
-            <option value="thu">Thursday only</option>
+            <option value="rest">Rest days only — Mon · Thu</option>
           </select></div>
         <div><label class="flbl">Name</label><input id="fLabel" type="text" placeholder="e.g. Meditation" class="fld" /></div>
         <div><label class="flbl">Notes</label><textarea id="fNotes" rows="2" placeholder="Optional details…" class="fld resize-none"></textarea></div>
@@ -330,52 +324,26 @@
   const SEED = {};
 
   /* ---------------- Schedules — from the Master Daily Routine ----------------
-     One weekday list, following the Gym & Diet Dashboard. The 5th field is "only":
-     '' = every weekday, 'gym' = training days (Tue/Wed/Fri, Gosford 18:15–19:30),
+     One list for every day of the week — no weekday/weekend split. The 5th field is
+     "only": '' = every day, 'gym' = training days (Tue/Wed/Fri, 18:15–19:30),
      'rest' = rest days (Mon/Thu). */
   SEED.schedules = {
     weekday: [
-      ["05:30", "Wake · black coffee", "500 ml water · Rules 2 & 3", "amber", ""],
-      ["05:45", "Meditation", "20 minutes · Rule 4", "teal", ""],
-      ["06:05", "Journal, longhand and slow", "This is the handwriting practice · Rule 4", "teal", ""],
+      ["05:30", "Wake · black coffee", "500 ml water", "amber", ""],
+      ["05:45", "Meditation", "20 minutes", "teal", ""],
+      ["06:05", "Journal, longhand and slow", "This is the handwriting practice", "teal", ""],
       ["06:30", "Go to washroom", "Hair: wash Mon · Thu · Sat — rinse other days", "purple", ""],
       ["06:50", "AM skincare", "Moisturiser → SPF 50. Vitamin C 2–3×/wk, optional", "purple", ""],
       ["07:00", "Breakfast", "", "amber", ""],
       ["08:15", "Work · deep block", "", "", ""],
-      ["09:00", "500 ml water at the desk", "Rule 3", "", ""],
-      ["12:30", "Lunch — kefir protein pot", "250 ml water · Rules 2 & 3", "amber", ""],
+      ["09:00", "500 ml water at the desk", "", "", ""],
+      ["12:30", "Lunch — kefir protein pot", "250 ml water", "amber", ""],
       ["16:30", "Kefir protein pot", "Pre-gym on Tue · Wed · Fri", "amber", ""],
       ["17:40", "Commute home", "", "", ""],
-      ["18:15", "TRAIN — see the Gym tab", "Gosford · 750 ml during · Rule 1", "teal", "gym"],
-      ["19:45", "Dinner — 6 eggs, onion, broccoli", "Soon after the gym · Rule 2", "amber", "gym"],
-      ["19:45", "PM skincare", "One active only — see Body › Skin", "purple", ""],
-      ["20:15", "Dinner — 6 eggs, onion, broccoli", "Rule 2", "amber", "rest"],
-      ["20:25", "Read 10 pages, physical book", "Rule 6", "", ""]
-    ],
-    weekend: [
-      ["06:30", "Wake · 500 ml water", "On waking, before coffee · Rule 3", "amber"],
-      ["06:35", "Meditation", "20 minutes · Rule 4", "teal"],
-      ["07:00", "Black coffee + 1 banana", "Pre-gym · Rule 2", "amber"],
-      ["07:05", "Journal, longhand and slow", "Rule 4", "teal"],
-      ["07:45", "Walk over to Gosford", "", ""],
-      ["08:00", "TRAIN — Sat Legs · Sun Push B", "08:00–09:15 · 750 ml during · Rule 1", "teal"],
-      ["09:15", "Shower + AM skincare", "Sat = hair wash. Sun = rinse", "purple"],
-      ["09:30", "Meal 1 — whey shake + 2 slices toast", "Butter, jam · straight after the gym · Rule 2", "amber"],
-      ["09:50", "PUJA", "Life rule", "amber"],
-      ["10:00", "SURYA JAL — arghya + Surya Gayatri", "Facing east · 2 min. Sunday: + Surya mantra ×108", "amber"],
-      ["10:05", "Aditya Hridayam", "~10 min", "amber"],
-      ["11:00", "500 ml water", "Late morning · Rule 3", ""],
-      ["13:30", "Kefir protein pot", "Meal 2 · 250 ml water · Rule 2", "amber"],
-      ["14:00", "SUNDAY ONLY — prep day", "Boil the eggs for the week · stock kefir, broccoli and onions", "amber"],
-      ["15:00", "500 ml water", "Afternoon · Rule 3", ""],
-      ["16:30", "Kefir protein pot", "Meal 3 · Rule 2", "amber"],
-      ["17:00", "SUNDAY ONLY — weekly benchmarks", "Waist · weight · WPM · lifts · handwriting · voice memo. Bench tab.", "amber"],
-      ["19:45", "PM skincare", "Sat = Azelaic · Sun = Recovery", "purple"],
-      ["19:50", "Hanuman Chalisa", "~8 min", "amber"],
-      ["20:00", "Dinner — 6 eggs, onion, broccoli", "250 ml water · Rule 2", "amber"],
-      ["20:25", "Read 10 pages, physical book", "Rule 6", ""],
-      ["20:45", "Progress photo · tick all 10 boxes · screens off", "Rule 8", ""],
-      ["21:00", "LIGHTS OUT — hard stop", "9.5 hours", "teal"]
+      ["18:15", "TRAIN — see the Gym tab", "750 ml during", "teal", "gym"],
+      ["19:45", "Dinner — 6 eggs, onion, broccoli", "After the gym on Tue · Wed · Fri", "amber", ""],
+      ["20:25", "Read 10 pages, physical book", "", "", ""],
+      ["20:30", "PM skincare", "One active only — see Body › Skin", "purple", ""]
     ],
     todo: [
       ['','Call GP or pharmacist about minoxidil','This month, not December — every month of waiting is ground you don’t get back'],
@@ -698,7 +666,7 @@
     const mk = (rows) => rows.map(([time,label,notes,band,only]) => ({ id: uid(), time, label, notes, band: band || '', only: only || '', done:false }));
     return {
       v: CONTENT_V,
-      schedules: { weekday: mk(SEED.schedules.weekday), weekend: mk(SEED.schedules.weekend), todo: mk(SEED.schedules.todo) },
+      schedules: { weekday: mk(SEED.schedules.weekday), todo: mk(SEED.schedules.todo) },
       hardTasks: clone(SEED.hardTasks), phases: clone(SEED.phases), trainPhases: clone(SEED.trainPhases),
       comms: clone(SEED.comms), splitMap: clone(SEED.splitMap), gym: clone(SEED.gym), gymNotes: clone(SEED.gymNotes),
       rebuild: clone(SEED.rebuild), diet: clone(SEED.diet),
@@ -765,7 +733,7 @@
     lsSet('habitTracker.content.predash.archived', JSON.stringify(C));
     const d = seedContent();
     C.schedules.weekday = d.schedules.weekday;
-    C.schedules.weekend = d.schedules.weekend;
+    if (C.schedules.weekend) { lsSet('habitTracker.weekend.archived', JSON.stringify(C.schedules.weekend)); delete C.schedules.weekend; }
     C.gym = d.gym; C.splitMap = d.splitMap; C.gymNotes = d.gymNotes;
     C.diet = d.diet;
     C.patches.dash2026 = 1;
@@ -827,12 +795,12 @@
     }
   }
 
-  function scheduleKeyFor(d) { const w = d.getDay(); return (w === 0 || w === 6) ? 'weekend' : 'weekday'; }
+  function scheduleKeyFor(d) { return 'weekday'; }   // one list for every day
   const isRestDay = (d) => [1,4].includes((d || new Date()).getDay());   // Monday & Thursday
   /* Which weekday tags apply on a given date: Mon & Thu rest, Tue/Wed/Fri train. */
   function tagsFor(when) {
     const w = (when || new Date()).getDay();
-    return (w === 1 || w === 4) ? ['rest'] : ['gym'];
+    return (w === 1 || w === 4) ? ['rest'] : (w === 0 || w === 6) ? [] : ['gym'];
   }
   /* Day type, as the Gym & Diet Dashboard uses it. */
   function dayType(ds) {
@@ -1154,7 +1122,7 @@
     });
     const isList = isListView();
     $('#summaryBlock').classList.toggle('hidden', !isList);
-    $('#dayTabs').classList.toggle('hidden', view !== 'plan');
+    $('#dayTabs').classList.add('hidden');   // single list — no day tabs
     $('#bodyTabs').classList.toggle('hidden', view !== 'body');
     $('#editToggle').classList.toggle('hidden', view === 'photos');
     $('#view-list').classList.toggle('hidden', !isList);
@@ -1196,19 +1164,16 @@
     $('#resetBtn').classList.toggle('hidden', editMode);
     $('#resetLabel').textContent = isTodo ? 'Clear Done' : 'Reset Day';
     const key = activeListKey();
-    const titles = { weekday: isRestDay() ? 'Rest day — Mon & Thu' : (new Date().getDay() === 3 ? 'Wednesday — office gym after work' : 'Tue · Fri — Gosford training'), weekend:'Saturday · Sunday', todo:'To-Do' };
+    const wd = new Date().getDay();
+    const titles = { weekday: isRestDay() ? 'Today — rest day' : (wd === 0 || wd === 6) ? 'Today' : 'Today — training day', todo:'To-Do' };
     $('#listTitle').textContent = titles[key];
     $('#dayNote').classList.toggle('hidden', !(view === 'plan' && key === 'weekday'));
     if (view === 'plan' && key === 'weekday') {
       $('#dayNote').innerHTML = editMode
-        ? '✎ Editing shows every weekday row, including those tagged <b>GYM</b>, <b>TUE·FRI AM</b>, <b>WED</b>, <b>NOT WED</b>, <b>REST</b>, <b>MON</b> and <b>THU</b>. Use “Shows on” in the editor to move a row between them.'
-        : (isRestDay()
-            ? (new Date().getDay() === 1
-                ? '🚶 Monday rest day — the 5:45 block is the 45-minute outdoor walk, and it ticks Rule 1.'
-                : '🕉 Thursday — the 5:45 block is the Vishnu Sahasranama. No walk, so nothing here ticks Rule 1.')
-            : (new Date().getDay() === 3
-                ? '🏢 Wednesday — no Gosford this morning. Push B is at the office gym, 17:00–17:45; pack the kit.'
-                : '🏋 Gosford training day. Mondays and Thursdays swap the 5:45 block automatically; Wednesday trains at the office after work.'));
+        ? '✎ Editing shows every row, including those tagged <b>TUE·WED·FRI</b> (training days) and <b>MON·THU</b> (rest days). Use “Shows on” in the editor to change a row.'
+        : (isRestDay() ? '🛌 Rest day — no gym today.'
+            : (wd === 0 || wd === 6) ? 'Weekend — see the Gym tab for today’s session.'
+            : '🏋 Training day — gym 18:15–19:30. See the Gym tab.');
     }
 
     const list = visibleRows(currentList(), key);
@@ -2567,7 +2532,7 @@
     S.push({ name:'Photos', rows:ph });
 
     const sc = [['Schedule','ShowsOn','Time','Item','Notes','Band','DoneToday']];
-    const showsOn = { gym:'Tue/Wed/Fri only', rest:'Mon/Thu rest days', mon:'Monday only', thu:'Thursday only' };
+    const showsOn = { gym:'Tue/Wed/Fri only', rest:'Mon/Thu rest days' };
     Object.keys(C.schedules).forEach(k => (C.schedules[k]||[]).forEach(t => sc.push([k, showsOn[t.only]||'All', t.time||'', t.label, t.notes||'', t.band||'', t.done?1:0])));
     S.push({ name:'Schedules', rows:sc });
 
@@ -2662,7 +2627,7 @@
         'GymSets':'every set logged: weight x reps, with volume',
         'Water':'the timed water schedule, day by day',
         'Photos':'index of which photos exist (the images are in photos/)',
-        'Schedules':'the weekday and weekend routines and the to-do list, with which days each row shows on',
+        'Schedules':'the daily routine and the to-do list, with which days each row shows on',
         'GymPlan':'the training sessions as programmed',
         'Diet':'daily and Tuesday templates, prep map, supplements',
         'Comms':'the 75-day communication sequence',
