@@ -330,71 +330,52 @@
   const SEED = {};
 
   /* ---------------- Schedules — from the Master Daily Routine ----------------
-     One weekday list. The 5th field is "only": '' = every weekday,
-     'gym' = Tue/Wed/Fri, 'gosford' = Tue/Fri mornings, 'wed' = Wednesday only
-     (Push B at the office gym after work), 'nowed' = every weekday but Wednesday. The Plan tab swaps
-     the morning block automatically, so there is no separate Wednesday tab. */
+     One weekday list, following the Gym & Diet Dashboard. The 5th field is "only":
+     '' = every weekday, 'gym' = training days (Tue/Wed/Fri, Gosford 18:15–19:30),
+     'rest' = rest days (Mon/Thu). */
   SEED.schedules = {
     weekday: [
-      ['04:30','Wake · bullet coffee + 1 tbsp ghee','500 ml water · Rules 2 & 3','amber',''],
-      ['05:00','Meditation','20 minutes · Rule 4','teal',''],
-      ['05:20','Journal, longhand and slow','This is the handwriting practice · Rule 4','teal',''],
-      ['05:40','Pack bag · gym kit · SPF in the bag','Wednesday: kit goes to the office','','gym'],
-      ['05:40','Shoes on · layers','No gym kit today — walking','','mon'],
-      ['05:45','Walk to Gosford (8 min)','250 ml water · Rule 3','teal','gosford'],
-      ['05:45','45-MINUTE OUTDOOR WALK','Monday rest day. Ticks Rule 1 — the streak holds.','teal','mon'],
-      ['05:45','VISHNU SAHASRANAMA · Guru mantra ×108','Thursday · 30 min. This replaced the walk — see the Rule 1 warning on the 75 tab.','amber','thu'],
-      ['06:00','TRAIN — see the Gym tab','600 ml during · Rule 1','teal','gosford'],
-      ['06:30','Home','','','mon'],
-      ['06:45','Walk home','','','gosford'],
-      ['06:53','Shower','Hair: wash Mon · Thu · Sat — rinse other days','purple','gym'],
-      ['06:53','Shower','Rinse only on a rest day — no shampoo','purple','rest'],
-      ['07:02','AM skincare','Moisturiser → SPF 50. Vitamin C 2–3×/wk, optional','purple',''],
-      ['07:05','Meal — shake + banana + eggs + toast','Supplements. 400 ml water. Tue: no egg · Rules 2 & 3','amber',''],
-      ['07:25','PUJA','Life rule','amber',''],
-      ['07:35','SURYA JAL — arghya + Surya Gayatri','Facing east · 2 min · life rule. Sun +108 · Mon +108 through Nov','amber',''],
-      ['07:42','Bus to Oxford — Aditya Hridayam','~10 min, read on the bus','',''],
-      ['08:15','Work · deep blocks · Coursera · APM','Keyboard covered, never look · Rule 5','',''],
-      ['10:00','500 ml water · Greek yogurt at 10:30','Rules 2 & 3','',''],
-      ['12:45','Lunch + 500 ml','Per the prep map · Rules 2 & 3','',''],
-      ['15:00','600 ml · peanuts + green tea at 15:30','Last caffeine of the day','',''],
-      ['16:30','450 ml — last full glass','Sips only after 18:00 · Rule 3','',''],
-      ['17:00','TRAIN Push B — office gym','600 ml during · Rule 1 · shower there','teal','wed'],
-      ['17:40','Commute home','','','nowed'],
-      ['17:50','Commute home','After the office session','','wed'],
-      ['18:30','Family / personal','','',''],
-      ['19:00','Dinner','Rule 2','amber',''],
-      ['19:45','Sattu + PM skincare','One active only — see Body › Skin','purple',''],
-      ['19:50','Hanuman Chalisa','~8 min','amber',''],
-      ['20:00','Communication lesson + apply it','Code on the 75 tab · Rule 7','',''],
-      ['20:25','Read 10 pages, physical book','Rule 6','',''],
-      ['20:45','Progress photo · tick all 10 boxes · screens off','Rule 8','',''],
-      ['21:00','LIGHTS OUT — hard stop','7.5 hours','teal','']
+      ["05:30", "Wake · black coffee", "500 ml water · Rules 2 & 3", "amber", ""],
+      ["05:45", "Meditation", "20 minutes · Rule 4", "teal", ""],
+      ["06:05", "Journal, longhand and slow", "This is the handwriting practice · Rule 4", "teal", ""],
+      ["06:30", "Go to washroom", "Hair: wash Mon · Thu · Sat — rinse other days", "purple", ""],
+      ["06:50", "AM skincare", "Moisturiser → SPF 50. Vitamin C 2–3×/wk, optional", "purple", ""],
+      ["07:00", "Breakfast", "", "amber", ""],
+      ["08:15", "Work · deep block", "", "", ""],
+      ["09:00", "500 ml water at the desk", "Rule 3", "", ""],
+      ["12:30", "Lunch — kefir protein pot", "250 ml water · Rules 2 & 3", "amber", ""],
+      ["16:30", "Kefir protein pot", "Pre-gym on Tue · Wed · Fri", "amber", ""],
+      ["17:40", "Commute home", "", "", ""],
+      ["18:15", "TRAIN — see the Gym tab", "Gosford · 750 ml during · Rule 1", "teal", "gym"],
+      ["19:45", "Dinner — 6 eggs, onion, broccoli", "Soon after the gym · Rule 2", "amber", "gym"],
+      ["19:45", "PM skincare", "One active only — see Body › Skin", "purple", ""],
+      ["20:15", "Dinner — 6 eggs, onion, broccoli", "Rule 2", "amber", "rest"],
+      ["20:25", "Read 10 pages, physical book", "Rule 6", "", ""]
     ],
     weekend: [
-      ['05:30','Wake · bullet coffee + ghee','500 ml water · Rules 2 & 3','amber'],
-      ['06:00','Meditation','20 minutes · Rule 4','teal'],
-      ['06:20','Journal, longhand and slow','Rule 4','teal'],
-      ['06:45','Walk over to Gosford','No bus to catch today','teal'],
-      ['07:00','TRAIN — Sat Legs · Sun Push A','Centre opens at 7:00 · Rule 1','teal'],
-      ['07:55','Shower + AM skincare','Sat = hair wash. Sun = rinse','purple'],
-      ['08:05','Meal — shake + banana + eggs + toast','Supplements · Rules 2 & 3','amber'],
-      ['08:25','PUJA','Life rule','amber'],
-      ['08:35','SURYA JAL — arghya + Surya Gayatri','Facing east · 2 min. Sunday: + Surya mantra ×108','amber'],
-      ['08:40','Aditya Hridayam','~10 min','amber'],
-      ['10:30','Greek yogurt · 500 ml water','Rules 2 & 3',''],
-      ['12:45','Lunch + 500 ml','Prerna cooks Saturday · Rules 2 & 3',''],
-      ['14:00','SUNDAY ONLY — prep day','Chicken curry · boil a tray of eggs · portion the peanuts','amber'],
-      ['15:30','Peanuts + green tea · 600 ml','Last caffeine of the day',''],
-      ['16:30','450 ml — last full glass','Sips only after 18:00 · Rule 3',''],
-      ['17:00','SUNDAY ONLY — weekly benchmarks','Waist · weight · WPM · lifts · handwriting · voice memo. Bench tab.','amber'],
-      ['19:00','Dinner','Rule 2','amber'],
-      ['19:45','Sattu + PM skincare','Sat = Azelaic · Sun = Recovery','purple'],
-      ['19:50','Hanuman Chalisa','~8 min','amber'],
-      ['20:00','Communication lesson + apply it','Rule 7',''],
-      ['20:25','Read 10 pages, physical book','Rule 6',''],
-      ['20:45','Progress photo · tick all 10 boxes · screens off','Rule 8',''],
-      ['21:00','LIGHTS OUT — hard stop','7.5 hours','teal']
+      ["06:30", "Wake · 500 ml water", "On waking, before coffee · Rule 3", "amber"],
+      ["06:35", "Meditation", "20 minutes · Rule 4", "teal"],
+      ["07:00", "Black coffee + 1 banana", "Pre-gym · Rule 2", "amber"],
+      ["07:05", "Journal, longhand and slow", "Rule 4", "teal"],
+      ["07:45", "Walk over to Gosford", "", ""],
+      ["08:00", "TRAIN — Sat Legs · Sun Push B", "08:00–09:15 · 750 ml during · Rule 1", "teal"],
+      ["09:15", "Shower + AM skincare", "Sat = hair wash. Sun = rinse", "purple"],
+      ["09:30", "Meal 1 — whey shake + 2 slices toast", "Butter, jam · straight after the gym · Rule 2", "amber"],
+      ["09:50", "PUJA", "Life rule", "amber"],
+      ["10:00", "SURYA JAL — arghya + Surya Gayatri", "Facing east · 2 min. Sunday: + Surya mantra ×108", "amber"],
+      ["10:05", "Aditya Hridayam", "~10 min", "amber"],
+      ["11:00", "500 ml water", "Late morning · Rule 3", ""],
+      ["13:30", "Kefir protein pot", "Meal 2 · 250 ml water · Rule 2", "amber"],
+      ["14:00", "SUNDAY ONLY — prep day", "Boil the eggs for the week · stock kefir, broccoli and onions", "amber"],
+      ["15:00", "500 ml water", "Afternoon · Rule 3", ""],
+      ["16:30", "Kefir protein pot", "Meal 3 · Rule 2", "amber"],
+      ["17:00", "SUNDAY ONLY — weekly benchmarks", "Waist · weight · WPM · lifts · handwriting · voice memo. Bench tab.", "amber"],
+      ["19:45", "PM skincare", "Sat = Azelaic · Sun = Recovery", "purple"],
+      ["19:50", "Hanuman Chalisa", "~8 min", "amber"],
+      ["20:00", "Dinner — 6 eggs, onion, broccoli", "250 ml water · Rule 2", "amber"],
+      ["20:25", "Read 10 pages, physical book", "Rule 6", ""],
+      ["20:45", "Progress photo · tick all 10 boxes · screens off", "Rule 8", ""],
+      ["21:00", "LIGHTS OUT — hard stop", "9.5 hours", "teal"]
     ],
     todo: [
       ['','Call GP or pharmacist about minoxidil','This month, not December — every month of waiting is ground you don’t get back'],
@@ -507,131 +488,26 @@
   SEED.commsCasualty = 'One casualty, named honestly: the original “Present” block (a real presentation) no longer fits inside 75 days once the vocal work shifts back. Treat it as the capstone after Day 75 rather than pretending it squeezes in.';
 
   /* ---------------- Training split by weekday --------------- */
-  SEED.splitMap = { 1:'restMon', 2:'pullA', 3:'pushB', 4:'restThu', 5:'pullB', 6:'legs', 0:'pushA' };
+  SEED.splitMap = { 1:'restMon', 2:'pullA', 3:'pushA', 4:'restThu', 5:'pullB', 6:'legs', 0:'pushB' };
 
   /* ---------------- Five sessions, two rest days ---------------
      sets = number of log rows. setsL = what the programme says ("3–4").  */
   const EX = (n, sets, setsL, reps, pri, sec, vid, vidT) =>
     ({ n, sets, setsL: setsL || String(sets), reps, rest:'', why:'', pri, sec, vid: vid || '', vidT: vidT || '' });
 
-  SEED.gym = [
-    {key:'restMon', label:'Rest', day:'Monday', lead:'Rest day', time:'5:45–6:30', mins:'45 min walk',
-     note:'No gym. A 45-minute outdoor walk in the morning — it ticks Rule 1, so the streak holds, and it carries the day’s steps.',
-     exs:[]},
-
-    {key:'restThu', label:'Sadhana', day:'Thursday', lead:'No training', time:'5:45–6:15', mins:'30 min',
-     note:'The walk was replaced by the Vishnu Sahasranama and the Guru mantra. Nothing in the plan satisfies Rule 1 on a Thursday — the 75 tab says so plainly.',
-     exs:[]},
-
-    {key:'pullA', label:'Pull A', day:'Tuesday', lead:'Heavy', time:'6:00–6:45', mins:'',
-     note:'',
-     exs:[
-      EX('Pull-up',3,'3','6–10',['lats'],['biceps','rhomboids','forearms'],'eGo4IYlbE5g','The Perfect Pull Up — Calisthenicmovement'),
-      EX('Barbell row',4,'3–4','8–12',['lats','rhomboids'],['biceps','lowerBack','rearDelts'],'kBWAon7ItDw','How To PROPERLY Barbell Row — Jeremy Ethier'),
-      EX('45° back extension',3,'3','10–15',['lowerBack','glutes'],['hamstrings'],'ph3pddpKzzw','How to Do Back Extensions — LIVESTRONG'),
-      EX('Shrug',3,'3','12–15',['traps'],['forearms'],'cJRVVxmytaM','How To: Dumbbell Shrugs — ScottHermanFitness'),
-      EX('Face pull',3,'3','12–15',['rearDelts'],['traps','rhomboids'],'rep-qVOkqgk','How To: Face Pull — ScottHermanFitness'),
-      EX('Barbell curl',3,'3','8–12',['biceps'],['forearms'],'kwG2ipFRgfo','How to Do a Barbell Curl — Howcast'),
-      EX('Seated leg curl',3,'3','10–15',['hamstrings'],['calves'],'',''),
-      EX('Standing calf raise',2,'2','12–15',['calves'],[],'-M4-G8p8fmc','How to Do a Calf Raise — Howcast')]},
-
-    {key:'pushB', label:'Push B', day:'Wednesday', lead:'Shoulder lead, + squat · office gym', time:'17:00–17:45', mins:'',
-     note:'Office gym, straight after work. Pack the kit in the morning and shower there before the commute home.',
-     exs:[
-      EX('Back squat',4,'4','6–10',['quads','glutes'],['hamstrings','lowerBack','abs'],'bEv6CCg2BC8','How To Get A Huge Squat With Perfect Technique — Jeff Nippard'),
-      EX('Overhead press',4,'3–4','6–10',['delts'],['triceps','traps','abs'],'2yjwXTZQDDI','How To: Standing Straight-Bar Overhead Press — ScottHermanFitness'),
-      EX('Incline barbell press',3,'3','8–12',['chest'],['delts','triceps'],'SrqOu55lrYU','How To: Incline Barbell Bench Press — ScottHermanFitness'),
-      EX('Lateral raise',4,'4','12–15',['delts'],['traps'],'3VcKaXpzqRo','How To: Dumbbell Side Lateral Raise — ScottHermanFitness'),
-      EX('Overhead triceps extension',3,'3','10–15',['triceps'],['delts'],'_gsUck-7M74','How to Do a Dumbbell Tricep Extension — Howcast'),
-      EX('Standing calf raise',2,'2','12–15',['calves'],[],'-M4-G8p8fmc','How to Do a Calf Raise — Howcast'),
-      EX('Tibialis raise',2,'2','15–20',['tibialis'],[],'',''),
-      EX('Neck flexion + extension',2,'2','15–20 each',['neck'],[],'','')]},
-
-    {key:'pullB', label:'Pull B', day:'Friday', lead:'Supported', time:'6:00–6:45', mins:'',
-     note:'',
-     exs:[
-      EX('Chin-up',3,'3','6–10',['lats','biceps'],['rhomboids','forearms'],'brhRXlOhsAM','How to Perform Chin-Ups — Buff Dudes'),
-      EX('Chest-supported dumbbell row',3,'3','8–12',['rhomboids','lats'],['biceps','rearDelts'],'',''),
-      EX('Rear delt flye',3,'3','12–15',['rearDelts'],['traps','rhomboids'],'ttvfGg9d76c','How To: Dumbbell Bent-Over Raise — ScottHermanFitness'),
-      EX('Shrug',3,'3','12–15',['traps'],['forearms'],'cJRVVxmytaM','How To: Dumbbell Shrugs — ScottHermanFitness'),
-      EX('Hammer curl',3,'3','10–12',['biceps','forearms'],[],'zC3nLlEvin4','How To: Dumbbell Hammer Curl — ScottHermanFitness'),
-      EX('Lateral raise',2,'2','12–15',['delts'],['traps'],'3VcKaXpzqRo','How To: Dumbbell Side Lateral Raise — ScottHermanFitness'),
-      EX('Suitcase carry',3,'3','30–40 m per side',['obliques','forearms'],['traps','abs'],'','')]},
-
-    {key:'legs', label:'Legs', day:'Saturday', lead:'', time:'7:00–7:45', mins:'',
-     note:'Weekends start at 7:00 — the centre does not open earlier. No bus to catch, so the whole morning shifts back an hour.',
-     exs:[
-      EX('Back squat',5,'5','6–10',['quads','glutes'],['hamstrings','lowerBack','abs'],'bEv6CCg2BC8','How To Get A Huge Squat With Perfect Technique — Jeff Nippard'),
-      EX('Romanian deadlift',3,'3','8–12',['hamstrings','glutes'],['lowerBack','forearms'],'JCXUYuzwNrM','How To: Romanian Deadlift (Barbell) — ScottHermanFitness'),
-      EX('Hip thrust',3,'3','8–12',['glutes'],['hamstrings'],'SEdqd1n0cvg','How To: Hip Thrust — ScottHermanFitness'),
-      EX('Seated leg curl',3,'3','10–15',['hamstrings'],['calves'],'',''),
-      EX('Standing calf raise',4,'3–4','10–15',['calves'],[],'-M4-G8p8fmc','How to Do a Calf Raise — Howcast'),
-      EX('Tibialis raise',2,'2','15–20',['tibialis'],[],'',''),
-      EX('Hanging leg raise',3,'3','10–15',['abs'],['obliques'],'Pr1ieGZ5atk','Hanging Leg Raise | HOW-TO — ATHLEAN-X')]},
-
-    {key:'pushA', label:'Push A', day:'Sunday', lead:'Chest lead', time:'7:00–7:45', mins:'',
-     note:'Weekends start at 7:00.',
-     exs:[
-      EX('Barbell bench press',4,'3–4','6–10',['chest'],['delts','triceps'],'rT7DgCr-3pg','How To: Barbell Bench Press — ScottHermanFitness'),
-      EX('Incline dumbbell press',3,'3','8–12',['chest'],['delts','triceps'],'8iPEnn-ltC8','How To: Dumbbell Incline Chest Press — ScottHermanFitness'),
-      EX('Lateral raise',4,'4','12–15',['delts'],['traps'],'3VcKaXpzqRo','How To: Dumbbell Side Lateral Raise — ScottHermanFitness'),
-      EX('Triceps pushdown',3,'3','10–15',['triceps'],['forearms'],'2-LAMcpzODU','How To: Tricep Pushdown — ScottHermanFitness'),
-      EX('Pallof press',3,'3','',['abs','obliques'],[],'AH_QZLm_0-s','Standing Band Resisted Pallof Press — Breathing to Heal'),
-      EX('Neck flexion + extension',2,'2','15–20 each',['neck'],[],'','')]}
-  ];
+  /* From the Gym & Diet Dashboard — the guiding plan from 19 Oct 2026. */
+  SEED.gym = [{"key": "restMon", "label": "Rest", "day": "Monday", "lead": "Rest day", "time": "", "mins": "No gym", "note": "Rest day — no gym. Recovery is part of the programme.", "exs": []}, {"key": "pullA", "label": "Pull A", "day": "Tuesday", "lead": "Lats, upper back, RDL", "time": "18:15–19:30", "mins": "", "note": "Gosford. Warm-up, stretching and cool-down sit inside the session window.", "exs": [{"n": "Lat pulldown, wide grip", "sets": 4, "setsL": "4", "reps": "8–12", "rest": "", "why": "Drive elbows down to your back pockets; bar to upper chest, lean back slightly. · Backbone lift", "pri": ["lats"], "sec": ["biceps", "rhomboids", "rearDelts", "forearms"], "vid": "", "vidT": ""}, {"n": "Seated cable row", "sets": 3, "setsL": "3", "reps": "8–12", "rest": "", "why": "Chest tall, pull the handle to your navel and squeeze the shoulder blades. · Backbone lift; elbows tucked", "pri": ["lats", "rhomboids"], "sec": ["rearDelts", "biceps", "traps", "forearms"], "vid": "", "vidT": ""}, {"n": "Romanian deadlift", "sets": 3, "setsL": "3", "reps": "8–10", "rest": "", "why": "Soft knees, push hips back, bar close to the legs; stop when hamstrings are stretched. · Weekly RDL", "pri": ["hamstrings", "glutes"], "sec": ["lowerBack", "forearms"], "vid": "JCXUYuzwNrM", "vidT": "How To: Romanian Deadlift (Barbell) — ScottHermanFitness"}, {"n": "Chest-supported DB row", "sets": 3, "setsL": "3", "reps": "10–12", "rest": "", "why": "Chest stays on the pad; row elbows back towards the hips.", "pri": ["rhomboids", "lats"], "sec": ["rearDelts", "biceps", "traps"], "vid": "", "vidT": ""}, {"n": "Barbell curl", "sets": 3, "setsL": "3", "reps": "8–12", "rest": "", "why": "Elbows pinned to your sides; no swinging.", "pri": ["biceps"], "sec": ["forearms"], "vid": "kwG2ipFRgfo", "vidT": "How to Do a Barbell Curl — Howcast"}, {"n": "Barbell shrug", "sets": 3, "setsL": "3", "reps": "10–12", "rest": "", "why": "Lift shoulders straight up to the ears, pause, lower slowly. No rolling.", "pri": ["traps"], "sec": ["forearms"], "vid": "", "vidT": ""}, {"n": "Face pull", "sets": 2, "setsL": "2", "reps": "12–15", "rest": "", "why": "Rope to the eyes, elbows high, pull the rope apart.", "pri": ["rearDelts"], "sec": ["rhomboids", "traps", "delts"], "vid": "rep-qVOkqgk", "vidT": "How To: Face Pull — ScottHermanFitness"}]}, {"key": "pushA", "label": "Push A", "day": "Wednesday", "lead": "Chest, squat, shoulders", "time": "18:15–19:30", "mins": "", "note": "Gosford. Warm-up, stretching and cool-down sit inside the session window.", "exs": [{"n": "Bench press", "sets": 4, "setsL": "4", "reps": "8–12", "rest": "", "why": "Shoulder blades pinned, bar to lower chest, feet planted.", "pri": ["chest"], "sec": ["delts", "triceps"], "vid": "rT7DgCr-3pg", "vidT": "How To: Barbell Bench Press — ScottHermanFitness"}, {"n": "Back squat", "sets": 3, "setsL": "3", "reps": "8–10", "rest": "", "why": "Brace, sit between the heels, knees track over toes, chest up. · Weekly push-day squat", "pri": ["quads", "glutes"], "sec": ["lowerBack", "abs"], "vid": "bEv6CCg2BC8", "vidT": "How To Get A Huge Squat With Perfect Technique — Jeff Nippard"}, {"n": "Overhead press", "sets": 3, "setsL": "3", "reps": "8–10", "rest": "", "why": "Squeeze glutes, press in a straight line, head through at the top.", "pri": ["delts"], "sec": ["triceps", "traps", "abs"], "vid": "2yjwXTZQDDI", "vidT": "How To: Standing Straight-Bar Overhead Press — ScottHermanFitness"}, {"n": "Lateral raise", "sets": 4, "setsL": "4", "reps": "12–15", "rest": "", "why": "Lead with the elbows to shoulder height; slight bend, no shrug.", "pri": ["delts"], "sec": ["traps"], "vid": "3VcKaXpzqRo", "vidT": "How To: Dumbbell Side Lateral Raise — ScottHermanFitness"}, {"n": "Triceps pushdown", "sets": 3, "setsL": "3", "reps": "10–12", "rest": "", "why": "Elbows locked at your sides; only the forearms move.", "pri": ["triceps"], "sec": ["forearms"], "vid": "2-LAMcpzODU", "vidT": "How To: Tricep Pushdown — ScottHermanFitness"}, {"n": "Pallof press", "sets": 2, "setsL": "2", "reps": "10 / side", "rest": "", "why": "Stand side-on to the cable, press out and hold; don't let it twist you. · Anti-rotation", "pri": ["obliques", "abs"], "sec": ["glutes"], "vid": "AH_QZLm_0-s", "vidT": "Standing Band Resisted Pallof Press — Breathing to Heal"}]}, {"key": "restThu", "label": "Rest Thu", "day": "Thursday", "lead": "Rest day", "time": "", "mins": "No gym", "note": "Rest day — no gym. Recovery is part of the programme.", "exs": []}, {"key": "pullB", "label": "Pull B", "day": "Friday", "lead": "Lats, hinge, arms", "time": "18:15–19:30", "mins": "", "note": "Gosford. Warm-up, stretching and cool-down sit inside the session window.", "exs": [{"n": "Pull-up (assisted if needed)", "sets": 3, "setsL": "3", "reps": "6–10", "rest": "", "why": "Start from a dead hang, drive elbows down, chin over the bar.", "pri": ["lats"], "sec": ["biceps", "rhomboids", "forearms", "abs"], "vid": "eGo4IYlbE5g", "vidT": "The Perfect Pull Up — Calisthenicmovement"}, {"n": "Seated cable row, close grip", "sets": 3, "setsL": "3", "reps": "10–12", "rest": "", "why": "Neutral grip, elbows close; pull to the belly button. · Backbone lift", "pri": ["lats", "rhomboids"], "sec": ["rearDelts", "biceps", "traps", "forearms"], "vid": "", "vidT": ""}, {"n": "45° back extension", "sets": 3, "setsL": "3", "reps": "10–12", "rest": "", "why": "Hinge at the hips, rise to a straight line, don't over-arch. · Second hinge exposure", "pri": ["lowerBack", "glutes"], "sec": ["hamstrings"], "vid": "ph3pddpKzzw", "vidT": "How to Do Back Extensions — LIVESTRONG"}, {"n": "Lying leg curl", "sets": 2, "setsL": "2", "reps": "10–12", "rest": "", "why": "Hips pressed into the pad; curl heels to glutes.", "pri": ["hamstrings"], "sec": ["calves"], "vid": "", "vidT": ""}, {"n": "Hammer curl", "sets": 3, "setsL": "3", "reps": "10–12", "rest": "", "why": "Thumbs up, elbows still, lower over three seconds.", "pri": ["biceps", "forearms"], "sec": [], "vid": "zC3nLlEvin4", "vidT": "How To: Dumbbell Hammer Curl — ScottHermanFitness"}, {"n": "DB shrug", "sets": 3, "setsL": "3", "reps": "10–12", "rest": "", "why": "Dumbbells at your sides, shoulders straight up, hold one second.", "pri": ["traps"], "sec": ["forearms"], "vid": "cJRVVxmytaM", "vidT": "How To: Dumbbell Shrugs — ScottHermanFitness"}, {"n": "Cable Y-raise", "sets": 2, "setsL": "2", "reps": "12–15", "rest": "", "why": "Raise arms up and out into a Y, thumbs up, light weight.", "pri": ["delts", "traps"], "sec": ["rearDelts"], "vid": "", "vidT": ""}]}, {"key": "legs", "label": "Legs", "day": "Saturday", "lead": "Quads, hamstrings, glutes", "time": "08:00–09:15", "mins": "", "note": "Gosford. Warm-up, stretching and cool-down sit inside the session window.", "exs": [{"n": "Leg press", "sets": 4, "setsL": "4", "reps": "8–12", "rest": "", "why": "Feet mid-plate, lower until knees near 90°, don't lock out hard.", "pri": ["quads", "glutes"], "sec": ["hamstrings"], "vid": "", "vidT": ""}, {"n": "Hip thrust", "sets": 3, "setsL": "3", "reps": "8–12", "rest": "", "why": "Upper back on the bench, chin tucked, drive hips up and squeeze.", "pri": ["glutes"], "sec": ["hamstrings"], "vid": "SEdqd1n0cvg", "vidT": "How To: Hip Thrust — ScottHermanFitness"}, {"n": "Seated leg curl", "sets": 4, "setsL": "4", "reps": "10–12", "rest": "", "why": "Thigh pad snug; curl fully and control the return.", "pri": ["hamstrings"], "sec": ["calves"], "vid": "", "vidT": ""}, {"n": "Leg extension", "sets": 2, "setsL": "2", "reps": "12–15", "rest": "", "why": "Squeeze at the top for a second; lower slowly.", "pri": ["quads"], "sec": [], "vid": "", "vidT": ""}, {"n": "Standing calf raise", "sets": 4, "setsL": "4", "reps": "10–15", "rest": "", "why": "Full stretch at the bottom, pause at the top.", "pri": ["calves"], "sec": [], "vid": "-M4-G8p8fmc", "vidT": "How to Do a Calf Raise — Howcast"}, {"n": "Tibialis raise", "sets": 2, "setsL": "2", "reps": "15–20", "rest": "", "why": "Back to the wall, heels down, pull toes up high.", "pri": ["tibialis"], "sec": [], "vid": "", "vidT": ""}, {"n": "Suitcase carry", "sets": 3, "setsL": "3", "reps": "30 m / side", "rest": "", "why": "Heavy weight in one hand, stand tall, don't lean; switch sides.", "pri": ["obliques", "forearms"], "sec": ["traps", "glutes", "abs"], "vid": "", "vidT": ""}]}, {"key": "pushB", "label": "Push B", "day": "Sunday", "lead": "Upper chest, delts, triceps", "time": "08:00–09:15", "mins": "", "note": "Gosford. Warm-up, stretching and cool-down sit inside the session window.", "exs": [{"n": "Incline DB press", "sets": 4, "setsL": "4", "reps": "8–12", "rest": "", "why": "Bench at 30°, lower dumbbells to upper chest, press up and slightly in.", "pri": ["chest", "delts"], "sec": ["triceps"], "vid": "8iPEnn-ltC8", "vidT": "How To: Dumbbell Incline Chest Press — ScottHermanFitness"}, {"n": "Seated DB shoulder press", "sets": 3, "setsL": "3", "reps": "8–12", "rest": "", "why": "Back on the pad, press up without arching.", "pri": ["delts"], "sec": ["triceps", "traps"], "vid": "", "vidT": ""}, {"n": "Cable fly", "sets": 2, "setsL": "2", "reps": "12–15", "rest": "", "why": "Slight bend in the elbows, hug a barrel, squeeze at the middle.", "pri": ["chest"], "sec": ["delts"], "vid": "", "vidT": ""}, {"n": "Lateral raise", "sets": 4, "setsL": "4", "reps": "12–15", "rest": "", "why": "Lead with the elbows to shoulder height; slight bend, no shrug.", "pri": ["delts"], "sec": ["traps"], "vid": "3VcKaXpzqRo", "vidT": "How To: Dumbbell Side Lateral Raise — ScottHermanFitness"}, {"n": "Overhead cable triceps extension", "sets": 3, "setsL": "3", "reps": "10–12", "rest": "", "why": "Elbows by the ears, extend fully overhead, long stretch on the way back.", "pri": ["triceps"], "sec": [], "vid": "", "vidT": ""}, {"n": "Neck flexion and extension", "sets": 2, "setsL": "2", "reps": "15 each", "rest": "", "why": "Slow and light, small range, no jerking.", "pri": ["neck"], "sec": ["traps"], "vid": "", "vidT": ""}]}];
+  SEED.gymNotes = {"progress": ["3–4 sets of 8–12 reps, lowering each rep over 3 seconds.", "When every set reaches 12 clean reps, add 2.5 kg next session.", "Lat pulldown and seated row are the backbone: never skip them.", "In this deficit, hold the weight before cutting sets: keeping strength is the aim until 1 December.", "Warm-up, stretching and cool-down sit inside the session window."], "lifts": [{"lift": "Bench press", "session": "Push A", "now": 40, "target": 42}, {"lift": "Overhead press", "session": "Push A", "now": 26, "target": 28}, {"lift": "Lat pulldown", "session": "Pull A", "now": 40, "target": 42.5}, {"lift": "Seated row", "session": "Pull A", "now": 30, "target": 32.5}, {"lift": "Barbell curl", "session": "Pull A", "now": 17.5, "target": 20}, {"lift": "Incline DB press", "session": "Push B", "now": 15, "target": 17.5}], "volume": [{"m": "Lats", "lo": 12, "hi": 13}, {"m": "Chest", "lo": 9, "hi": 10}, {"m": "Side delts", "lo": 10, "hi": 10}, {"m": "Quads", "lo": 9, "hi": 9}, {"m": "Hamstrings", "lo": 6, "hi": 6}, {"m": "Traps", "lo": 6, "hi": 6}], "warn": "Gosford membership: you gave one month’s notice on 11 Oct, so access ends around 11 Nov — three weeks before the 1 December deadline. The last three weeks of this plan need another gym."};
 
   /* ---------------- Diet block --------------- */
   SEED.diet = {
-    target: { kcal:2250, p:175, c:200, f:80 },
-    headline:'Your estimated maintenance is ~2,450 kcal. This is a deliberately small deficit of ~200 — enough to move the waist, small enough that you still build muscle through a newbie-gains window. Aggressive cutting now would cost you the muscle that makes the waist look smaller in the first place.',
-    standard: [
-      {t:'4:30',  f:'Black coffee + 1 tbsp ghee', n:'Fixed anchor. Never negotiated.', k:125, p:0,  c:0,  fa:14},
-      {t:'7:05',  f:'Whey 1 scoop + 200 ml semi-skimmed milk + 1 banana + 5 g creatine', n:'Blend the night before if it saves 3 minutes.', k:325, p:33, c:38, fa:5},
-      {t:'7:05',  f:'3 large eggs', n:'Boiled the night before. Non-negotiable prep.', k:234, p:19, c:1,  fa:16},
-      {t:'7:05',  f:'2 slices wholemeal toast + butter 10 g + jam 15 g', n:'Permitted and mandatory. Not a cheat.', k:315, p:8,  c:44, fa:10},
-      {t:'10:30', f:'Greek yogurt, 170 g pot', n:'Desk snack. Keep a box at work.', k:100, p:17, c:6,  fa:0},
-      {t:'12:45', f:'Protein, ~130 g cooked', n:'Per the prep map.', k:215, p:39, c:0,  fa:6},
-      {t:'12:45', f:'Rice 150 g cooked or 2 chapati', n:'', k:195, p:4,  c:42, fa:1},
-      {t:'12:45', f:'Sabzi / veg + 1 tsp oil', n:'Fill half the container with vegetables.', k:120, p:3,  c:10, fa:6},
-      {t:'15:30', f:'Salted peanuts, 20 g (~20) + green tea', n:'Last caffeine of the day. Weigh them — peanuts are the easiest thing in the plan to overeat.', k:114, p:5, c:3, fa:10},
-      {t:'19:00', f:'Protein, ~110 g cooked', n:'Home 18:30, eat 19:00.', k:185, p:33, c:0,  fa:5},
-      {t:'19:00', f:'Veg + 1 chapati', n:'Smaller carb portion in the evening.', k:180, p:6,  c:28, fa:4},
-      {t:'19:45', f:'Sattu, 30 g in water', n:'', k:115, p:7,  c:17, fa:2}
-    ],
-    standardNote:'One combined post-gym meal at ~7:05–7:25. Shake, eggs and toast together in one sitting — no split feeding. You train fasted on the bullet coffee, which is fine for 45 minutes of lifting. Weekends: same meal, shifted with the 7:00 gym opening, timings flexible.',
-    tuesday: [
-      {t:'4:30',  f:'Black coffee + 1 tbsp ghee', n:'Unchanged'},
-      {t:'7:05',  f:'Whey 1.5 scoops + 200 ml milk + banana + creatine', n:'Half a scoop more — covers the missing eggs'},
-      {t:'7:05',  f:'Paneer bhurji, 100 g paneer', n:'Cook Monday night. Reheats in 2 minutes'},
-      {t:'7:05',  f:'2 slices toast + butter + jam', n:'Unchanged'},
-      {t:'10:30', f:'Greek yogurt, 170 g', n:'Unchanged'},
-      {t:'12:45', f:'Veg main + rice + veg', n:'Prerna · must be fully vegetarian, no egg'},
-      {t:'15:30', f:'Salted peanuts 20 g + green tea', n:'Unchanged'},
-      {t:'19:00', f:'Veg main + chapati + curd (150 g) + 80 g paneer', n:'Prerna · veg. The paneer is the Tuesday top-up'},
-      {t:'19:45', f:'Sattu 30 g', n:'Unchanged'}
-    ],
-    tuesdayNote:'~2,250 kcal · ~168 g protein. Without eggs, Tuesday is the hardest protein day of the week — it lands near 155 g on its own. The extra half-scoop and the 80 g of evening paneer are what close that gap, and neither is optional. Prerna needs a standing reminder that Tuesday is egg-free.',
-    water: [
-      {t:'4:30',  ml:500, n:'On waking, alongside the coffee'},
-      {t:'5:45',  ml:250, n:'Before walking to the gym'},
-      {t:'6:00',  ml:600, n:'During training — take a bottle'},
-      {t:'7:05',  ml:400, n:'With the combined meal'},
-      {t:'10:00', ml:500, n:'Refill at the desk'},
-      {t:'12:45', ml:500, n:'With lunch'},
-      {t:'15:00', ml:600, n:'The big afternoon push'},
-      {t:'16:30', ml:450, n:'Last full glass'}
-    ],
-    waterNote:'3,800 ml total, all in by 18:00. After that, sips only — non-negotiable; late fluid means night waking, and your sleep is already the bottleneck. Buy a 1 litre bottle and count refills. Counting sips fails; counting bottles works. Add a pinch of salt or an electrolyte tab on heavy-sweat days.',
-    prep: [
-      {d:'SUN', l:'Chicken curry — you cook, Sunday', dn:'Chicken curry', who:'YOU · Sunday batch'},
-      {d:'MON', l:'Chicken curry (Sunday batch)',    dn:'Chicken curry', who:'YOU · finishes the batch'},
-      {d:'TUE', l:'Veg — no egg, no non-veg',        dn:'Veg — no egg, no non-veg', who:'Prerna · VEG DAY'},
-      {d:'WED', l:'',                                dn:'',              who:'Prerna'},
-      {d:'THU', l:'Egg curry — you cook, Thu evening', dn:'',            who:'YOU · Thu evening / Prerna lunch'},
-      {d:'FRI', l:'Egg curry (Thu batch)',           dn:'',              who:'YOU / Prerna dinner'},
-      {d:'SAT', l:'',                                dn:'',              who:'Prerna'}
-    ],
-    prepNote:'Beef is permanently excluded. It does not appear here and never will. Blanks are Prerna’s meals — deliberately left empty. Two requests worth making of her: (1) Tuesday must be fully vegetarian including no egg, and (2) oily fish twice a week (salmon or mackerel) somewhere in Wed/Thu/Sat. That fish is your omega-3 supply — and if the surgeon asks you to pause fish-oil capsules before 11 September, it becomes your only source. Food safety on the Sunday batch: cool it fast, refrigerate within an hour, and reheat until steaming hot right through.',
+    headline:"Maintenance is estimated at ~2,475 kcal (range 2,400–2,550). Advised floors: 1,600 kcal and 125 g protein a day. Fibre goal 30 g. Waist goal: 32 in by 1 December.",
+    days: {"training": [{"t": "06:00", "m": "Coffee", "f": "Strong black coffee, no ghee", "n": "", "k": 5, "p": 0, "c": 0, "fa": 0, "fi": 0}, {"t": "07:00", "m": "Meal 1", "f": "1 scoop whey shake; 2 slices wholemeal toast, one with 10 g butter, one with 15 g jam", "n": "", "k": 418, "p": 32, "c": 44, "fa": 12, "fi": 6}, {"t": "12:30", "m": "Meal 2", "f": "Biotiful Kefir Protein Original pot (250 g)", "n": "", "k": 165, "p": 30, "c": 9, "fa": 1, "fi": 0}, {"t": "16:30", "m": "Meal 3", "f": "Biotiful Kefir Protein Original pot (250 g), pre-gym", "n": "", "k": 165, "p": 30, "c": 9, "fa": 1, "fi": 0}, {"t": "19:45", "m": "Meal 4", "f": "6 whole boiled eggs with ½ chopped onion, 100 g steamed broccoli, soon after the gym", "n": "", "k": 507, "p": 46, "c": 9, "fa": 32, "fi": 4}], "weekend": [{"t": "07:00", "m": "Pre-gym", "f": "Strong black coffee and 1 banana", "n": "", "k": 110, "p": 1, "c": 27, "fa": 0, "fi": 2}, {"t": "09:30", "m": "Meal 1", "f": "Whey shake and 2 slices of toast (butter, jam), straight after the gym", "n": "", "k": 418, "p": 32, "c": 44, "fa": 12, "fi": 6}, {"t": "13:30", "m": "Meal 2", "f": "Biotiful Kefir Protein Original pot (250 g)", "n": "", "k": 165, "p": 30, "c": 9, "fa": 1, "fi": 0}, {"t": "16:30", "m": "Meal 3", "f": "Biotiful Kefir Protein Original pot (250 g)", "n": "", "k": 165, "p": 30, "c": 9, "fa": 1, "fi": 0}, {"t": "20:00", "m": "Meal 4", "f": "6 whole boiled eggs with ½ chopped onion, 100 g steamed broccoli", "n": "", "k": 507, "p": 46, "c": 9, "fa": 32, "fi": 4}], "rest": [{"t": "06:00", "m": "Coffee", "f": "Strong black coffee, no ghee", "n": "", "k": 5, "p": 0, "c": 0, "fa": 0, "fi": 0}, {"t": "07:00", "m": "Meal 1", "f": "1 scoop whey shake; 2 slices wholemeal toast, one with 10 g butter, one with 15 g jam", "n": "", "k": 418, "p": 32, "c": 44, "fa": 12, "fi": 6}, {"t": "12:30", "m": "Meal 2", "f": "Biotiful Kefir Protein Original pot (250 g)", "n": "", "k": 165, "p": 30, "c": 9, "fa": 1, "fi": 0}, {"t": "16:30", "m": "Meal 3", "f": "Biotiful Kefir Protein Original pot (250 g)", "n": "", "k": 165, "p": 30, "c": 9, "fa": 1, "fi": 0}, {"t": "20:15", "m": "Meal 4", "f": "6 whole boiled eggs with ½ chopped onion, 100 g steamed broccoli", "n": "", "k": 507, "p": 46, "c": 9, "fa": 32, "fi": 4}]},
+    dayNote:{"training": "Training day · Tue Wed Fri — gym 18:15–19:30. Meal 4 soon after the gym.", "weekend": "Weekend · Sat Sun — gym 08:00–09:15. Meal 1 straight after the gym.", "rest": "Rest day · Mon Thu — no gym."},
+    fibre: [{"slot": "Wake", "item": "Psyllium husk (isabgol), 5 g in a full glass of water", "fi": 4, "k": 18}, {"slot": "Lunch", "item": "200 g frozen berries stirred into the kefir", "fi": 5, "k": 60}, {"slot": "Meal 3", "item": "15 g chia seeds stirred into the kefir", "fi": 5, "k": 73}, {"slot": "Dinner", "item": "Another 100 g broccoli, green beans or spinach", "fi": 3, "k": 30}, {"slot": "Evening", "item": "Psyllium husk (isabgol), 5 g in a full glass of water", "fi": 4, "k": 18}],
+    fibreNote:"Five low-effort additions that take fibre from about 10 g to 30 g a day.",
+    waterBy: {"training": [{"t": "05:30", "ml": 500, "n": "On waking, before coffee"}, {"t": "09:00", "ml": 500, "n": "At your desk, morning"}, {"t": "12:30", "ml": 250, "n": "With lunch"}, {"t": "14:00", "ml": 500, "n": "At your desk, afternoon"}, {"t": "18:15", "ml": 750, "n": "During the gym"}, {"t": "19:45", "ml": 250, "n": "With dinner"}], "weekend": [{"t": "06:30", "ml": 500, "n": "On waking, before coffee"}, {"t": "08:00", "ml": 750, "n": "During the gym"}, {"t": "11:00", "ml": 500, "n": "Late morning"}, {"t": "13:30", "ml": 250, "n": "With lunch"}, {"t": "15:00", "ml": 500, "n": "Afternoon"}, {"t": "20:00", "ml": 250, "n": "With dinner"}], "rest": [{"t": "05:30", "ml": 500, "n": "On waking, before coffee"}, {"t": "09:00", "ml": 500, "n": "At your desk, morning"}, {"t": "12:30", "ml": 250, "n": "With lunch"}, {"t": "14:00", "ml": 500, "n": "At your desk, afternoon"}, {"t": "18:00", "ml": 500, "n": "Early evening"}, {"t": "20:15", "ml": 250, "n": "With dinner"}]},
+    waterNote:"Plain water, on top of coffee and kefir. 2.75 L on training days and weekends, 2.5 L on rest days.",
     supps: [
       {n:'Creatine, 5 g daily', t:'With the morning shake. The best-evidenced supplement there is — take it every day, training or not.', flag:''},
       {n:'Vitamin D3', t:'UK winter + South Asian skin = high deficiency risk, and low D worsens sleep and recovery. Get tested.', flag:''},
@@ -640,20 +516,11 @@
       {n:'Ashwagandha', t:'May help stress and sleep quality.', flag:'ASK SURGEON'},
       {n:'Shilajit', t:'Removed. Weak evidence, and a real heavy-metal contamination risk in unregulated supply.', flag:'REMOVED'}
     ],
-    surgery: [
-      {ph:'PRE-OP WEEK', when:'Fri 4–Thu 10 Sep · Days 33–39', t:'Stop the deficit. Eat ~2,450 kcal — maintenance. Healing runs on energy and protein, and you must not walk into theatre depleted. Hold protein at 175 g. Confirm supplement pauses at pre-op. Do the big shop this week, not afterwards — you will not want to leave the house.'},
-      {ph:'RECOVERY',    when:'Fri 11–Thu 24 Sep · Days 40–54', t:'Maintenance or slightly above. No deficit, no tracking, no weighing yourself. Protein target drops to a realistic 100–120 g — that is a win, not a failure. Expect the scale to move in both directions; it means nothing for these two weeks.'},
-      {ph:'RETURN',      when:'Fri 25 Sep–Fri 16 Oct · Days 55–75', t:'Ease back to 2,250 over about four days rather than in one step. Reintroduce solid protein first, chewy and spiced foods last.'}
-    ],
-    postopEat:'Whey shakes made thin, not thick · milk · Greek yogurt · curd · smooth dal · khichdi · soft paneer · scrambled eggs (not Tuesday) · mashed potato · soft-cooked lentils · thinned sattu · lukewarm soups · custard · banana · protein-fortified milk',
-    postopAvoid:'Crisps, toast, nuts, crusty bread and anything with edges · heavy spice and chilli · acidic foods (citrus, tomato-heavy) · anything served very hot · alcohol (already n/a)',
-    postopNote:'Hydration becomes the single highest priority — ignore the 18:00 taper entirely for that fortnight. Dehydration makes the throat hurt more, which makes you drink less, which makes it hurt more. That spiral is the most common reason people are readmitted after this operation. Sip constantly, day and night. Any bleeding: seek urgent medical help.',
     rules: [
-      'Sunday is prep day. Batch-cook the week, boil a tray of eggs, portion the yogurt and almonds. Six days of adherence are decided on Sunday afternoon, not at 7:10 on a Tuesday morning.',
+      'Sunday is prep day. Batch-cook the week, boil a tray of eggs, stock the kefir. Six days of adherence are decided on Sunday afternoon, not at 7:10 on a Tuesday morning.',
       'Track the waist, not the scale. Weight swings 1–1.5 kg on water and food alone. The waist does not lie.',
       'Weigh food for the first two weeks only. After that your eye is calibrated and you can stop. Rice, oil and nuts are where estimates go wrong.',
       'Protein first at every meal. If a meal gets cut short, the protein is the part that should already be eaten.',
-      'Above 80 kg → rice down to 150 g. Below 75 kg → add a chapati. Self-correcting, no recalculation needed.',
       'Toast, jam and butter stay. They are written into the plan precisely so that they can never become a negotiation.'
     ]
   };
@@ -763,7 +630,7 @@
   let listTab   = 'todo';
   let activeTab = 'weekday';     // weekday|wednesday|weekend
   let gymDay    = 'pushA';
-  let dietTab   = 'std';         // std|tue
+  let dietTab   = 'training';    // training|weekend|rest
   let editMode  = false;
   let editingId = null;
   let modalKind = 'task';
@@ -833,12 +700,12 @@
       v: CONTENT_V,
       schedules: { weekday: mk(SEED.schedules.weekday), weekend: mk(SEED.schedules.weekend), todo: mk(SEED.schedules.todo) },
       hardTasks: clone(SEED.hardTasks), phases: clone(SEED.phases), trainPhases: clone(SEED.trainPhases),
-      comms: clone(SEED.comms), splitMap: clone(SEED.splitMap), gym: clone(SEED.gym),
+      comms: clone(SEED.comms), splitMap: clone(SEED.splitMap), gym: clone(SEED.gym), gymNotes: clone(SEED.gymNotes),
       rebuild: clone(SEED.rebuild), diet: clone(SEED.diet),
       skinAM: clone(SEED.skinAM), skinPM: clone(SEED.skinPM), skinCan: clone(SEED.skinCan), skinAhead: clone(SEED.skinAhead),
       hairWeek: clone(SEED.hairWeek), hairStyle: clone(SEED.hairStyle),
       outstanding: SEED.outstanding.map(t => ({ t })), sadhana: clone(SEED.sadhana),
-      surgical: clone(SEED.surgical), threshold: 10, patches: { wedOffice: 1 }
+      surgical: clone(SEED.surgical), threshold: 10, patches: { wedOffice: 1, dash2026: 1 }
     };
   }
   function saveC() { lsSet(SK.content, JSON.stringify(C)); }
@@ -859,6 +726,7 @@
         }
         migrateContent();
         patchWedOffice();
+        patchDashboard();
         return;
       } catch (e) {}
     }
@@ -885,6 +753,24 @@
     C.v = CONTENT_V;
     saveC();
     toast('Training programme updated — Mon & Thu are now rest days');
+  }
+
+  /* 19 Oct 2026 — the Gym & Diet Dashboard becomes the guiding plan. Applied once:
+     the plan lists, gym programme and diet are replaced from the seed. The whole
+     previous content object is archived first, so nothing is lost. Logs (gym sets,
+     water, ticks, photos, bench) live in their own keys and are not touched. */
+  function patchDashboard() {
+    C.patches = C.patches || {};
+    if (C.patches.dash2026) return;
+    lsSet('habitTracker.content.predash.archived', JSON.stringify(C));
+    const d = seedContent();
+    C.schedules.weekday = d.schedules.weekday;
+    C.schedules.weekend = d.schedules.weekend;
+    C.gym = d.gym; C.splitMap = d.splitMap; C.gymNotes = d.gymNotes;
+    C.diet = d.diet;
+    C.patches.dash2026 = 1;
+    saveC();
+    setTimeout(() => toast('Plan, gym and diet updated from the dashboard'), 600);
   }
 
   /* Wednesday's session moved to the office gym after work. Applied once, in place,
@@ -943,14 +829,15 @@
 
   function scheduleKeyFor(d) { const w = d.getDay(); return (w === 0 || w === 6) ? 'weekend' : 'weekday'; }
   const isRestDay = (d) => [1,4].includes((d || new Date()).getDay());   // Monday & Thursday
-  /* Which weekday tags apply on a given date. Monday and Thursday are both rest
-     days but no longer identical — Monday walks, Thursday sits with the Sahasranama. */
+  /* Which weekday tags apply on a given date: Mon & Thu rest, Tue/Wed/Fri train. */
   function tagsFor(when) {
     const w = (when || new Date()).getDay();
-    if (w === 1) return ['rest','mon','nowed'];
-    if (w === 4) return ['rest','thu','nowed'];
-    if (w === 3) return ['gym','wed'];                 // Push B at the office gym, after work
-    return ['gym','gosford','nowed'];
+    return (w === 1 || w === 4) ? ['rest'] : ['gym'];
+  }
+  /* Day type, as the Gym & Diet Dashboard uses it. */
+  function dayType(ds) {
+    const w = ds ? new Date(ds + 'T12:00:00').getDay() : new Date().getDay();
+    return (w === 0 || w === 6) ? 'weekend' : (w === 1 || w === 4) ? 'rest' : 'training';
   }
   /* Weekday rows tagged 'gym' or 'wed' show only on their own days. In edit mode
      you see all of them, so nothing is hidden from you when you go to change it. */
@@ -980,7 +867,7 @@
   function loadWater() { waterLog = jget(SK.water, {}); migrateWaterKeys(); }
   /* Slot-index keys break the moment the schedule is edited. Convert to time keys once. */
   function migrateWaterKeys() {
-    const slots = (C.diet && C.diet.water) || [];
+    const slots = (C.diet && C.diet.waterBy && C.diet.waterBy.training) || (C.diet && C.diet.water) || [];
     let changed = false;
     Object.keys(waterLog).forEach(date => {
       const row = waterLog[date] || {}, out = {};
@@ -1117,15 +1004,16 @@
 
   /* ============================ WATER ============================ */
   function waterFor(ds) { return waterLog[ds] || {}; }
-  function waterMl(ds) { const w = waterFor(ds); return C.diet.water.reduce((a,s) => a + (w[s.t] ? s.ml : 0), 0); }
-  function waterTarget() { return C.diet.water.reduce((a,s) => a + s.ml, 0); }
+  function waterSlots(ds) { const W = (C.diet && C.diet.waterBy) || {}; return W[dayType(ds)] || []; }
+  function waterMl(ds) { const w = waterFor(ds); return waterSlots(ds).reduce((a,s) => a + (w[s.t] ? s.ml : 0), 0); }
+  function waterTarget(ds) { return waterSlots(ds).reduce((a,s) => a + s.ml, 0); }
   function toggleWater(ds, i) {
-    const slot = C.diet.water[i]; if (!slot) return;
+    const slot = waterSlots(ds)[i]; if (!slot) return;
     if (!waterLog[ds]) waterLog[ds] = {};
     if (waterLog[ds][slot.t]) delete waterLog[ds][slot.t]; else waterLog[ds][slot.t] = 1;
     saveWater();
     // Hitting the full schedule ticks Rule 3 for you; dropping below unticks it.
-    setHardTask(ds, 'water', waterMl(ds) >= waterTarget());
+    setHardTask(ds, 'water', waterMl(ds) >= waterTarget(ds));
   }
 
   /* ============================ GENERIC EDITOR ============================ */
@@ -1133,10 +1021,9 @@
     hardTasks:{ one:'Non-negotiable', path:()=>C.hardTasks, fields:[{k:'icon',l:'Icon'},{k:'label',l:'Label'},{k:'sub',l:'Detail',t:'area'}], blank:()=>({key:'x'+uid(),icon:'✦',label:'',sub:''}) },
     comms:    { one:'Comms day', path:()=>C.comms, noAdd:true, fields:[{k:'d',l:'Day',t:'num',ro:true},{k:'code',l:'Code'},{k:'watch',l:'Watch / do',t:'area'},{k:'apply',l:'Apply that day',t:'area'},{k:'silent',l:'Silent block (no speaking)',t:'bool'}] },
     gymDays:  { one:'Session', path:()=>C.gym, fields:[{k:'label',l:'Label'},{k:'day',l:'Weekday'},{k:'lead',l:'Lead'},{k:'time',l:'Time'},{k:'mins',l:'Duration'},{k:'note',l:'Note',t:'area'},{k:'key',l:'Key (unique)'}], blank:()=>({key:'s'+uid(),label:'New session',day:'',lead:'',time:'',mins:'',note:'',exs:[]}) },
-    dietStd:  { one:'Meal row', path:()=>C.diet.standard, fields:[{k:'t',l:'Time'},{k:'f',l:'Food'},{k:'n',l:'Note',t:'area'},{k:'k',l:'Kcal',t:'num'},{k:'p',l:'Protein g',t:'num'},{k:'c',l:'Carbs g',t:'num'},{k:'fa',l:'Fat g',t:'num'}], blank:()=>({t:'',f:'',n:'',k:0,p:0,c:0,fa:0}) },
-    dietTue:  { one:'Tuesday row', path:()=>C.diet.tuesday, fields:[{k:'t',l:'Time'},{k:'f',l:'Food'},{k:'n',l:'Note',t:'area'}], blank:()=>({t:'',f:'',n:''}) },
-    water:    { one:'Water slot', path:()=>C.diet.water, fields:[{k:'t',l:'Time'},{k:'ml',l:'Millilitres',t:'num'},{k:'n',l:'Note'}], blank:()=>({t:'',ml:500,n:''}) },
-    prep:     { one:'Prep row', path:()=>C.diet.prep, fields:[{k:'d',l:'Day'},{k:'l',l:'Lunch'},{k:'dn',l:'Dinner'},{k:'who',l:'Who cooks'}], blank:()=>({d:'',l:'',dn:'',who:''}) },
+    dietStd:  { one:'Meal row', path:()=>C.diet.days[dietTab], fields:[{k:'t',l:'Time'},{k:'m',l:'Meal'},{k:'f',l:'Food'},{k:'n',l:'Note',t:'area'},{k:'k',l:'Kcal',t:'num'},{k:'p',l:'Protein g',t:'num'},{k:'c',l:'Carbs g',t:'num'},{k:'fa',l:'Fat g',t:'num'},{k:'fi',l:'Fibre g',t:'num'}], blank:()=>({t:'',m:'',f:'',n:'',k:0,p:0,c:0,fa:0,fi:0}) },
+    fibre:    { one:'Fibre top-up', path:()=>C.diet.fibre, fields:[{k:'slot',l:'When'},{k:'item',l:'Item',t:'area'},{k:'fi',l:'Fibre g',t:'num'},{k:'k',l:'Kcal',t:'num'}], blank:()=>({slot:'',item:'',fi:0,k:0}) },
+    water:    { one:'Water slot', path:()=>C.diet.waterBy[dietTab], fields:[{k:'t',l:'Time'},{k:'ml',l:'Millilitres',t:'num'},{k:'n',l:'Note'}], blank:()=>({t:'',ml:500,n:''}) },
     supps:    { one:'Supplement', path:()=>C.diet.supps, fields:[{k:'n',l:'Name'},{k:'t',l:'Detail',t:'area'},{k:'flag',l:'Flag'}], blank:()=>({n:'',t:'',flag:''}) },
     dietRules:{ one:'Diet rule', path:()=>C.diet.rules, noObj:true, fields:[{k:'v',l:'Rule',t:'area'}] },
     skinAM:   { one:'AM step', path:()=>C.skinAM, fields:[{k:'n',l:'Step'},{k:'t',l:'Detail',t:'area'}], blank:()=>({n:'',t:''}) },
@@ -1358,7 +1245,7 @@
       ${t.time ? `<span class="tabular text-[10px] font-semibold mt-1 ${t.done ? 'text-gray-400' : 'text-brand'}">${to12h(t.time)}</span>` : ''}`;
     const body = document.createElement('div');
     body.className = 'flex-1 min-w-0';
-    const ONLY_LBL = { gym:'GYM', gosford:'TUE·FRI AM', wed:'WED', nowed:'NOT WED' };
+    const ONLY_LBL = { gym:'TUE·WED·FRI', rest:'MON·THU' };
     const onlyChip = !t.only ? ''
       : '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded mr-1.5 align-middle ' + (ONLY_LBL[t.only] ? 'bg-teal-50 text-teal-700' : 'bg-amber-50 text-amber-700') + '">'
         + esc(ONLY_LBL[t.only] || t.only.toUpperCase()) + '</span>';
@@ -1418,11 +1305,11 @@
         </div><span class="opacity-70 text-xl">›</span></div>`;
   }
   function renderWaterWidget() {
-    const ds = todayStr(), w = waterFor(ds), ml = waterMl(ds), tgt = waterTarget();
+    const ds = todayStr(), w = waterFor(ds), ml = waterMl(ds), tgt = waterTarget(ds);
     const pct = Math.round(ml/tgt*100);
     const surg = inSurgical();
     let chips = '';
-    C.diet.water.forEach((s,i) => {
+    waterSlots(ds).forEach((s,i) => {
       const on = !!w[s.t];
       chips += `<button onclick="tapWater(${i})" class="flex-1 min-w-[54px] rounded-lg py-1.5 px-1 text-center transition ${on?'bg-blue-500 text-white':'bg-blue-50 text-blue-600 active:bg-blue-100'}">
         <span class="block text-[10px] font-bold leading-none">${esc(s.t)}</span>
@@ -1435,7 +1322,7 @@
       </div>
       <div class="h-2 bg-blue-50 rounded-full overflow-hidden mb-2.5"><div class="h-full bg-blue-500 rounded-full transition-all duration-500" style="width:${Math.min(100,pct)}%"></div></div>
       <div class="flex flex-wrap gap-1">${chips}</div>
-      <p class="text-[10px] text-gray-400 mt-2 leading-snug">${surg ? '⚠ Surgical clause — sip constantly, day and night. Ignore the 18:00 taper.' : 'All in by 18:00. After that, sips only.'}</p>
+      <p class="text-[10px] text-gray-400 mt-2 leading-snug">${surg ? '⚠ Surgical clause — sip constantly, day and night.' : 'Plain water, on top of coffee and kefir.'}</p>
     </div>`);
   }
   function tapWater(i) { toggleWater(todayStr(), i); renderWaterWidget(); renderRing(); }
@@ -1778,6 +1665,7 @@
       return;
     }
 
+    if (C.gymNotes && C.gymNotes.warn) h += `<div class="rounded-2xl border border-amber-200 bg-amber-50 p-3 mb-3"><p class="text-[11px] text-amber-800 leading-snug">⚠ ${esc(C.gymNotes.warn)}</p></div>`;
     h += '<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mb-3 overflow-x-auto no-sb">';
     C.gym.forEach(x => {
       const on = x.key === gymDay, isToday = todaySess && todaySess.key === x.key;
@@ -1802,10 +1690,9 @@
     </div>`;
 
     if (!d.exs.length) {
-      h += card(`<div class="p-5 text-center"><p class="text-4xl">🚶</p>
-        <p class="text-base font-bold text-gray-800 mt-2">45-minute outdoor walk</p>
-        <p class="text-xs text-gray-500 leading-relaxed mt-1">5:45–6:30, before work. It ticks Rule 1, so the streak holds, and it carries the day’s steps. Shoes and a coat — no kit.</p>
-        <button onclick="tapHard('work')" class="mt-3 w-full bg-brand text-white text-sm font-semibold py-2.5 rounded-xl active:bg-brand-dark">${hardDay(todayStr()).t.work?'✓ Rule 1 ticked today':'Tick Rule 1 — walk done'}</button></div>`, 'mt-2');
+      h += card(`<div class="p-5 text-center"><p class="text-4xl">🛌</p>
+        <p class="text-base font-bold text-gray-800 mt-2">${esc(d.lead || 'Rest day')}</p>
+        <p class="text-xs text-gray-500 leading-relaxed mt-1">${esc(d.note || 'No gym today.')}</p></div>`, 'mt-2');
     } else {
       h += '<div class="space-y-2.5 mt-2">';
       d.exs.forEach((ex, ei) => {
@@ -1860,6 +1747,29 @@
     });
     h += '</div>';
 
+    /* From the Gym & Diet Dashboard */
+    const GN = C.gymNotes || {};
+    if ((GN.progress||[]).length) {
+      h += secTitle('How to progress');
+      h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+      GN.progress.forEach((r,i) => { h += `<div class="px-4 py-2.5 flex gap-2"><span class="text-xs font-bold text-brand shrink-0">${i+1}</span><p class="text-xs text-gray-600 leading-snug flex-1">${esc(r)}</p></div>`; });
+      h += '</div>';
+    }
+    if ((GN.lifts||[]).length) {
+      h += secTitle('Main lifts — last logged → 4–6 week target');
+      h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+      GN.lifts.forEach(l => { h += `<div class="px-4 py-2.5 flex items-center justify-between gap-2">
+        <div class="min-w-0"><p class="text-sm font-semibold text-gray-700">${esc(l.lift)}</p><p class="text-[10px] text-gray-400">${esc(l.session)}</p></div>
+        <span class="tabular text-sm font-bold text-gray-700 shrink-0">${l.now} → <span class="text-brand">${l.target}</span> kg</span></div>`; });
+      h += '</div>';
+    }
+    if ((GN.volume||[]).length) {
+      h += secTitle('Weekly hard-set targets');
+      h += '<div class="grid grid-cols-3 gap-2">';
+      GN.volume.forEach(v => { h += `<div class="bg-white rounded-xl border border-gray-100 shadow-sm py-2.5 text-center"><p class="tabular text-lg font-bold text-gray-700">${v.lo===v.hi?v.lo:v.lo+'–'+v.hi}</p><p class="text-[9px] uppercase tracking-wide text-gray-400">${esc(v.m)}</p></div>`; });
+      h += '</div>';
+    }
+
     const recent = recentGym(28);
     h += secTitle('Recent logs — tap to edit');
     if (!recent.length) h += '<p class="text-center text-gray-400 text-sm py-4">No sessions logged yet.</p>';
@@ -1895,93 +1805,82 @@
   function renderDiet() {
     const st = hardStatus(), n = Math.max(1, Math.min(st.n, st.L));
     const surg = st.state === 'live' && surgicalWindow(n);
-    const preop = st.state === 'live' && n >= 33 && n <= 39;
-    const isTue = new Date().getDay() === 2;
-    const D = C.diet;
+    const D = C.diet, todayType = dayType();
+    if (!D.days[dietTab]) dietTab = todayType;
+    const rows = D.days[dietTab] || [];
 
     let h = '';
     if (surg) h += `<div class="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 mb-3">
       <p class="text-sm font-bold text-amber-800">⚕ Recovery — days 40–54</p>
-      <p class="text-xs text-amber-700 leading-relaxed mt-1">Maintenance or slightly above. No deficit, no tracking, no weighing yourself. Protein target drops to a realistic 100–120 g — that is a win, not a failure. Expect the scale to move in both directions; it means nothing for these two weeks.</p></div>`;
-    else if (preop) h += `<div class="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 mb-3">
-      <p class="text-sm font-bold text-amber-800">Pre-op week — days 33–39</p>
-      <p class="text-xs text-amber-700 leading-relaxed mt-1">Stop the deficit. Eat ~2,450 kcal — maintenance. Hold protein at 175 g. Do the big shop this week, not afterwards. Confirm supplement pauses at pre-op.</p></div>`;
+      <p class="text-xs text-amber-700 leading-relaxed mt-1">Maintenance or slightly above. No deficit, no tracking, no weighing yourself.</p></div>`;
 
-    const tot = D.standard.reduce((a,r) => ({ k:a.k+(r.k||0), p:a.p+(r.p||0), c:a.c+(r.c||0), f:a.f+(r.fa||0) }), {k:0,p:0,c:0,f:0});
-    h += `<div class="grid grid-cols-4 gap-2">
-      ${[['kcal',tot.k,D.target.kcal,'#374151'],['P',tot.p,D.target.p,'#047857'],['C',tot.c,D.target.c,'#b45309'],['F',tot.f,D.target.f,'#1d4ed8']].map(([l,v,t,c]) =>
-        `<div class="bg-white rounded-xl border border-gray-100 shadow-sm py-2.5 text-center"><p class="tabular text-lg font-bold" style="color:${c}">${v}</p><p class="text-[9px] uppercase tracking-wide text-gray-400">${l} · tgt ${t}</p></div>`).join('')}</div>`;
+    const names = { training:'Training', weekend:'Weekend', rest:'Rest' };
+    h += `<div class="flex gap-1 bg-gray-100 rounded-xl p-1">${['training','weekend','rest'].map(k =>
+      `<button onclick="setDietTab('${k}')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${dietTab===k?'bg-brand text-white shadow':'text-gray-500 active:bg-gray-200'}">${names[k]}${todayType===k?' •':''}</button>`).join('')}</div>`;
+    h += `<p class="text-[11px] text-gray-500 leading-relaxed mt-2 px-1">${esc((D.dayNote||{})[dietTab]||'')}</p>`;
+
+    const tot = rows.reduce((a,r) => ({ k:a.k+(+r.k||0), p:a.p+(+r.p||0), c:a.c+(+r.c||0), f:a.f+(+r.fa||0), fi:a.fi+(+r.fi||0) }), {k:0,p:0,c:0,f:0,fi:0});
+    h += `<div class="grid grid-cols-5 gap-1.5 mt-3">
+      ${[['kcal',tot.k,'#374151'],['Protein',tot.p,'#047857'],['Carbs',tot.c,'#b45309'],['Fat',tot.f,'#1d4ed8'],['Fibre',tot.fi,'#6d28d9']].map(([l,v,c]) =>
+        `<div class="bg-white rounded-xl border border-gray-100 shadow-sm py-2.5 text-center"><p class="tabular text-lg font-bold" style="color:${c}">${v}</p><p class="text-[9px] uppercase tracking-wide text-gray-400">${l}${l==='kcal'?'':' g'}</p></div>`).join('')}</div>`;
     h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${esc(D.headline)}</p>`;
 
-    h += `<div class="flex gap-1 bg-gray-100 rounded-xl p-1 mt-4">
-      <button onclick="setDietTab('std')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${dietTab==='std'?'bg-brand text-white shadow':'text-gray-500 active:bg-gray-200'}">Every day</button>
-      <button onclick="setDietTab('tue')" class="flex-1 rounded-lg py-2 text-sm font-semibold transition ${dietTab==='tue'?'bg-brand text-white shadow':'text-gray-500 active:bg-gray-200'}">Tuesday — veg${isTue?' •':''}</button></div>`;
-
-    if (dietTab === 'std') {
-      h += secTitle('The daily template', editMode?'dietStd':null, 'Add row');
-      h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-      D.standard.forEach((r,i) => {
-        h += `<div ${editMode?`onclick="openRec('dietStd',${i})"`:''} class="px-4 py-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
-          <div class="flex items-start gap-3">
-            <span class="tabular text-xs font-bold text-brand shrink-0 w-11 mt-0.5">${esc(r.t)}</span>
-            <div class="flex-1 min-w-0"><p class="text-sm font-semibold text-gray-800 leading-snug">${esc(r.f)}</p>
-              ${r.n?`<p class="text-[11px] text-gray-400 leading-snug mt-0.5">${esc(r.n)}</p>`:''}
-              <div class="flex flex-wrap gap-1 mt-1.5">
-                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">${r.k} kcal</span>
-                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">P ${r.p}</span>
-                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700">C ${r.c}</span>
-                <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">F ${r.fa}</span></div></div>
-            ${editMode?editPencil:''}</div></div>`;
-      });
-      h += `<div class="px-4 py-2.5 bg-gray-50 flex items-center justify-between"><span class="text-xs font-bold text-gray-700">TOTAL</span>
-        <span class="tabular text-xs font-bold text-gray-700">${tot.k} kcal · P ${tot.p} · C ${tot.c} · F ${tot.f}</span></div></div>`;
-      h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${esc(D.standardNote)}</p>`;
-    } else {
-      h += infoBox('Tuesday — fully vegetarian, no eggs', 'Life rule. Never broken, never renegotiated. The only day that needs a separate template.', '#256b42');
-      h += secTitle('Tuesday template', editMode?'dietTue':null, 'Add row');
-      h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-      D.tuesday.forEach((r,i) => {
-        h += `<div ${editMode?`onclick="openRec('dietTue',${i})"`:''} class="px-4 py-3 flex items-start gap-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
-          <span class="tabular text-xs font-bold text-brand shrink-0 w-11 mt-0.5">${esc(r.t)}</span>
-          <div class="flex-1 min-w-0"><p class="text-sm font-semibold text-gray-800 leading-snug">${esc(r.f)}</p>
-            ${r.n?`<p class="text-[11px] text-gray-400 leading-snug mt-0.5">${esc(r.n)}</p>`:''}</div>${editMode?editPencil:''}</div>`;
-      });
-      h += '</div>';
-      h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${esc(D.tuesdayNote)}</p>`;
-    }
-
-    /* Water */
-    const ds = todayStr(), w = waterFor(ds), ml = waterMl(ds), tgt = waterTarget();
-    h += secTitle('Water — ' + (tgt/1000).toFixed(1) + ' L, all in by 18:00', editMode?'water':null, 'Add slot');
+    h += secTitle('Meals — ' + names[dietTab].toLowerCase() + ' day', editMode?'dietStd':null, 'Add row');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    D.water.forEach((s,i) => {
+    rows.forEach((r,i) => {
+      h += `<div ${editMode?`onclick="openRec('dietStd',${i})"`:''} class="px-4 py-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
+        <div class="flex items-start gap-3">
+          <span class="tabular text-xs font-bold text-brand shrink-0 w-11 mt-0.5">${esc(r.t)}</span>
+          <div class="flex-1 min-w-0">${r.m?`<p class="text-[10px] font-bold uppercase tracking-wide text-gray-400">${esc(r.m)}</p>`:''}
+            <p class="text-sm font-semibold text-gray-800 leading-snug">${esc(r.f)}</p>
+            ${r.n?`<p class="text-[11px] text-gray-400 leading-snug mt-0.5">${esc(r.n)}</p>`:''}
+            <div class="flex flex-wrap gap-1 mt-1.5">
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">${r.k} kcal</span>
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">P ${r.p}</span>
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700">C ${r.c}</span>
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">F ${r.fa}</span>
+              <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-violet-50 text-violet-700">Fi ${r.fi||0}</span></div></div>
+          ${editMode?editPencil:''}</div></div>`;
+    });
+    h += `<div class="px-4 py-2.5 bg-gray-50 flex items-center justify-between"><span class="text-xs font-bold text-gray-700">TOTAL</span>
+      <span class="tabular text-xs font-bold text-gray-700">${tot.k} kcal · P ${tot.p} · C ${tot.c} · F ${tot.f}</span></div></div>`;
+
+    /* Fibre top-ups */
+    const fiAdd = (D.fibre||[]).reduce((a,f) => a + (+f.fi||0), 0);
+    h += secTitle('Fibre top-ups — ' + tot.fi + ' g → ' + (tot.fi + fiAdd) + ' g', editMode?'fibre':null, 'Add');
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    (D.fibre||[]).forEach((f,i) => {
+      h += `<div ${editMode?`onclick="openRec('fibre',${i})"`:''} class="px-4 py-2.5 flex items-start gap-3 ${editMode?'cursor-pointer active:bg-gray-50':''}">
+        <span class="text-xs font-bold text-violet-700 shrink-0 w-14 mt-0.5">${esc(f.slot)}</span>
+        <p class="text-xs text-gray-600 leading-snug flex-1">${esc(f.item)}</p>
+        <span class="tabular text-[10px] font-semibold text-gray-400 shrink-0 mt-0.5">+${f.fi} g · ${f.k} kcal</span>${editMode?editPencil:''}</div>`;
+    });
+    h += '</div>';
+    h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${esc(D.fibreNote||'')}</p>`;
+
+    /* Water — ticks only for today; other day types are shown for reference */
+    const ds = todayStr(), isToday = dietTab === todayType;
+    const slots = (D.waterBy||{})[dietTab] || [], w = isToday ? waterFor(ds) : {};
+    const tgt = slots.reduce((a,s) => a + s.ml, 0), ml = slots.reduce((a,s) => a + (w[s.t] ? s.ml : 0), 0);
+    h += secTitle('Water — ' + (tgt/1000).toFixed(2) + ' L', editMode?'water':null, 'Add slot');
+    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
+    slots.forEach((s,i) => {
       const on = !!w[s.t];
-      h += `<div onclick="${editMode?`openRec('water',${i})`:`tapWaterD(${i})`}" class="px-4 py-2.5 flex items-center gap-3 cursor-pointer active:bg-gray-50 ${on?'opacity-60':''}">
+      const act = editMode ? `openRec('water',${i})` : (isToday ? `tapWaterD(${i})` : '');
+      h += `<div ${act?`onclick="${act}"`:''} class="px-4 py-2.5 flex items-center gap-3 ${act?'cursor-pointer active:bg-gray-50':''} ${on?'opacity-60':''}">
         <div class="w-6 h-6 shrink-0 rounded-full flex items-center justify-center border-2 ${on?'bg-blue-500 border-blue-500':'border-gray-300'}">${on?tickSvg:''}</div>
         <span class="tabular text-xs font-bold text-blue-600 w-11">${esc(s.t)}</span>
         <span class="text-sm font-semibold text-gray-700 w-16">${s.ml} ml</span>
         <span class="text-[11px] text-gray-400 flex-1 leading-snug">${esc(s.n)}</span>${editMode?editPencil:''}</div>`;
     });
-    h += `<div class="px-4 py-2.5 bg-blue-50 flex items-center justify-between"><span class="text-xs font-bold text-blue-800">Today</span>
-      <span class="tabular text-xs font-bold text-blue-800">${(ml/1000).toFixed(2)} / ${(tgt/1000).toFixed(2)} L</span></div></div>`;
-    h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${surg ? '⚠ Surgical clause: ignore the 18:00 taper entirely for this fortnight. Sip constantly, day and night.' : esc(D.waterNote)}</p>`;
-
-    /* Prep map */
-    h += secTitle('Who cooks what', editMode?'prep':null, 'Add row');
-    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    D.prep.forEach((r,i) => {
-      h += `<div ${editMode?`onclick="openRec('prep',${i})"`:''} class="px-4 py-2.5 ${editMode?'cursor-pointer active:bg-gray-50':''}">
-        <div class="flex items-center justify-between gap-2"><span class="text-xs font-bold text-gray-700">${esc(r.d)}</span>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${r.who.startsWith('YOU')?'bg-brand-light text-brand':'bg-gray-100 text-gray-500'}">${esc(r.who)}</span></div>
-        ${(r.l||r.dn)?`<p class="text-[11px] text-gray-500 leading-snug mt-1">${r.l?'L: '+esc(r.l):''}${r.l&&r.dn?' · ':''}${r.dn?'D: '+esc(r.dn):''}</p>`:''}</div>`;
-    });
-    h += '</div>';
-    h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${esc(D.prepNote)}</p>`;
+    h += `<div class="px-4 py-2.5 bg-blue-50 flex items-center justify-between"><span class="text-xs font-bold text-blue-800">${isToday?'Today':'Reference — not today'}</span>
+      <span class="tabular text-xs font-bold text-blue-800">${isToday?(ml/1000).toFixed(2)+' / ':''}${(tgt/1000).toFixed(2)} L</span></div></div>`;
+    h += `<p class="text-[11px] text-gray-400 leading-relaxed mt-2 px-1">${esc(D.waterNote)}</p>`;
 
     /* Supplements */
     h += secTitle('Supplements', editMode?'supps':null, 'Add');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    D.supps.forEach((s,i) => {
+    (D.supps||[]).forEach((s,i) => {
       const flagCol = s.flag === 'REMOVED' ? 'bg-gray-100 text-gray-400' : s.flag ? 'bg-amber-50 text-amber-700' : '';
       h += `<div ${editMode?`onclick="openRec('supps',${i})"`:''} class="px-4 py-2.5 ${editMode?'cursor-pointer active:bg-gray-50':''} ${s.flag==='REMOVED'?'opacity-55':''}">
         <div class="flex items-center justify-between gap-2"><span class="text-sm font-semibold text-gray-700">${esc(s.n)}</span>
@@ -1990,20 +1889,10 @@
     });
     h += '</div>';
 
-    /* Surgery window */
-    h += secTitle('The surgery window');
-    h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    D.surgery.forEach(s => { h += `<div class="px-4 py-3"><p class="text-xs font-bold text-amber-800">${esc(s.ph)}</p><p class="text-[10px] text-gray-400 font-medium">${esc(s.when)}</p><p class="text-xs text-gray-500 leading-snug mt-1">${esc(s.t)}</p></div>`; });
-    h += '</div>';
-    h += `<div class="mt-2 grid gap-2">
-      ${card(`<div class="p-3.5"><p class="text-xs font-bold text-emerald-700">EAT — soft, smooth, lukewarm</p><p class="text-xs text-gray-500 leading-relaxed mt-1">${esc(D.postopEat)}</p></div>`)}
-      ${card(`<div class="p-3.5"><p class="text-xs font-bold text-red-600">AVOID — sharp, hot, harsh</p><p class="text-xs text-gray-500 leading-relaxed mt-1">${esc(D.postopAvoid)}</p></div>`)}</div>`;
-    h += `<p class="text-[11px] text-amber-700 leading-relaxed mt-2 px-1 bg-amber-50 rounded-xl p-3">${esc(D.postopNote)}</p>`;
-
     /* Rules */
-    h += secTitle('Six rules that survive everything else', editMode?'dietRules':null, 'Add rule');
+    h += secTitle('Diet rules', editMode?'dietRules':null, 'Add rule');
     h += '<div class="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">';
-    D.rules.forEach((r,i) => { h += `<div ${editMode?`onclick="openRec('dietRules',${i})"`:''} class="px-4 py-2.5 flex gap-2 ${editMode?'cursor-pointer active:bg-gray-50':''}">
+    (D.rules||[]).forEach((r,i) => { h += `<div ${editMode?`onclick="openRec('dietRules',${i})"`:''} class="px-4 py-2.5 flex gap-2 ${editMode?'cursor-pointer active:bg-gray-50':''}">
       <span class="text-xs font-bold text-brand shrink-0">${i+1}</span><p class="text-xs text-gray-600 leading-snug flex-1">${esc(r)}</p>${editMode?editPencil:''}</div>`; });
     h += '</div>';
     h += creedBox();
@@ -2663,10 +2552,10 @@
     });
     S.push({ name:'GymSets', rows:g });
 
-    const w = [['Date','Day'].concat(C.diet.water.map(s => s.t + ' (' + s.ml + 'ml)')).concat(['TotalMl','TargetMl','Hit'])];
+    const w = [['Date','Day','DayType','Slots','TotalMl','TargetMl','Hit']];
     Object.keys(waterLog).sort().forEach(d => {
       const dn = hardDayFor(d), row = waterFor(d);
-      w.push([d, (dn>=1&&dn<=hardMeta.length)?dn:''].concat(C.diet.water.map(s => row[s.t]?s.ml:0)).concat([waterMl(d), waterTarget(), waterMl(d)>=waterTarget()?1:0]));
+      w.push([d, (dn>=1&&dn<=hardMeta.length)?dn:'', dayType(d), Object.keys(row).join(' '), waterMl(d), waterTarget(d), waterMl(d)>=waterTarget(d)?1:0]);
     });
     S.push({ name:'Water', rows:w });
 
@@ -2689,10 +2578,7 @@
     S.push({ name:'GymPlan', rows:gp });
 
     const dt = [['Template','Time','Food','Note','Kcal','Protein','Carbs','Fat']];
-    C.diet.standard.forEach(r => dt.push(['Daily', r.t, r.f, r.n, r.k, r.p, r.c, r.fa]));
-    C.diet.tuesday.forEach(r => dt.push(['Tuesday', r.t, r.f, r.n, '', '', '', '']));
-    dt.push([]); dt.push(['Prep map','Day','Lunch','Dinner','Who cooks']);
-    C.diet.prep.forEach(r => dt.push(['', r.d, r.l, r.dn, r.who]));
+    Object.keys(C.diet.days).forEach(t => C.diet.days[t].forEach(r => dt.push([t, r.t, (r.m?r.m+' — ':'')+r.f, r.n, r.k, r.p, r.c, r.fa])));
     dt.push([]); dt.push(['Supplement','Detail','Flag']);
     C.diet.supps.forEach(s => dt.push([s.n, s.t, s.flag]));
     S.push({ name:'Diet', rows:dt });
@@ -2889,7 +2775,7 @@ Send the whole zip to Claude and ask for the analysis you want.
     activeTab = scheduleKeyFor(new Date());
     const s = sessionForDate(todayStr());
     gymDay = s ? s.key : C.gym[0].key;
-    dietTab = new Date().getDay() === 2 ? 'tue' : 'std';
+    dietTab = dayType();
   }
   function init() {
     loadPrefs();
